@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bloco de Notas com Ditado (PWA)</title>
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon.png">
+<link rel="apple-touch-icon" href="icon-512.png">
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="bg" x1="0%25" y1="0%25" x2="100%25" y2="100%25"><stop offset="0%25" stop-color="%230f172a"/><stop offset="100%25" stop-color="%23020617"/></linearGradient><linearGradient id="mic" x1="0%25" y1="0%25" x2="100%25" y2="100%25"><stop offset="0%25" stop-color="%2360a5fa"/><stop offset="100%25" stop-color="%232563eb"/></linearGradient></defs><rect width="512" height="512" rx="128" fill="url(%23bg)"/><g><rect x="216" y="128" width="80" height="160" rx="40" fill="url(%23mic)"/><path d="M160 256c0 53 43 96 96 96s96-43 96-96" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round" fill="none"/><line x1="256" y1="352" x2="256" y2="416" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round"/><line x1="208" y1="416" x2="304" y2="416" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round"/></g></svg>'>
+<meta name="theme-color" content="#0f172a">
+
+<!-- Google Fonts Inter para máxima legibilidade -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --font-size: 18px;
+    --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    --controls-height: 64px;
+    --notes-panel-width: 380px;
+
+    /* Tema Escuro por Padrão (Dark Mode Premium) */
+    --bg-app: #090d16;
+    --bg-surface: #131b2e;
+    --bg-card: #1e293b;
+    --border-color: #2e3d56;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
+    --primary-glow: rgba(59, 130, 246, 0.25);
+    --recording-color: #ef4444;
+    --recording-glow: rgba(239, 68, 68, 0.4);
+    --warn-color: #f43f5e;
+    --input-bg: #0f172a;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  [data-theme="light"] {
+    --bg-app: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-card: #f1f5f9;
+    --border-color: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --primary-glow: rgba(37, 99, 235, 0.15);
+    --recording-color: #dc2626;
+    --recording-glow: rgba(220, 38, 38, 0.3);
+    --warn-color: #e11d48;
+    --input-bg: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: var(--font-family);
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* ====== Barra Superior de Controles ====== */
+  #controls {
+    height: var(--controls-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 16px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    z-index: 10;
+  }
+
+  .controls-left, .controls-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* ====== Estilização de Botões ====== */
+  button, .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  button:hover:not(:disabled) {
+    background: var(--border-color);
+    transform: translateY(-1px);
+  }
+
+  button:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  button.primary {
+    background: var(--primary-color);
+    color: #ffffff;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 12px var(--primary-glow);
+  }
+  button.primary:hover:not(:disabled) {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+  }
+
+  button.recording {
+    background: var(--recording-color) !important;
+    color: #ffffff !important;
+    border-color: var(--recording-color) !important;
+    animation: pulseMic 1.8s infinite;
+  }
+
+  @keyframes pulseMic {
+    0% { box-shadow: 0 0 0 0 var(--recording-glow); }
+    70% { box-shadow: 0 0 0 10px rgba(0, 0, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+  }
+
+  button.warn {
+    color: var(--warn-color);
+    border-color: rgba(244, 63, 94, 0.3);
+    background: rgba(244, 63, 94, 0.08);
+  }
+  button.warn:hover:not(:disabled) {
+    background: rgba(244, 63, 94, 0.2);
+    border-color: var(--warn-color);
+  }
+
+  button.icon-only {
+    padding: 8px;
+    width: 36px;
+    height: 36px;
+  }
+
+  /* ====== Controles de Fonte ====== */
+  #fontControls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-card);
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+  }
+  #fontControls label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  #fontSizeVal {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 32px;
+    text-align: center;
+  }
+  input[type="range"] {
+    width: 90px;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+  }
+
+  /* ====== Checkboxes Estilizados ====== */
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    user-select: none;
+  }
+  .toggle:hover {
+    color: var(--text-primary);
+    border-color: var(--text-muted);
+  }
+  .toggle input {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary-color);
+  }
+
+  #status {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+  }
+
+  /* ====== Área Principal do Editor ====== */
+  #main {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;
+  }
+
+  #editor {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    box-sizing: border-box;
+    min-width: 0;
+    background: var(--bg-app);
+  }
+
+  .editor-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .editor-wrapper:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+  }
+
+  #output {
+    width: 100%;
+    flex: 1 1 auto;
+    font-family: var(--font-family);
+    font-size: var(--font-size);
+    line-height: 1.6;
+    padding: 24px;
+    border: none;
+    resize: none;
+    outline: none;
+    background: transparent;
+    color: var(--text-primary);
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  #output::placeholder {
+    color: var(--text-muted);
+  }
+
+  /* ====== Rodapé do Editor (Estatísticas Minimalistas) ====== */
+  #editorFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-color);
+    font-size: 12px;
+    color: var(--text-secondary);
+    user-select: none;
+  }
+  
+  .stats-group {
+    display: flex;
+    gap: 16px;
+    font-weight: 500;
+  }
+
+  /* ====== Painel Lateral de Notas ====== */
+  #notesPanel {
+    width: 0;
+    transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+    border-left: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    display: flex;
+    flex-direction: column;
+    z-index: 20;
+  }
+
+  #notesPanel.open {
+    width: var(--notes-panel-width);
+  }
+
+  #notesHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-surface);
+  }
+
+  .notes-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  #searchInput {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    font-size: 13px;
+    outline: none;
+  }
+  #searchInput:focus {
+    border-color: var(--primary-color);
+  }
+
+  #notesList {
+    padding: 16px;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .note-card {
+    padding: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.45;
+    position: relative;
+    transition: all 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .note-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .note-card.active {
+    border-color: var(--primary-color);
+    background: var(--bg-surface);
+  }
+
+  .note-card .text-preview {
+    color: var(--text-primary);
+    white-space: pre-wrap;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .note-card .meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 6px;
+  }
+
+  .note-card .actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  /* ====== Overlay de Ditado em Tempo Real ====== */
+  #dictateOverlay {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%) translateY(100px);
+    max-width: 680px;
+    width: calc(100% - 48px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 20px;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--primary-color);
+    border-radius: 50px;
+    box-shadow: var(--shadow-md), 0 0 20px var(--primary-glow);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  #dictateOverlay.open {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .overlay-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--recording-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--recording-color);
+    animation: blinkDot 1s infinite alternate;
+  }
+
+  @keyframes blinkDot {
+    from { opacity: 0.3; }
+    to { opacity: 1; }
+  }
+
+  #overlayText {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1 1 auto;
+  }
+
+  /* ====== Toast & Modais Customizados ====== */
+  #toast {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-md);
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .modal-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .modal-card h3 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--text-primary);
+  }
+
+  .modal-card p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  @media (max-width: 800px) {
+    #controls {
+      height: auto;
+      padding: 12px;
+    }
+    #notesPanel.open {
+      width: 100%;
+      position: absolute;
+      left: 0;
+      top: var(--controls-height);
+      height: calc(100vh - var(--controls-height));
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="app" role="application">
+  <!-- ====== Barra Superior de Ferramentas ====== -->
+  <header id="controls" role="toolbar" aria-label="Barra de ferramentas do ditado">
+    <div class="controls-left">
+      <button id="micBtn" class="primary" title="Atalhos: Esc">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+        <span id="micBtnText">Iniciar (Esc)</span>
+      </button>
+
+      <button id="copyBtn" title="Atalho: F4">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copiar (F4)
+      </button>
+
+      <button id="undoBtn" title="Atalho: Ctrl+U" class="icon-only">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+      </button>
+
+      <button id="redoBtn" title="Atalho: Ctrl+Y" class="icon-only">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+      </button>
+
+      <button id="newBtn" title="Atalho: F9 ou Ctrl+N">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Nova Nota (F9)
+      </button>
+
+      <button id="clearBtn" class="warn" title="Atalho: F8">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        Limpar (F8)
+      </button>
+
+      <div id="fontControls">
+        <button id="fontDec" class="icon-only" style="border:none;background:transparent;">A-</button>
+        <input id="fontRange" type="range" min="14" max="36" value="18" />
+        <button id="fontInc" class="icon-only" style="border:none;background:transparent;">A+</button>
+        <span id="fontSizeVal">18px</span>
+      </div>
+    </div>
+
+    <div class="controls-right">
+      <label class="toggle" title="Pontuação inteligente no ditado">
+        <input type="checkbox" id="autoPunct" checked />
+        <span>Pontuação</span>
+      </label>
+
+      <label class="toggle" title="Caixa alta em todo texto ditado">
+        <input type="checkbox" id="allCaps" />
+        <span>Caixa Alta</span>
+      </label>
+
+      <button id="themeToggleBtn" class="icon-only" title="Alternar Modo Escuro / Claro">
+        <svg id="themeIconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+
+      <button id="notesToggle" title="Atalho: F2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Notas (F2)
+      </button>
+
+      <div id="status" aria-live="polite">Pronto</div>
+    </div>
+  </header>
+
+  <!-- ====== Editor de Texto Principal ====== -->
+  <main id="main">
+    <div id="editor">
+      <div class="editor-wrapper">
+        <textarea id="output" placeholder="O texto ditado ou digitado aparecerá aqui..." aria-label="Área de texto ditado"></textarea>
+        
+        <div id="editorFooter">
+          <div class="stats-group">
+            <span id="wordCount">0 palavras</span>
+            <span id="charCount">0 caracteres</span>
+          </div>
+          <span style="opacity: 0.7;">Pressione <strong>Esc</strong> para falar</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== Painel Lateral de Notas Salvas ====== -->
+    <aside id="notesPanel" aria-hidden="true">
+      <div id="notesHeader">
+        <div class="notes-header-top">
+          <strong style="font-size:16px;">Notas Salvas</strong>
+          <div style="display:flex;gap:8px;">
+            <button id="deleteAllBtn" class="warn icon-only" title="Excluir todas (Ctrl+Shift+Delete)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+            <button id="closeNotesBtn">Fechar</button>
+          </div>
+        </div>
+        <input type="text" id="searchInput" placeholder="Filtrar notas..." aria-label="Filtrar notas" />
+      </div>
+      <div id="notesList" role="list"></div>
+    </aside>
+  </main>
+</div>
+
+<!-- ====== Overlay de Status de Voz ====== -->
+<div id="dictateOverlay" aria-hidden="true">
+  <div class="overlay-content">
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      Ouvindo
+    </div>
+    <div id="overlayText">Aguardando fala...</div>
+  </div>
+</div>
+
+<!-- ====== Componentes Flutuantes ====== -->
+<div id="toast" role="status">Copiado</div>
+
+<div id="confirmModal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal-card">
+    <h3>Excluir todas as notas?</h3>
+    <p>Esta ação apagará permanentemente todo o histórico de notas salvas no seu navegador.</p>
+    <div class="modal-actions">
+      <button id="cancelModalBtn">Cancelar</button>
+      <button id="confirmModalBtn" class="warn">Excluir Tudo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ====== Referências DOM ====== */
+const output = document.getElementById('output');
+const micBtn = document.getElementById('micBtn');
+const micBtnText = document.getElementById('micBtnText');
+const copyBtn = document.getElementById('copyBtn');
+const undoBtn = document.getElementById('undoBtn');
+const redoBtn = document.getElementById('redoBtn');
+const newBtn = document.getElementById('newBtn');
+const clearBtn = document.getElementById('clearBtn');
+const notesToggle = document.getElementById('notesToggle');
+const notesPanel = document.getElementById('notesPanel');
+const notesList = document.getElementById('notesList');
+const searchInput = document.getElementById('searchInput');
+const closeNotesBtn = document.getElementById('closeNotesBtn');
+const deleteAllBtn = document.getElementById('deleteAllBtn');
+const status = document.getElementById('status');
+const fontRange = document.getElementById('fontRange');
+const fontSizeVal = document.getElementById('fontSizeVal');
+const fontInc = document.getElementById('fontInc');
+const fontDec = document.getElementById('fontDec');
+const autoPunct = document.getElementById('autoPunct');
+const allCaps = document.getElementById('allCaps');
+const themeToggleBtn = document.getElementById('themeToggleBtn');
+const themeIconSun = document.getElementById('themeIconSun');
+const themeIconMoon = document.getElementById('themeIconMoon');
+
+const wordCountEl = document.getElementById('wordCount');
+const charCountEl = document.getElementById('charCount');
+
+const overlay = document.getElementById('dictateOverlay');
+const overlayText = document.getElementById('overlayText');
+const toastEl = document.getElementById('toast');
+
+const confirmModal = document.getElementById('confirmModal');
+const cancelModalBtn = document.getElementById('cancelModalBtn');
+const confirmModalBtn = document.getElementById('confirmModalBtn');
+
+/* ====== Estado e Armazenamento ====== */
+let saveTimer = null;
+const autosaveDelay = 1500;
+let history = [];
+let redoStack = [];
+let notes = [];
+const STORAGE_KEY = 'ditado_notes_v2';
+const FONT_STORAGE_KEY = 'ditado_fontsize';
+const THEME_STORAGE_KEY = 'ditado_theme';
+const HISTORY_LIMIT = 300;
+const MAX_NOTES = 500;
+let currentNoteIndex = null;
+let lastInterim = '';
+
+/* ====== Gerenciamento de Tema (Dark / Light) ====== */
+function initTheme() {
+  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'dark';
+  setTheme(savedTheme);
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem(THEME_STORAGE_KEY, theme);
+  if (theme === 'dark') {
+    themeIconSun.style.display = 'none';
+    themeIconMoon.style.display = 'block';
+  } else {
+    themeIconSun.style.display = 'block';
+    themeIconMoon.style.display = 'none';
+  }
+}
+
+themeToggleBtn.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  setTheme(current === 'dark' ? 'light' : 'dark');
+});
+
+/* ====== Utilitários ====== */
+function nowLabel(ts){ return new Date(ts).toLocaleString(); }
+function persistNotes(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(notes)); }
+function loadNotes(){ 
+  try{ notes = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }catch(e){ notes = []; } 
+  renderNotes(); 
+}
+
+function updateStats() {
+  const text = output.value || '';
+  const chars = text.length;
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  
+  wordCountEl.textContent = `${words} ${words === 1 ? 'palavra' : 'palavras'}`;
+  charCountEl.textContent = `${chars} ${chars === 1 ? 'caractere' : 'caracteres'}`;
+}
+
+function renderNotes(filter = ''){
+  notesList.innerHTML = '';
+  const query = filter.toLowerCase().trim();
+  const filtered = notes.filter(n => !query || n.text.toLowerCase().includes(query));
+
+  if(filtered.length === 0){ 
+    notesList.innerHTML = `<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center;">${notes.length === 0 ? 'Nenhuma nota salva' : 'Nenhuma nota encontrada'}</div>`; 
+    return; 
+  }
+
+  filtered.forEach((n) => {
+    const realIdx = notes.indexOf(n);
+    const el = document.createElement('div');
+    el.className = `note-card ${realIdx === currentNoteIndex ? 'active' : ''}`;
+    
+    const textNode = document.createElement('div');
+    textNode.className = 'text-preview';
+    textNode.textContent = n.text;
+    el.appendChild(textNode);
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.innerHTML = `<span>${nowLabel(n.t)}</span>`;
+    
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+    
+    const loadBtn = document.createElement('button');
+    loadBtn.style.padding = '4px 8px';
+    loadBtn.style.fontSize = '12px';
+    loadBtn.textContent = 'Carregar';
+    
+    const delBtn = document.createElement('button');
+    delBtn.className = 'warn';
+    delBtn.style.padding = '4px 8px';
+    delBtn.style.fontSize = '12px';
+    delBtn.textContent = 'Excluir';
+
+    actions.appendChild(loadBtn);
+    actions.appendChild(delBtn);
+    meta.appendChild(actions);
+    el.appendChild(meta);
+
+    loadBtn.addEventListener('click', (e)=> { 
+      e.stopPropagation();
+      loadNote(realIdx); 
+      closeNotes(); 
+    });
+
+    delBtn.addEventListener('click', (e)=> {
+      e.stopPropagation();
+      deleteSingleNote(realIdx);
+    });
+
+    el.addEventListener('click', () => {
+      loadNote(realIdx);
+      closeNotes();
+    });
+
+    notesList.appendChild(el);
+  });
+}
+
+function deleteSingleNote(idx) {
+  if(currentNoteIndex !== null){
+    if(idx === currentNoteIndex){
+      currentNoteIndex = null;
+    } else if(idx < currentNoteIndex){
+      currentNoteIndex = currentNoteIndex - 1;
+    }
+  }
+  notes.splice(idx,1);
+  persistNotes();
+  renderNotes(searchInput.value);
+  status.textContent = 'Nota excluída';
+  setTimeout(()=> status.textContent = 'Pronto', 900);
+}
+
+searchInput.addEventListener('input', () => renderNotes(searchInput.value));
+
+/* ====== Salvamento automático ====== */
+function scheduleAutoSave(){ 
+  clearTimeout(saveTimer); 
+  saveTimer = setTimeout(()=> { saveCurrentAsNote(); }, autosaveDelay); 
+}
+
+function saveCurrentAsNote(){
+  const text = output.value.trim();
+  if(!text) return;
+
+  if(currentNoteIndex !== null && notes[currentNoteIndex]){
+    if(notes[currentNoteIndex].text === text) return;
+    notes[currentNoteIndex].text = text;
+    notes[currentNoteIndex].t = Date.now();
+    persistNotes();
+    renderNotes(searchInput.value);
+    status.textContent = 'Salvo';
+    setTimeout(()=> status.textContent = 'Pronto', 900);
+    return;
+  }
+
+  if(notes.length > 0 && notes[0].text === text){
+    notes[0].t = Date.now();
+    persistNotes();
+    renderNotes(searchInput.value);
+    currentNoteIndex = 0;
+    status.textContent = 'Salvo';
+    setTimeout(()=> status.textContent = 'Pronto', 900);
+    return;
+  }
+
+  notes.unshift({ text, t: Date.now() });
+  if(notes.length > MAX_NOTES) notes.length = MAX_NOTES;
+  persistNotes();
+  renderNotes(searchInput.value);
+  currentNoteIndex = 0;
+  status.textContent = 'Salvo';
+  setTimeout(()=> status.textContent = 'Pronto', 900);
+}
+
+/* ====== Histórico ====== */
+function pushHistory(value){
+  if(history.length && history[history.length-1] === value) return;
+  history.push(value);
+  if(history.length > HISTORY_LIMIT) history.shift();
+  redoStack = [];
+}
+
+function undo(){
+  if(history.length <= 1) return;
+  const cur = history.pop();
+  redoStack.push(cur);
+  const prev = history[history.length-1] || '';
+  output.value = prev;
+  output.focus();
+  updateStats();
+  scheduleAutoSave();
+  status.textContent = 'Desfeito';
+  setTimeout(()=> status.textContent = 'Pronto', 700);
+}
+
+function redo(){
+  if(redoStack.length === 0) return;
+  const next = redoStack.pop();
+  output.value = next;
+  pushHistory(next);
+  output.focus();
+  updateStats();
+  scheduleAutoSave();
+  status.textContent = 'Refeito';
+  setTimeout(()=> status.textContent = 'Pronto', 700);
+}
+
+/* ====== Operações no Editor ====== */
+function newNote(){
+  saveCurrentAsNote();
+  output.value = '';
+  history = [''];
+  redoStack = [];
+  currentNoteIndex = null;
+  updateStats();
+  status.textContent = 'Nova nota';
+  setTimeout(()=> status.textContent = 'Pronto', 700);
+}
+
+function clearEditor(){
+  output.value = '';
+  pushHistory(output.value);
+  currentNoteIndex = null;
+  updateStats();
+  status.textContent = 'Limpo';
+  setTimeout(()=> status.textContent = 'Pronto', 700);
+}
+
+function loadNote(idx){
+  const n = notes[idx];
+  if(!n) return;
+  output.value = n.text;
+  history = [n.text];
+  redoStack = [];
+  currentNoteIndex = idx;
+  updateStats();
+  renderNotes(searchInput.value);
+  status.textContent = 'Nota carregada';
+  setTimeout(()=> status.textContent = 'Pronto', 700);
+}
+
+/* ====== Confirm Modal para Excluir Todas ====== */
+function promptDeleteAllNotes() {
+  if(!notes.length) return;
+  confirmModal.classList.add('open');
+  confirmModal.setAttribute('aria-hidden', 'false');
+}
+
+cancelModalBtn.addEventListener('click', () => {
+  confirmModal.classList.remove('open');
+  confirmModal.setAttribute('aria-hidden', 'true');
+});
+
+confirmModalBtn.addEventListener('click', () => {
+  notes = [];
+  persistNotes();
+  renderNotes();
+  currentNoteIndex = null;
+  confirmModal.classList.remove('open');
+  confirmModal.setAttribute('aria-hidden', 'true');
+  status.textContent = 'Todas as notas excluídas';
+  setTimeout(()=> status.textContent = 'Pronto', 900);
+});
+
+/* ====== Copiar & Toast ====== */
+let __toastTimer = null;
+function showToast(message = 'Copiado', ms = 1200){
+  if(!toastEl) return;
+  toastEl.textContent = message;
+  toastEl.classList.add('show');
+  clearTimeout(__toastTimer);
+  __toastTimer = setTimeout(() => {
+    toastEl.classList.remove('show');
+  }, ms);
+}
+
+async function copyAll(){
+  try{
+    const textToCopy = output.value || '';
+    if(!textToCopy){
+      showToast('Nada para copiar');
+      return;
+    }
+
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(textToCopy);
+    } else {
+      output.select();
+      document.execCommand('copy');
+      try { window.getSelection().removeAllRanges(); } catch(e){}
+    }
+
+    showToast('Copiado para a área de transferência');
+    status.textContent = 'Copiado';
+    setTimeout(()=> status.textContent = 'Pronto', 900);
+  }catch(e){
+    console.error('Erro ao copiar:', e);
+    showToast('Erro ao copiar');
+  }
+}
+
+/* ====== Tamanho da Fonte (Default 18px) ====== */
+function setFontSize(px){
+  const fontPx = Math.max(12, Math.min(36, Number(px)));
+  document.documentElement.style.setProperty('--font-size', fontPx + 'px');
+  fontRange.value = fontPx;
+  fontSizeVal.textContent = fontPx + 'px';
+  localStorage.setItem(FONT_STORAGE_KEY, fontPx);
+}
+
+fontRange.addEventListener('input', ()=> setFontSize(fontRange.value));
+fontInc.addEventListener('click', ()=> setFontSize(Number(fontRange.value) + 2));
+fontDec.addEventListener('click', ()=> setFontSize(Number(fontRange.value) - 2));
+
+/* ====== Painel Lateral ====== */
+function openNotes(){ notesPanel.classList.add('open'); notesPanel.setAttribute('aria-hidden','false'); searchInput.focus(); }
+function closeNotes(){ notesPanel.classList.remove('open'); notesPanel.setAttribute('aria-hidden','true'); }
+function toggleNotes(){ if(notesPanel.classList.contains('open')) closeNotes(); else openNotes(); }
+
+/* ====== Processamento de Texto e Ditado ====== */
+function stripPunctuation(s){ return s.replace(/[.,!?;:—–\-()\"'«»“”…]/g, '').replace(/\s+/g,' ').trim(); }
+
+function analyzeInsertionContext(prefix) {
+  const trimmed = prefix.trimEnd();
+  if (trimmed.length === 0) return { capitalize: true, prefixAppend: "" };
+  
+  const trailingWhitespace = prefix.slice(trimmed.length);
+  const hasNewline = /[\r\n]/.test(trailingWhitespace);
+  const lastChar = trimmed.charAt(trimmed.length - 1);
+  
+  if (hasNewline) return { capitalize: true, prefixAppend: "" };
+  if (/[.!?]/.test(lastChar)) {
+    return { capitalize: true, prefixAppend: trailingWhitespace.length === 0 ? " " : "" };
+  }
+  return { capitalize: false, prefixAppend: trailingWhitespace.length === 0 ? " " : "" };
+}
+
+function insertAtCursor(textToInsert){
+  const start = output.selectionStart;
+  const end = output.selectionEnd;
+  const before = output.value.slice(0, start);
+  const after = output.value.slice(end);
+
+  const newValue = before + textToInsert + after;
+  output.value = newValue;
+  const newPos = before.length + textToInsert.length;
+  output.setSelectionRange(newPos, newPos);
+  output.focus();
+  updateStats();
+}
+
+/* ====== Reconhecimento de Voz ====== */
+const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let recognizing = false;
+let userWantsRecording = false;
+let reconnectTimer = null;
+let reconnectAttempts = 0;
+const MAX_RECONNECT = 5;
+
+function setMicState(state){
+  micBtn.disabled = false;
+  micBtn.classList.remove('recording');
+  
+  if(state === 'recording'){
+    micBtn.classList.add('recording');
+    micBtnText.textContent = 'Parar (Esc)';
+  } else if(state === 'reconnecting'){
+    micBtnText.textContent = 'Reconectando…';
+    micBtn.disabled = true;
+  } else {
+    micBtnText.textContent = 'Iniciar (Esc)';
+  }
+}
+
+function buildRecognition(){
+  if(!SpeechRecognitionAPI) return null;
+  const r = new SpeechRecognitionAPI();
+  r.lang = 'pt-BR';
+  r.interimResults = true;
+  r.continuous = true;
+
+  r.onstart = () => {
+    recognizing = true;
+    reconnectAttempts = 0;
+    setMicState('recording');
+    status.textContent = 'Gravando...';
+    showOverlay('Ouvindo voz...');
+    lastInterim = '';
+  };
+
+  r.onresult = (e) => {
+    let interim = '';
+    let final = '';
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      const t = e.results[i][0].transcript;
+      if(e.results[i].isFinal) final += t;
+      else interim += t;
+    }
+
+    if(interim && interim.trim()){
+      lastInterim = interim.trim();
+      showOverlay(lastInterim);
+    }
+
+    if(final && final.trim()){
+      let finalText = final.trim();
+
+      if(!autoPunct.checked){
+        finalText = stripPunctuation(finalText);
+      }
+
+      const insertPos = (typeof output.selectionStart === 'number') ? output.selectionStart : output.value.length;
+      const before = output.value.slice(0, insertPos);
+      const context = analyzeInsertionContext(before);
+
+      if(allCaps.checked){
+        finalText = finalText.toUpperCase();
+      } else {
+        if(context.capitalize){
+          finalText = finalText.charAt(0).toUpperCase() + finalText.slice(1);
+        } else {
+          finalText = finalText.charAt(0).toLowerCase() + finalText.slice(1);
+        }
+      }
+
+      finalText = context.prefixAppend + finalText;
+      insertAtCursor(finalText);
+
+      if(currentNoteIndex !== null && notes[currentNoteIndex]){
+        notes[currentNoteIndex].text = output.value;
+        notes[currentNoteIndex].t = Date.now();
+        persistNotes();
+        renderNotes(searchInput.value);
+      } else {
+        saveCurrentAsNote();
+      }
+
+      pushHistory(output.value);
+      scheduleAutoSave();
+
+      lastInterim = '';
+      hideOverlay();
+    }
+  };
+
+  r.onerror = (ev) => {
+    console.error('Erro de fala:', ev.error);
+    recognizing = false;
+    lastInterim = '';
+    hideOverlay();
+
+    if(ev.error === 'not-allowed' || ev.error === 'service-not-allowed'){
+      userWantsRecording = false;
+      setMicState('idle');
+      status.textContent = 'Permissão de microfone negada';
+      setTimeout(()=> status.textContent = 'Pronto', 3000);
+      return;
+    }
+
+    if(ev.error !== 'no-speech'){
+      status.textContent = 'Erro no microfone (' + ev.error + ')';
+      setTimeout(()=> status.textContent = recognizing ? 'Gravando...' : 'Pronto', 1500);
+    }
+
+    if(userWantsRecording) scheduleReconnect();
+  };
+
+  r.onend = () => {
+    recognizing = false;
+    lastInterim = '';
+    hideOverlay();
+
+    if(userWantsRecording){
+      scheduleReconnect();
+    } else {
+      setMicState('idle');
+      status.textContent = 'Pronto';
+    }
+  };
+
+  return r;
+}
+
+function scheduleReconnect(){
+  if(reconnectAttempts >= MAX_RECONNECT){
+    userWantsRecording = false;
+    setMicState('idle');
+    status.textContent = 'Microfone em espera. Clique para reiniciar.';
+    setTimeout(()=> status.textContent = 'Pronto', 3000);
+    return;
+  }
+  reconnectAttempts++;
+  setMicState('reconnecting');
+  status.textContent = 'Reconectando…';
+  clearTimeout(reconnectTimer);
+  reconnectTimer = setTimeout(()=> {
+    if(!userWantsRecording) return;
+    recognition = buildRecognition();
+    try{ recognition.start(); } catch(e){ scheduleReconnect(); }
+  }, 400);
+}
+
+if(SpeechRecognitionAPI){
+  recognition = buildRecognition();
+} else {
+  micBtn.disabled = true;
+  status.textContent = 'Navegador sem suporte a fala';
+}
+
+function toggleMic(){
+  if(!SpeechRecognitionAPI) return;
+  if(!userWantsRecording){
+    userWantsRecording = true;
+    reconnectAttempts = 0;
+    clearTimeout(reconnectTimer);
+    recognition = buildRecognition();
+    try{
+      recognition.start();
+    } catch(e){
+      userWantsRecording = false;
+      setMicState('idle');
+      status.textContent = 'Erro ao iniciar microfone';
+      setTimeout(()=> status.textContent = 'Pronto', 2000);
+    }
+  } else {
+    userWantsRecording = false;
+    clearTimeout(reconnectTimer);
+    recognizing = false;
+    setMicState('idle');
+    status.textContent = 'Pronto';
+    hideOverlay();
+    try{ recognition.stop(); } catch(e){}
+  }
+}
+
+function showOverlay(text){
+  overlayText.textContent = text || 'Ouvindo...';
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden','false');
+}
+function hideOverlay(){ 
+  overlay.classList.remove('open'); 
+  overlay.setAttribute('aria-hidden','true'); 
+  overlayText.textContent = ''; 
+}
+
+/* ====== Eventos do Usuário ====== */
+micBtn.addEventListener('click', toggleMic);
+copyBtn.addEventListener('click', copyAll);
+undoBtn.addEventListener('click', undo);
+redoBtn.addEventListener('click', redo);
+newBtn.addEventListener('click', newNote);
+clearBtn.addEventListener('click', clearEditor);
+notesToggle.addEventListener('click', toggleNotes);
+closeNotesBtn.addEventListener('click', closeNotes);
+deleteAllBtn.addEventListener('click', promptDeleteAllNotes);
+
+output.addEventListener('input', () => {
+  updateStats();
+  pushHistory(output.value);
+  scheduleAutoSave();
+});
+
+/* ====== Atalhos de Teclado ====== */
+window.addEventListener('keydown', (e) => {
+  if(e.key === 'F9'){ e.preventDefault(); newNote(); return; }
+  if(e.key === 'F2'){ e.preventDefault(); toggleNotes(); return; }
+  if(e.key === 'F8'){ e.preventDefault(); clearEditor(); return; }
+  if(e.key === 'Escape'){ e.preventDefault(); toggleMic(); return; }
+  if(e.key === 'F4'){ e.preventDefault(); copyAll(); return; }
+  if(e.ctrlKey && (e.key === 'u' || e.key === 'U')){ e.preventDefault(); undo(); return; }
+  if((e.ctrlKey && (e.key === 'y' || e.key === 'Y')) || (e.ctrlKey && e.shiftKey && (e.key === 'Z'))){
+    e.preventDefault();
+    redo();
+    return;
+  }
+  if(e.ctrlKey && (e.key === 'n' || e.key === 'N')){ e.preventDefault(); newNote(); return; }
+  if(e.ctrlKey && e.shiftKey && e.key === 'Delete'){ e.preventDefault(); promptDeleteAllNotes(); return; }
+});
+
+/* ====== Inicialização ====== */
+initTheme();
+loadNotes();
+pushHistory(output.value || '');
+
+// Tamanho de fonte inicial: 18px (ou recuperado do armazenamento do usuário)
+const initialFontSize = localStorage.getItem(FONT_STORAGE_KEY) || 18;
+setFontSize(initialFontSize);
+updateStats();
+
+/* ====== Service Worker (PWA) ====== */
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('service-worker.js').catch(err => console.warn('PWA:', err));
+}
+</script>
+</body>
+</html>

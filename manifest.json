@@ -1,0 +1,25 @@
+{
+  "name": "Bloco de Notas com Ditado",
+  "short_name": "Ditado",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%230f172a'/><stop offset='100%25' stop-color='%23020617'/></linearGradient><linearGradient id='mic' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%2360a5fa'/><stop offset='100%25' stop-color='%232563eb'/></linearGradient><filter id='glow'><feDropShadow dx='0' dy='4' stdDeviation='12' flood-color='%232563eb' flood-opacity='0.4'/></filter></defs><rect width='512' height='512' rx='128' fill='url(%23bg)'/><rect x='8' y='8' width='496' height='496' rx='120' fill='none' stroke='%23334155' stroke-width='8'/><g filter='url(%23glow)'><rect x='216' y='128' width='80' height='160' rx='40' fill='url(%23mic)'/><path d='M160 256c0 53 43 96 96 96s96-43 96-96' stroke='%2338bdf8' stroke-width='24' stroke-linecap='round' fill='none'/><line x1='256' y1='352' x2='256' y2='416' stroke='%2338bdf8' stroke-width='24' stroke-linecap='round'/><line x1='208' y1='416' x2='304' y2='416' stroke='%2338bdf8' stroke-width='24' stroke-linecap='round'/></g></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
