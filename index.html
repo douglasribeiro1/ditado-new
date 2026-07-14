@@ -424,22 +424,24 @@
     left: 50%;
     bottom: 24px;
     transform: translateX(-50%) translateY(100px);
-    max-width: 680px;
-    width: calc(100% - 48px);
+    width: fit-content;
+    min-width: 280px;
+    max-width: min(760px, 92vw);
+    max-height: 220px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    gap: 16px;
-    padding: 12px 20px;
+    gap: 14px;
+    padding: 14px 20px;
     background: var(--bg-surface);
     color: var(--text-primary);
     border: 1px solid var(--primary-color);
-    border-radius: 50px;
-    box-shadow: var(--shadow-md), 0 0 20px var(--primary-glow);
+    border-radius: 20px;
+    box-shadow: var(--shadow-md), 0 0 24px var(--primary-glow);
     z-index: 100;
     opacity: 0;
     pointer-events: none;
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease, width 0.2s ease, max-height 0.2s ease;
   }
 
   #dictateOverlay.open {
@@ -450,7 +452,7 @@
 
   .overlay-content {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
     flex: 1 1 auto;
     min-width: 0;
@@ -466,6 +468,7 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     white-space: nowrap;
+    padding-top: 2px;
   }
 
   .live-dot {
@@ -484,10 +487,14 @@
   #overlayText {
     font-size: 15px;
     font-weight: 500;
+    line-height: 1.5;
     color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-y: auto;
+    max-height: 180px;
+    flex: 1 1 auto;
+  }
     flex: 1 1 auto;
   }
 
@@ -759,15 +766,23 @@ const MAX_NOTES = 500;
 let currentNoteIndex = null;
 let lastInterim = '';
 
-/* ====== Gerenciamento de Tema (Dark / Light) ====== */
+/* ====== Gerenciamento de Tema (Dark / Light com Detecção Automática do Sistema) ====== */
 function initTheme() {
-  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'dark';
-  setTheme(savedTheme);
+  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  if (savedTheme) {
+    setTheme(savedTheme, false);
+  } else {
+    // Detecta a preferência do sistema operacional do usuário
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setTheme(prefersDark ? 'dark' : 'light', false);
+  }
 }
 
-function setTheme(theme) {
+function setTheme(theme, saveUserChoice = true) {
   document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem(THEME_STORAGE_KEY, theme);
+  if (saveUserChoice) {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  }
   if (theme === 'dark') {
     themeIconSun.style.display = 'none';
     themeIconMoon.style.display = 'block';
@@ -777,9 +792,18 @@ function setTheme(theme) {
   }
 }
 
+// Atualiza o tema se a preferência do sistema mudar (apenas se o usuário não escolheu manualmente)
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem(THEME_STORAGE_KEY)) {
+      setTheme(e.matches ? 'dark' : 'light', false);
+    }
+  });
+}
+
 themeToggleBtn.addEventListener('click', () => {
   const current = document.documentElement.getAttribute('data-theme');
-  setTheme(current === 'dark' ? 'light' : 'dark');
+  setTheme(current === 'dark' ? 'light' : 'dark', true);
 });
 
 /* ====== Utilitários ====== */
