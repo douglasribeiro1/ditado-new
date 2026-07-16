@@ -632,14 +632,19 @@
     </div>
 
     <div class="controls-right">
-      <label class="toggle" title="Pontuação inteligente no ditado">
+      <label class="toggle" title="Pontuação inteligente no ditado (funciona apenas no Microsoft Edge)">
         <input type="checkbox" id="autoPunct" checked />
-        <span>Pontuação</span>
+        <span>Pontuação (Edge)</span>
       </label>
 
       <label class="toggle" title="Caixa alta em todo texto ditado">
         <input type="checkbox" id="allCaps" />
         <span>Caixa Alta</span>
+      </label>
+
+      <label class="toggle" title="Envia o texto ditado imediatamente ao pressionar Enter ou pontuação final (., !, ?, ;). Útil no Google Chrome.">
+        <input type="checkbox" id="quickSend" />
+        <span>Envio Imediato</span>
       </label>
 
       <button id="themeToggleBtn" class="icon-only" title="Alternar Modo Escuro / Claro">
@@ -739,6 +744,14 @@ const fontInc = document.getElementById('fontInc');
 const fontDec = document.getElementById('fontDec');
 const autoPunct = document.getElementById('autoPunct');
 const allCaps = document.getElementById('allCaps');
+const quickSend = document.getElementById('quickSend');
+
+output.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && quickSend.checked && recognition && lastInterim){
+    e.preventDefault();
+    flushInterim();
+  }
+});
 const themeToggleBtn = document.getElementById('themeToggleBtn');
 const themeIconSun = document.getElementById('themeIconSun');
 const themeIconMoon = document.getElementById('themeIconMoon');
@@ -1125,6 +1138,49 @@ function insertAtCursor(textToInsert){
 /* ====== Reconhecimento de Voz ====== */
 const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
+
+function processAndInsert(finalText){
+  if(!autoPunct.checked){
+    finalText = stripPunctuation(finalText);
+  }
+
+  const insertPos = (typeof output.selectionStart === 'number') ? output.selectionStart : output.value.length;
+  const before = output.value.slice(0, insertPos);
+  const context = analyzeInsertionContext(before);
+
+  if(allCaps.checked){
+    finalText = finalText.toUpperCase();
+  } else {
+    if(context.capitalize){
+      finalText = finalText.charAt(0).toUpperCase() + finalText.slice(1);
+    } else {
+      finalText = finalText.charAt(0).toLowerCase() + finalText.slice(1);
+    }
+  }
+
+  finalText = context.prefixAppend + finalText;
+  insertAtCursor(finalText);
+
+  if(currentNoteIndex !== null && notes[currentNoteIndex]){
+    notes[currentNoteIndex].text = output.value;
+    notes[currentNoteIndex].t = Date.now();
+    persistNotes();
+    renderNotes(searchInput.value);
+  } else {
+    saveCurrentAsNote();
+  }
+
+  pushHistory(output.value);
+  scheduleAutoSave();
+
+  lastInterim = '';
+  hideOverlay();
+}
+
+function flushInterim(){
+  if(!lastInterim) return;
+  processAndInsert(lastInterim);
+}
 let recognizing = false;
 let userWantsRecording = false;
 let reconnectTimer = null;
@@ -1174,46 +1230,17 @@ function buildRecognition(){
     if(interim && interim.trim()){
       lastInterim = interim.trim();
       showOverlay(lastInterim);
+
+      if(quickSend.checked && lastInterim){
+        const lastChar = lastInterim.slice(-1);
+        if(/[.,!?;:]/.test(lastChar)){
+          flushInterim();
+        }
+      }
     }
 
     if(final && final.trim()){
-      let finalText = final.trim();
-
-      if(!autoPunct.checked){
-        finalText = stripPunctuation(finalText);
-      }
-
-      const insertPos = (typeof output.selectionStart === 'number') ? output.selectionStart : output.value.length;
-      const before = output.value.slice(0, insertPos);
-      const context = analyzeInsertionContext(before);
-
-      if(allCaps.checked){
-        finalText = finalText.toUpperCase();
-      } else {
-        if(context.capitalize){
-          finalText = finalText.charAt(0).toUpperCase() + finalText.slice(1);
-        } else {
-          finalText = finalText.charAt(0).toLowerCase() + finalText.slice(1);
-        }
-      }
-
-      finalText = context.prefixAppend + finalText;
-      insertAtCursor(finalText);
-
-      if(currentNoteIndex !== null && notes[currentNoteIndex]){
-        notes[currentNoteIndex].text = output.value;
-        notes[currentNoteIndex].t = Date.now();
-        persistNotes();
-        renderNotes(searchInput.value);
-      } else {
-        saveCurrentAsNote();
-      }
-
-      pushHistory(output.value);
-      scheduleAutoSave();
-
-      lastInterim = '';
-      hideOverlay();
+      processAndInsert(final.trim());
     }
   };
 

@@ -1,8 +1,8 @@
 // service-worker.js
-const CACHE_NAME = 'ditado-cache-v2';
+const CACHE_NAME = 'ditado-cache-v3';
 const ASSETS = [
   '.',
-  './index.html', // Alterado de ./ditado.html para ./index.html
+  './index.html',
   './manifest.json'
 ];
 
@@ -29,21 +29,54 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  const req = event.request;
+
+  if (req.method !== 'GET') return;
+
+  const isDocument =
+    req.mode === 'navigate' ||
+    req.destination === 'document' ||
+    req.destination === 'style' ||
+    req.destination === 'script' ||
+    req.destination === 'worker';
+
+  if (isDocument) {
+    event.respondWith(
+      fetch(req)
+        .then((response) => {
+          if (response && response.status === 200 && response.type === 'basic' && req.url.startsWith(self.location.origin)) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(req, clone).catch(() => {});
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          return caches.match(req).then((cached) => {
+            return cached || caches.match('./index.html');
+          });
+        })
+    );
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request).then((cached) => {
+    caches.match(req).then((cached) => {
       if (cached) return cached;
-      return fetch(event.request).then((response) => {
+      return fetch(req).then((response) => {
         if (!response || response.status !== 200 || response.type === 'opaque') {
           return response;
         }
-        if (event.request.method === 'GET' && event.request.url.startsWith(self.location.origin)) {
+        if (req.url.startsWith(self.location.origin)) {
+          const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, response.clone()).catch(()=>{});
+            cache.put(req, clone).catch(() => {});
           });
         }
         return response;
       }).catch(() => {
-        return caches.match('./index.html'); // Alterado de ./ditado.html para ./index.html
+        return caches.match('./index.html');
       });
     })
   );
