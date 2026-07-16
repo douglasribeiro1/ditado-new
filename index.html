@@ -1138,9 +1138,35 @@ function insertAtCursor(textToInsert){
 /* ====== Reconhecimento de Voz ====== */
 const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
+let suppressNextFinal = false;
+let pendingFinalText = '';
 
-function processAndInsert(finalText){
-  if(!autoPunct.checked){
+const SPOKEN_PUNCT = [
+  { re: /\bvírgula\b/gi, out: ',' },
+  { re: /\bponto final\b/gi, out: '.' },
+  { re: /\bponto e vírgula\b/gi, out: ';' },
+  { re: /\bponto de interrogação\b/gi, out: '?' },
+  { re: /\bponto de exclamação\b/gi, out: '!' },
+  { re: /\bponto\b/gi, out: '.' },
+  { re: /\bdois pontos\b/gi, out: ':' },
+  { re: /\binterrogação\b/gi, out: '?' },
+  { re: /\bexclamação\b/gi, out: '!' },
+];
+
+function convertSpokenPunct(text){
+  let out = text;
+  for(const p of SPOKEN_PUNCT){
+    out = out.replace(p.re, p.out);
+  }
+  return out;
+}
+
+function endsWithPunct(text){
+  return /[.,!?;:]$/.test(text.trim());
+}
+
+function processAndInsert(finalText, keepPunct){
+  if(!keepPunct && !autoPunct.checked){
     finalText = stripPunctuation(finalText);
   }
 
@@ -1179,7 +1205,11 @@ function processAndInsert(finalText){
 
 function flushInterim(){
   if(!lastInterim) return;
-  processAndInsert(lastInterim);
+  const converted = convertSpokenPunct(lastInterim);
+  const hasPunct = endsWithPunct(converted);
+  const keepPunct = hasPunct && !autoPunct.checked;
+  suppressNextFinal = true;
+  processAndInsert(converted, keepPunct);
 }
 let recognizing = false;
 let userWantsRecording = false;
@@ -1232,14 +1262,20 @@ function buildRecognition(){
       showOverlay(lastInterim);
 
       if(quickSend.checked && lastInterim){
-        const lastChar = lastInterim.slice(-1);
-        if(/[.,!?;:]/.test(lastChar)){
+        const converted = convertSpokenPunct(lastInterim);
+        if(endsWithPunct(converted)){
           flushInterim();
         }
       }
     }
 
     if(final && final.trim()){
+      if(suppressNextFinal){
+        suppressNextFinal = false;
+        lastInterim = '';
+        hideOverlay();
+        return;
+      }
       processAndInsert(final.trim());
     }
   };
