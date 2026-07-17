@@ -753,9 +753,9 @@ output.addEventListener('keydown', (e) => {
 
   if(e.key === 'Enter'){
     e.preventDefault();
-    flushInterim();
+    flushInterimKeyboard();
   } else if(QUICK_SEND_PUNCT.has(e.key)){
-    flushInterim();
+    flushInterimKeyboard();
   }
 });
 const themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -1216,6 +1216,17 @@ function flushInterim(){
   const keepPunct = hasPunct && !autoPunct.checked;
   suppressNextFinal = true;
   processAndInsert(converted, keepPunct);
+}
+
+function flushInterimKeyboard(){
+  if(!lastInterim) return;
+  flushInterim();
+  lastInterim = '';
+  hideOverlay();
+  if(userWantsRecording && recognition){
+    reconnectAttempts = 0;
+    try{ recognition.stop(); } catch(e){}
+  }
 }
 let recognizing = false;
 let userWantsRecording = false;
