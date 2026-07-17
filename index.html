@@ -746,9 +746,15 @@ const autoPunct = document.getElementById('autoPunct');
 const allCaps = document.getElementById('allCaps');
 const quickSend = document.getElementById('quickSend');
 
+const QUICK_SEND_PUNCT = new Set(['.', ',', ';', '/', '-', '!', '?', ':']);
+
 output.addEventListener('keydown', (e) => {
-  if(e.key === 'Enter' && quickSend.checked && recognition && lastInterim){
+  if(!quickSend.checked || !recognition || !lastInterim) return;
+
+  if(e.key === 'Enter'){
     e.preventDefault();
+    flushInterim();
+  } else if(QUICK_SEND_PUNCT.has(e.key)){
     flushInterim();
   }
 });
