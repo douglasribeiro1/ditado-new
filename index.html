@@ -418,7 +418,7 @@
     gap: 6px;
   }
 
-  /* ====== Overlay de Ditado em Tempo Real (Expansão Livre Dinâmica) ====== */
+  /* ====== Overlay de Ditado em Tempo Real ====== */
   #dictateOverlay {
     position: fixed;
     left: 50%;
@@ -548,7 +548,7 @@
     border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 24px;
-    max-width: 400px;
+    max-width: 440px;
     width: 90%;
     box-shadow: var(--shadow-md);
     display: flex;
@@ -599,6 +599,17 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
         <span id="micBtnText">Iniciar (Esc)</span>
       </button>
+
+      <!-- Grupo do Botão de IA + Engrenagem de Configuração -->
+      <div style="display:inline-flex; gap:2px;">
+        <button id="aiBtn" title="Atalho: F10 | Corrigir ortografia e gramática com IA">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2z"/></svg>
+          Corrigir com IA (F10)
+        </button>
+        <button id="aiConfigBtn" class="icon-only" title="Configurar Chave de API da IA">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
 
       <button id="copyBtn" title="Atalho: F4">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -661,7 +672,7 @@
     </div>
   </header>
 
-  <!-- ====== Editor de Texto Principal ====== -->
+  <!-- ====== Área Principal do Editor ====== -->
   <main id="main">
     <div id="editor">
       <div class="editor-wrapper">
@@ -672,7 +683,7 @@
             <span id="wordCount">0 palavras</span>
             <span id="charCount">0 caracteres</span>
           </div>
-          <span style="opacity: 0.7;">Pressione <strong>Esc</strong> para falar</span>
+          <span style="opacity: 0.7;">Pressione <strong>Esc</strong> para falar | <strong>Enter</strong> para lançar do buffer</span>
         </div>
       </div>
     </div>
@@ -721,6 +732,45 @@
   </div>
 </div>
 
+<!-- ====== Modal de Configuração de API da IA ====== -->
+<div id="aiModal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal-card">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="margin:0;">Configurar IA para Correção</h3>
+      <button id="closeAiModalBtn" style="border:none; background:transparent; font-size:20px; cursor:pointer; color:var(--text-secondary);">&times;</button>
+    </div>
+    <p>Insira sua chave de API para habilitar a correção por Inteligência Artificial. A chave será gravada <strong>apenas no LocalStorage do seu navegador</strong> neste computador.</p>
+    
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <label style="font-size:12px; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">PROVEDOR DE IA:</label>
+        <select id="aiProviderSelect" style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid var(--border-color); background:var(--input-bg); color:var(--text-primary); outline:none;">
+          <option value="gemini">Google Gemini (Grátis / Recomendado)</option>
+          <option value="groq">Groq (Ultra Rápido / Grátis)</option>
+          <option value="openrouter">OpenRouter</option>
+          <option value="openai">OpenAI (ChatGPT)</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="font-size:12px; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">CHAVE DE API (API KEY):</label>
+        <input type="password" id="aiApiKeyInput" placeholder="Cole sua chave aqui..." style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid var(--border-color); background:var(--input-bg); color:var(--text-primary); font-family:monospace; outline:none;" />
+      </div>
+
+      <div>
+        <label style="font-size:12px; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">MODELO DE LINGUAGEM (OPCIONAL):</label>
+        <input type="text" id="aiModelInput" placeholder="Ex: gemini-2.0-flash, llama-3.3-70b-versatile..." style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid var(--border-color); background:var(--input-bg); color:var(--text-primary); outline:none;" />
+      </div>
+    </div>
+
+    <div class="modal-actions" style="margin-top:8px;">
+      <button id="clearAiKeyBtn" class="warn" style="margin-right:auto; display:none;">Remover Chave</button>
+      <button id="cancelAiModalBtn">Cancelar</button>
+      <button id="saveAiModalBtn" class="primary">Salvar e Continuar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ====== Referências DOM ====== */
 const output = document.getElementById('output');
@@ -746,18 +796,37 @@ const autoPunct = document.getElementById('autoPunct');
 const allCaps = document.getElementById('allCaps');
 const quickSend = document.getElementById('quickSend');
 
+/* DOM Elementos da Correção por IA */
+const aiBtn = document.getElementById('aiBtn');
+const aiConfigBtn = document.getElementById('aiConfigBtn');
+const aiModal = document.getElementById('aiModal');
+const closeAiModalBtn = document.getElementById('closeAiModalBtn');
+const cancelAiModalBtn = document.getElementById('cancelAiModalBtn');
+const saveAiModalBtn = document.getElementById('saveAiModalBtn');
+const clearAiKeyBtn = document.getElementById('clearAiKeyBtn');
+const aiProviderSelect = document.getElementById('aiProviderSelect');
+const aiApiKeyInput = document.getElementById('aiApiKeyInput');
+const aiModelInput = document.getElementById('aiModelInput');
+
 const QUICK_SEND_PUNCT = new Set(['.', ',', ';', '/', '-', '!', '?', ':']);
 
+/* Lançamento Imediato do Buffer ao Pressionar Enter */
 output.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    if (lastInterim && lastInterim.trim()) {
+      e.preventDefault();
+      flushInterimAndInsert();
+      return;
+    }
+  }
+
   if(!quickSend.checked || !recognition || !lastInterim) return;
 
-  if(e.key === 'Enter'){
-    e.preventDefault();
-    flushInterimKeyboard();
-  } else if(QUICK_SEND_PUNCT.has(e.key)){
+  if(QUICK_SEND_PUNCT.has(e.key)){
     flushInterimKeyboard();
   }
 });
+
 const themeToggleBtn = document.getElementById('themeToggleBtn');
 const themeIconSun = document.getElementById('themeIconSun');
 const themeIconMoon = document.getElementById('themeIconMoon');
@@ -787,13 +856,24 @@ const MAX_NOTES = 500;
 let currentNoteIndex = null;
 let lastInterim = '';
 
-/* ====== Gerenciamento de Tema (Dark / Light com Detecção Automática do Sistema) ====== */
+/* Armazenamento das Configurações de IA */
+const AI_KEY_STORAGE = 'ditado_ai_key';
+const AI_PROVIDER_STORAGE = 'ditado_ai_provider';
+const AI_MODEL_STORAGE = 'ditado_ai_model';
+
+const DEFAULT_AI_MODELS = {
+  gemini: 'gemini-2.0-flash',
+  groq: 'llama-3.3-70b-versatile',
+  openrouter: 'google/gemini-2.0-flash-001',
+  openai: 'gpt-4o-mini'
+};
+
+/* ====== Gerenciamento de Tema ====== */
 function initTheme() {
   const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
   if (savedTheme) {
     setTheme(savedTheme, false);
   } else {
-    // Detecta a preferência do sistema operacional do usuário
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     setTheme(prefersDark ? 'dark' : 'light', false);
   }
@@ -813,7 +893,6 @@ function setTheme(theme, saveUserChoice = true) {
   }
 }
 
-// Atualiza o tema se a preferência do sistema mudar (apenas se o usuário não escolheu manualmente)
 if (window.matchMedia) {
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
     if (!localStorage.getItem(THEME_STORAGE_KEY)) {
@@ -1031,7 +1110,7 @@ function loadNote(idx){
   setTimeout(()=> status.textContent = 'Pronto', 700);
 }
 
-/* ====== Confirm Modal para Excluir Todas ====== */
+/* ====== Modal de Confirmação para Excluir Todas ====== */
 function promptDeleteAllNotes() {
   if(!notes.length) return;
   confirmModal.classList.add('open');
@@ -1056,7 +1135,7 @@ confirmModalBtn.addEventListener('click', () => {
 
 /* ====== Copiar & Toast ====== */
 let __toastTimer = null;
-function showToast(message = 'Copiado', ms = 1200){
+function showToast(message = 'Copiado', ms = 1400){
   if(!toastEl) return;
   toastEl.textContent = message;
   toastEl.classList.add('show');
@@ -1091,7 +1170,7 @@ async function copyAll(){
   }
 }
 
-/* ====== Tamanho da Fonte (Default 18px) ====== */
+/* ====== Tamanho da Fonte ====== */
 function setFontSize(px){
   const fontPx = Math.max(12, Math.min(36, Number(px)));
   document.documentElement.style.setProperty('--font-size', fontPx + 'px');
@@ -1145,7 +1224,6 @@ function insertAtCursor(textToInsert){
 const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
 let suppressNextFinal = false;
-let pendingFinalText = '';
 
 const SPOKEN_PUNCT = [
   { re: /\bvírgula\b/gi, out: ',' },
@@ -1218,6 +1296,13 @@ function flushInterim(){
   processAndInsert(converted, keepPunct);
 }
 
+/* Função acionada ao apertar Enter: insere o buffer sem parar o ditado */
+function flushInterimAndInsert(){
+  if(!lastInterim) return;
+  flushInterim();
+  insertAtCursor('\n');
+}
+
 function flushInterimKeyboard(){
   if(!lastInterim) return;
   flushInterim();
@@ -1228,6 +1313,7 @@ function flushInterimKeyboard(){
     try{ recognition.stop(); } catch(e){}
   }
 }
+
 let recognizing = false;
 let userWantsRecording = false;
 let reconnectTimer = null;
@@ -1401,6 +1487,175 @@ function hideOverlay(){
   overlayText.textContent = ''; 
 }
 
+/* ====== Lógica do Modal e Correção por IA ====== */
+aiProviderSelect.addEventListener('change', () => {
+  const p = aiProviderSelect.value;
+  aiModelInput.placeholder = `Padrão: ${DEFAULT_AI_MODELS[p] || ''}`;
+});
+
+function openAiConfigModal() {
+  const key = localStorage.getItem(AI_KEY_STORAGE) || '';
+  const provider = localStorage.getItem(AI_PROVIDER_STORAGE) || 'gemini';
+  const model = localStorage.getItem(AI_MODEL_STORAGE) || '';
+
+  aiProviderSelect.value = provider;
+  aiApiKeyInput.value = key;
+  aiModelInput.value = model;
+  aiModelInput.placeholder = `Padrão: ${DEFAULT_AI_MODELS[provider] || ''}`;
+
+  clearAiKeyBtn.style.display = key ? 'block' : 'none';
+
+  aiModal.classList.add('open');
+  aiModal.setAttribute('aria-hidden', 'false');
+}
+
+function closeAiModal() {
+  aiModal.classList.remove('open');
+  aiModal.setAttribute('aria-hidden', 'true');
+}
+
+closeAiModalBtn.addEventListener('click', closeAiModal);
+cancelAiModalBtn.addEventListener('click', closeAiModal);
+aiConfigBtn.addEventListener('click', openAiConfigModal);
+
+clearAiKeyBtn.addEventListener('click', () => {
+  localStorage.removeItem(AI_KEY_STORAGE);
+  localStorage.removeItem(AI_PROVIDER_STORAGE);
+  localStorage.removeItem(AI_MODEL_STORAGE);
+  aiApiKeyInput.value = '';
+  aiModelInput.value = '';
+  clearAiKeyBtn.style.display = 'none';
+  showToast('Chave de API removida');
+});
+
+saveAiModalBtn.addEventListener('click', () => {
+  const key = aiApiKeyInput.value.trim();
+  if(!key) {
+    showToast('Por favor, insira uma chave de API');
+    return;
+  }
+  localStorage.setItem(AI_KEY_STORAGE, key);
+  localStorage.setItem(AI_PROVIDER_STORAGE, aiProviderSelect.value);
+  localStorage.setItem(AI_MODEL_STORAGE, aiModelInput.value.trim());
+  closeAiModal();
+  showToast('Configurações de IA salvas');
+  
+  if(output.value.trim()){
+    correctWithAI();
+  }
+});
+
+async function correctWithAI() {
+  const text = output.value.trim();
+  if (!text) {
+    showToast('Nada para corrigir');
+    return;
+  }
+
+  const apiKey = localStorage.getItem(AI_KEY_STORAGE);
+  if (!apiKey) {
+    openAiConfigModal();
+    return;
+  }
+
+  const provider = localStorage.getItem(AI_PROVIDER_STORAGE) || 'gemini';
+  let model = localStorage.getItem(AI_MODEL_STORAGE) || DEFAULT_AI_MODELS[provider];
+  if (!model) model = DEFAULT_AI_MODELS[provider];
+
+  status.textContent = 'IA corrigindo texto...';
+  aiBtn.disabled = true;
+
+  const systemPrompt = "Você é um assistente especialista em revisão gramatical e ortográfica em português do Brasil. Sua única função é corrigir a ortografia, pontuação, concordância e o uso de maiúsculas e minúsculas do texto a seguir. Mantenha integralmente o sentido original e a estrutura dos parágrafos. NÃO adicione saudações, explicações, nem comentários como 'Aqui está o texto corrigido'. Retorne EXCLUSIVAMENTE o texto final corrigido.";
+
+  try {
+    let correctedText = '';
+
+    if (provider === 'gemini') {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{ text: `${systemPrompt}\n\nTexto para correção:\n${text}` }]
+          }]
+        })
+      });
+
+      if (!resp.ok) {
+        const errData = await resp.json().catch(() => ({}));
+        throw new Error(errData.error?.message || `Erro HTTP ${resp.status}`);
+      }
+
+      const data = await resp.json();
+      correctedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    } else {
+      let endpoint = 'https://api.openai.com/v1/chat/completions';
+      if (provider === 'groq') endpoint = 'https://api.groq.com/openai/v1/chat/completions';
+      if (provider === 'openrouter') endpoint = 'https://openrouter.ai/api/v1/chat/completions';
+
+      const resp = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: text }
+          ],
+          temperature: 0.2
+        })
+      });
+
+      if (!resp.ok) {
+        const errData = await resp.json().catch(() => ({}));
+        throw new Error(errData.error?.message || `Erro HTTP ${resp.status}`);
+      }
+
+      const data = await resp.json();
+      correctedText = data.choices?.[0]?.message?.content || '';
+    }
+
+    correctedText = correctedText.trim();
+    if (correctedText) {
+      output.value = correctedText;
+      pushHistory(output.value);
+      updateStats();
+      scheduleAutoSave();
+      
+      if (currentNoteIndex !== null && notes[currentNoteIndex]) {
+        notes[currentNoteIndex].text = output.value;
+        notes[currentNoteIndex].t = Date.now();
+        persistNotes();
+        renderNotes(searchInput.value);
+      } else {
+        saveCurrentAsNote();
+      }
+      showToast('Texto corrigido pela IA!');
+      status.textContent = 'Texto corrigido com sucesso';
+    } else {
+      throw new Error('A resposta da IA veio vazia');
+    }
+  } catch (err) {
+    console.error('Erro ao chamar a IA:', err);
+    showToast('Erro ao corrigir: ' + err.message, 2500);
+    status.textContent = 'Erro na IA';
+  } finally {
+    aiBtn.disabled = false;
+    setTimeout(() => { 
+      if (status.textContent === 'Texto corrigido com sucesso' || status.textContent === 'Erro na IA') {
+        status.textContent = 'Pronto';
+      }
+    }, 2000);
+  }
+}
+
+aiBtn.addEventListener('click', correctWithAI);
+
 /* ====== Eventos do Usuário ====== */
 micBtn.addEventListener('click', toggleMic);
 copyBtn.addEventListener('click', copyAll);
@@ -1420,6 +1675,7 @@ output.addEventListener('input', () => {
 
 /* ====== Atalhos de Teclado ====== */
 window.addEventListener('keydown', (e) => {
+  if(e.key === 'F10'){ e.preventDefault(); correctWithAI(); return; }
   if(e.key === 'F9'){ e.preventDefault(); newNote(); return; }
   if(e.key === 'F2'){ e.preventDefault(); toggleNotes(); return; }
   if(e.key === 'F8'){ e.preventDefault(); clearEditor(); return; }
@@ -1440,7 +1696,6 @@ initTheme();
 loadNotes();
 pushHistory(output.value || '');
 
-// Tamanho de fonte inicial: 18px (ou recuperado do armazenamento do usuário)
 const initialFontSize = localStorage.getItem(FONT_STORAGE_KEY) || 18;
 setFontSize(initialFontSize);
 updateStats();
