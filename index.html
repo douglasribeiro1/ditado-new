@@ -292,7 +292,7 @@
     color: var(--text-muted);
   }
 
-  /* ====== Rodapé do Editor (Estatísticas Minimalistas) ====== */
+  /* ====== Rodapé do Editor ====== */
   #editorFooter {
     display: flex;
     align-items: center;
@@ -683,7 +683,7 @@
             <span id="wordCount">0 palavras</span>
             <span id="charCount">0 caracteres</span>
           </div>
-          <span style="opacity: 0.7;">Pressione <strong>Esc</strong> para falar | <strong>Enter</strong> para lançar do buffer</span>
+          <span style="opacity: 0.7;">Pressione <strong>Esc</strong> para falar</span>
         </div>
       </div>
     </div>
@@ -810,19 +810,14 @@ const aiModelInput = document.getElementById('aiModelInput');
 
 const QUICK_SEND_PUNCT = new Set(['.', ',', ';', '/', '-', '!', '?', ':']);
 
-/* Lançamento Imediato do Buffer ao Pressionar Enter */
+/* Funcionamento Original do Envio Imediato */
 output.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    if (lastInterim && lastInterim.trim()) {
-      e.preventDefault();
-      flushInterimAndInsert();
-      return;
-    }
-  }
-
   if(!quickSend.checked || !recognition || !lastInterim) return;
 
-  if(QUICK_SEND_PUNCT.has(e.key)){
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    flushInterimKeyboard();
+  } else if(QUICK_SEND_PUNCT.has(e.key)){
     flushInterimKeyboard();
   }
 });
@@ -1296,13 +1291,6 @@ function flushInterim(){
   processAndInsert(converted, keepPunct);
 }
 
-/* Função acionada ao apertar Enter: insere o buffer sem parar o ditado */
-function flushInterimAndInsert(){
-  if(!lastInterim) return;
-  flushInterim();
-  insertAtCursor('\n');
-}
-
 function flushInterimKeyboard(){
   if(!lastInterim) return;
   flushInterim();
@@ -1565,7 +1553,7 @@ async function correctWithAI() {
   status.textContent = 'IA corrigindo texto...';
   aiBtn.disabled = true;
 
-  const systemPrompt = "Você é um assistente especialista em revisão gramatical e ortográfica em português do Brasil. Sua única função é corrigir a ortografia, pontuação, concordância e o uso de maiúsculas e minúsculas do texto a seguir. Mantenha integralmente o sentido original e a estrutura dos parágrafos. NÃO adicione saudações, explicações, nem comentários como 'Aqui está o texto corrigido'. Retorne EXCLUSIVAMENTE o texto final corrigido.";
+  const systemPrompt = "Você é um assistente especialista em revisão gramatical e ortográfica em português do Brasil. Sua única função é corrigir a ortografia, pontuação, concordância e o uso de maiúsculas e minúsculas do texto a seguir. Mantenha integralmente o sentido original e a estrutura dos parágrafos. NÃO adicione saudações, explicações, nem comentários como 'Aqui está o texto corrigido'. Retorne EXCLUSIVAMENTE o texto final corrigido. Se um texto (frase ou palavra) estiver totalmente em CAIXA ALTA, você deve manter em CAIXA ALTA, e isso é Prioridade.";
 
   try {
     let correctedText = '';
