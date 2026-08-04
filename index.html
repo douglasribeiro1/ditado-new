@@ -910,6 +910,9 @@ const STORAGE_KEY = 'ditado_notes_v2';
 const FONT_STORAGE_KEY = 'ditado_fontsize';
 const THEME_STORAGE_KEY = 'ditado_theme';
 const BAR_MODE_STORAGE_KEY = 'ditado_bar_mode';
+const AUTO_PUNCT_STORAGE_KEY = 'ditado_auto_punct';
+const ALL_CAPS_STORAGE_KEY = 'ditado_all_caps';
+const QUICK_SEND_STORAGE_KEY = 'ditado_quick_send';
 const HISTORY_LIMIT = 300;
 const MAX_NOTES = 500;
 let currentNoteIndex = null;
@@ -929,6 +932,36 @@ const DEFAULT_AI_MODELS = {
   openrouter: 'google/gemini-2.0-flash-001',
   openai: 'gpt-4o-mini'
 };
+
+/* ====== Persistência das Opções dos Checkboxes ====== */
+function initToggles() {
+  const savedAutoPunct = localStorage.getItem(AUTO_PUNCT_STORAGE_KEY);
+  if (savedAutoPunct !== null) {
+    autoPunct.checked = savedAutoPunct === 'true';
+  }
+
+  const savedAllCaps = localStorage.getItem(ALL_CAPS_STORAGE_KEY);
+  if (savedAllCaps !== null) {
+    allCaps.checked = savedAllCaps === 'true';
+  }
+
+  const savedQuickSend = localStorage.getItem(QUICK_SEND_STORAGE_KEY);
+  if (savedQuickSend !== null) {
+    quickSend.checked = savedQuickSend === 'true';
+  }
+}
+
+autoPunct.addEventListener('change', () => {
+  localStorage.setItem(AUTO_PUNCT_STORAGE_KEY, autoPunct.checked);
+});
+
+allCaps.addEventListener('change', () => {
+  localStorage.setItem(ALL_CAPS_STORAGE_KEY, allCaps.checked);
+});
+
+quickSend.addEventListener('change', () => {
+  localStorage.setItem(QUICK_SEND_STORAGE_KEY, quickSend.checked);
+});
 
 /* ====== Ferramenta de Alternância da Barra Superior ====== */
 function setBarMode(mode, save = true) {
@@ -1273,7 +1306,7 @@ async function copyAll(){
   }
 }
 
-/* ====== Tamanho da Fonte ====== */
+/* ====== Tamanho da Fonte (Ajuste Quase Ilimitado: 8px até 200px) ====== */
 function setFontSize(px){
   const fontPx = Math.max(6, Math.min(300, Number(px)));
   document.documentElement.style.setProperty('--font-size', fontPx + 'px');
@@ -1368,7 +1401,6 @@ let recognition = null;
 let suppressNextFinal = false;
 
 function processAndInsert(finalText, keepPunct){
-  /* Converte palavras de pontuação falada (ex: "vírgula" -> ",") */
   finalText = convertSpokenPunct(finalText);
 
   if(!keepPunct && !autoPunct.checked){
@@ -1484,7 +1516,6 @@ function buildRecognition(){
 
     if(interim && interim.trim()){
       lastInterim = interim.trim();
-      /* Exibe prévia formatada com pontuação no balão visual */
       showOverlay(convertSpokenPunct(lastInterim));
     }
 
@@ -1817,6 +1848,7 @@ window.addEventListener('keydown', (e) => {
 
 /* ====== Inicialização ====== */
 initTheme();
+initToggles();
 loadNotes();
 pushHistory(output.value || '');
 
