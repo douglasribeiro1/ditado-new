@@ -237,8 +237,7 @@
     border: 1px solid var(--border-color);
   }
 
-  /* ====== Modos da Barra Superior (Compacto / Oculto) ====== */
-  /* Modo Compacto: exibe apenas os ícones para cliques eficientes */
+  /* ====== Modos da Barra Superior ====== */
   body.bar-compact #controls {
     height: 48px;
     padding: 0 10px;
@@ -255,12 +254,10 @@
     width: 70px;
   }
 
-  /* Modo Oculto: barra totalmente escondida */
   body.bar-hidden #controls {
     display: none !important;
   }
 
-  /* Botão Flutuante para reexpandir a barra quando oculta */
   #unhideBarBtn {
     position: fixed;
     top: 12px;
@@ -691,7 +688,7 @@
         <span class="btn-text">Limpar (F8)</span>
       </button>
 
-      <!-- Seletor de Tamanho de Fonte (Escala Quase Ilimitada) -->
+      <!-- Seletor de Tamanho de Fonte -->
       <div id="fontControls" title="Ajuste de tamanho da fonte (8px a 200px)">
         <button id="fontDec" class="icon-only" style="border:none;background:transparent;">A-</button>
         <input id="fontRange" type="range" min="8" max="200" value="18" />
@@ -711,12 +708,12 @@
         <span class="btn-text">Caixa Alta</span>
       </label>
 
-      <label class="toggle" title="Envia o texto ditado imediatamente ao pressionar Enter ou pontuação final">
+      <label class="toggle" title="Envia o texto ditado imediatamente ao pressionar Enter no teclado">
         <input type="checkbox" id="quickSend" />
         <span class="btn-text">Envio Imediato</span>
       </label>
 
-      <!-- Ferramenta de Alternância da Barra (Normal / Ícones Apenas / Oculta) -->
+      <!-- Ferramenta de Alternância da Barra -->
       <button id="barModeBtn" class="icon-only" title="Alternar Barra (Normal / Ícones / Ocultar - Atalho: Ctrl+B ou F6)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
@@ -918,7 +915,7 @@ const MAX_NOTES = 500;
 let currentNoteIndex = null;
 let lastInterim = '';
 
-/* Modo da Barra: 'full' (Normal) | 'compact' (Ícones apenas) | 'hidden' (Oculta) */
+/* Modo da Barra: 'full' | 'compact' | 'hidden' */
 let currentBarMode = 'full';
 
 /* Armazenamento das Configurações de IA */
@@ -971,7 +968,6 @@ unhideBarBtn.addEventListener('click', () => {
   showToast('Barra Expandida');
 });
 
-// Restaura estado da barra
 const savedBarMode = localStorage.getItem(BAR_MODE_STORAGE_KEY) || 'full';
 setBarMode(savedBarMode, false);
 
@@ -1277,7 +1273,7 @@ async function copyAll(){
   }
 }
 
-/* ====== Tamanho da Fonte (Ajuste Quase Ilimitado: 8px até 200px) ====== */
+/* ====== Tamanho da Fonte ====== */
 function setFontSize(px){
   const fontPx = Math.max(6, Math.min(300, Number(px)));
   document.documentElement.style.setProperty('--font-size', fontPx + 'px');
@@ -1307,6 +1303,35 @@ function toggleNotes(){ if(notesPanel.classList.contains('open')) closeNotes(); 
 
 /* ====== Processamento de Texto e Ditado ====== */
 function stripPunctuation(s){ return s.replace(/[.,!?;:—–\-()\"'«»“”…]/g, '').replace(/\s+/g,' ').trim(); }
+
+/* Conversão de Pontuação Falada e Ajuste de Espaçamento */
+const SPOKEN_PUNCT = [
+  { re: /\b(ponto e vírgula)\b/gi, out: ';' },
+  { re: /\b(ponto de interrogação)\b/gi, out: '?' },
+  { re: /\b(ponto de exclamação)\b/gi, out: '!' },
+  { re: /\b(ponto final)\b/gi, out: '.' },
+  { re: /\b(dois pontos)\b/gi, out: ':' },
+  { re: /\b(novo parágrafo|nova linha)\b/gi, out: '\n' },
+  { re: /\b(vírgula)\b/gi, out: ',' },
+  { re: /\b(interrogação)\b/gi, out: '?' },
+  { re: /\b(exclamação)\b/gi, out: '!' },
+  { re: /\b(ponto)\b/gi, out: '.' }
+];
+
+function formatPunctuationSpacing(text) {
+  return text
+    .replace(/\s+([.,!?;:])(?=\s|$)/g, '$1')  // Remove espaço ANTES da pontuação ("olá ," -> "olá,")
+    .replace(/([.,!?;:])([A-Za-zÀ-ÿ])/g, '$1 $2'); // Garante espaço DEPOIS da pontuação ("olá,tudo" -> "olá, tudo")
+}
+
+function convertSpokenPunct(text){
+  if(!text) return '';
+  let out = text;
+  for(const p of SPOKEN_PUNCT){
+    out = out.replace(p.re, p.out);
+  }
+  return formatPunctuationSpacing(out);
+}
 
 function analyzeInsertionContext(prefix) {
   const trimmed = prefix.trimEnd();
@@ -1342,33 +1367,12 @@ const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechReco
 let recognition = null;
 let suppressNextFinal = false;
 
-const SPOKEN_PUNCT = [
-  { re: /\bvírgula\b/gi, out: ',' },
-  { re: /\bponto final\b/gi, out: '.' },
-  { re: /\bponto e vírgula\b/gi, out: ';' },
-  { re: /\bponto de interrogação\b/gi, out: '?' },
-  { re: /\bponto de exclamação\b/gi, out: '!' },
-  { re: /\bponto\b/gi, out: '.' },
-  { re: /\bdois pontos\b/gi, out: ':' },
-  { re: /\binterrogação\b/gi, out: '?' },
-  { re: /\bexclamação\b/gi, out: '!' },
-];
-
-function convertSpokenPunct(text){
-  let out = text;
-  for(const p of SPOKEN_PUNCT){
-    out = out.replace(p.re, p.out);
-  }
-  return out;
-}
-
-function endsWithPunct(text){
-  return /[.,!?;:]$/.test(text.trim());
-}
-
 function processAndInsert(finalText, keepPunct){
+  /* Converte palavras de pontuação falada (ex: "vírgula" -> ",") */
+  finalText = convertSpokenPunct(finalText);
+
   if(!keepPunct && !autoPunct.checked){
-    finalText = stripPunctuation(finalText);
+    // se o usuário desligou pontuação inteligente e não é pontuação falada explícita
   }
 
   const insertPos = (typeof output.selectionStart === 'number') ? output.selectionStart : output.value.length;
@@ -1401,26 +1405,29 @@ function processAndInsert(finalText, keepPunct){
   scheduleAutoSave();
 
   lastInterim = '';
-  hideOverlay();
+  
+  if (recognizing || userWantsRecording) {
+    overlayText.textContent = 'Ouvindo...';
+  } else {
+    hideOverlay();
+  }
 }
 
 function flushInterim(){
   if(!lastInterim) return;
   const converted = convertSpokenPunct(lastInterim);
-  const hasPunct = endsWithPunct(converted);
-  const keepPunct = hasPunct && !autoPunct.checked;
   suppressNextFinal = true;
-  processAndInsert(converted, keepPunct);
+  processAndInsert(converted, true);
 }
 
 function flushInterimKeyboard(){
   if(!lastInterim) return;
   flushInterim();
   lastInterim = '';
-  hideOverlay();
-  if(userWantsRecording && recognition){
-    reconnectAttempts = 0;
-    try{ recognition.stop(); } catch(e){}
+  if (recognizing || userWantsRecording) {
+    overlayText.textContent = 'Ouvindo...';
+  } else {
+    hideOverlay();
   }
 }
 
@@ -1438,8 +1445,13 @@ function setMicState(state){
     micBtn.classList.add('recording');
     micBtnText.textContent = 'Parar (Esc)';
   } else if(state === 'reconnecting'){
-    micBtnText.textContent = 'Reconectando…';
-    micBtn.disabled = true;
+    if (userWantsRecording) {
+      micBtn.classList.add('recording');
+      micBtnText.textContent = 'Parar (Esc)';
+    } else {
+      micBtnText.textContent = 'Reconectando…';
+      micBtn.disabled = true;
+    }
   } else {
     micBtnText.textContent = 'Iniciar (Esc)';
   }
@@ -1472,21 +1484,19 @@ function buildRecognition(){
 
     if(interim && interim.trim()){
       lastInterim = interim.trim();
-      showOverlay(lastInterim);
-
-      if(quickSend.checked && lastInterim){
-        const converted = convertSpokenPunct(lastInterim);
-        if(endsWithPunct(converted)){
-          flushInterim();
-        }
-      }
+      /* Exibe prévia formatada com pontuação no balão visual */
+      showOverlay(convertSpokenPunct(lastInterim));
     }
 
     if(final && final.trim()){
       if(suppressNextFinal){
         suppressNextFinal = false;
         lastInterim = '';
-        hideOverlay();
+        if (recognizing || userWantsRecording) {
+          overlayText.textContent = 'Ouvindo...';
+        } else {
+          hideOverlay();
+        }
         return;
       }
       processAndInsert(final.trim());
@@ -1496,12 +1506,11 @@ function buildRecognition(){
   r.onerror = (ev) => {
     console.error('Erro de fala:', ev.error);
     recognizing = false;
-    lastInterim = '';
-    hideOverlay();
 
     if(ev.error === 'not-allowed' || ev.error === 'service-not-allowed'){
       userWantsRecording = false;
       setMicState('idle');
+      hideOverlay();
       status.textContent = 'Permissão de microfone negada';
       setTimeout(()=> status.textContent = 'Pronto', 3000);
       return;
@@ -1517,12 +1526,12 @@ function buildRecognition(){
 
   r.onend = () => {
     recognizing = false;
-    lastInterim = '';
-    hideOverlay();
 
     if(userWantsRecording){
       scheduleReconnect();
     } else {
+      lastInterim = '';
+      hideOverlay();
       setMicState('idle');
       status.textContent = 'Pronto';
     }
@@ -1535,19 +1544,19 @@ function scheduleReconnect(){
   if(reconnectAttempts >= MAX_RECONNECT){
     userWantsRecording = false;
     setMicState('idle');
+    hideOverlay();
     status.textContent = 'Microfone em espera. Clique para reiniciar.';
     setTimeout(()=> status.textContent = 'Pronto', 3000);
     return;
   }
   reconnectAttempts++;
   setMicState('reconnecting');
-  status.textContent = 'Reconectando…';
   clearTimeout(reconnectTimer);
   reconnectTimer = setTimeout(()=> {
     if(!userWantsRecording) return;
     recognition = buildRecognition();
     try{ recognition.start(); } catch(e){ scheduleReconnect(); }
-  }, 400);
+  }, 100);
 }
 
 if(SpeechRecognitionAPI){
@@ -1569,6 +1578,7 @@ function toggleMic(){
     } catch(e){
       userWantsRecording = false;
       setMicState('idle');
+      hideOverlay();
       status.textContent = 'Erro ao iniciar microfone';
       setTimeout(()=> status.textContent = 'Pronto', 2000);
     }
@@ -1585,12 +1595,15 @@ function toggleMic(){
 
 function showOverlay(text){
   overlayText.textContent = text || 'Ouvindo...';
-  overlay.classList.add('open');
-  overlay.setAttribute('aria-hidden','false');
+  if(!overlay.classList.contains('open')){
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden','false');
+  }
   requestAnimationFrame(() => {
     overlayText.scrollTop = overlayText.scrollHeight;
   });
 }
+
 function hideOverlay(){ 
   overlay.classList.remove('open'); 
   overlay.setAttribute('aria-hidden','true'); 
