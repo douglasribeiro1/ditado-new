@@ -11,7 +11,7 @@
 <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="bg" x1="0%25" y1="0%25" x2="100%25" y2="100%25"><stop offset="0%25" stop-color="%230f172a"/><stop offset="100%25" stop-color="%23020617"/></linearGradient><linearGradient id="mic" x1="0%25" y1="0%25" x2="100%25" y2="100%25"><stop offset="0%25" stop-color="%2360a5fa"/><stop offset="100%25" stop-color="%232563eb"/></linearGradient></defs><rect width="512" height="512" rx="128" fill="url(%23bg)"/><g><rect x="216" y="128" width="80" height="160" rx="40" fill="url(%23mic)"/><path d="M160 256c0 53 43 96 96 96s96-43 96-96" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round" fill="none"/><line x1="256" y1="352" x2="256" y2="416" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round"/><line x1="208" y1="416" x2="304" y2="416" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round"/></g></svg>'>
 <meta name="theme-color" content="#0f172a">
 
-<!-- Google Fonts Inter para máxima legibilidade -->
+<!-- Google Fonts Inter para fonte Sans Serif de alta legibilidade -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
 <style>
   :root {
     --font-size: 18px;
-    --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     --controls-height: 64px;
     --notes-panel-width: 380px;
 
@@ -90,6 +90,7 @@
     border-bottom: 1px solid var(--border-color);
     box-shadow: var(--shadow-sm);
     z-index: 10;
+    transition: all 0.2s ease;
   }
 
   .controls-left, .controls-right {
@@ -192,11 +193,11 @@
     font-size: 13px;
     font-weight: 600;
     color: var(--text-primary);
-    min-width: 32px;
+    min-width: 42px;
     text-align: center;
   }
   input[type="range"] {
-    width: 90px;
+    width: 100px;
     accent-color: var(--primary-color);
     cursor: pointer;
   }
@@ -234,6 +235,56 @@
     border-radius: 20px;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
+  }
+
+  /* ====== Modos da Barra Superior (Compacto / Oculto) ====== */
+  /* Modo Compacto: exibe apenas os ícones para cliques eficientes */
+  body.bar-compact #controls {
+    height: 48px;
+    padding: 0 10px;
+  }
+  body.bar-compact .btn-text,
+  body.bar-compact #fontControls label,
+  body.bar-compact #fontSizeVal {
+    display: none !important;
+  }
+  body.bar-compact button, body.bar-compact .toggle {
+    padding: 6px 10px;
+  }
+  body.bar-compact input[type="range"] {
+    width: 70px;
+  }
+
+  /* Modo Oculto: barra totalmente escondida */
+  body.bar-hidden #controls {
+    display: none !important;
+  }
+
+  /* Botão Flutuante para reexpandir a barra quando oculta */
+  #unhideBarBtn {
+    position: fixed;
+    top: 12px;
+    right: 20px;
+    z-index: 999;
+    display: none;
+    background: var(--bg-surface);
+    border: 1px solid var(--primary-color);
+    box-shadow: var(--shadow-md), 0 0 12px var(--primary-glow);
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  #unhideBarBtn:hover {
+    background: var(--primary-color);
+    color: #ffffff;
+    transform: translateY(2px);
+  }
+  body.bar-hidden #unhideBarBtn {
+    display: inline-flex !important;
   }
 
   /* ====== Área Principal do Editor ====== */
@@ -500,7 +551,7 @@
     padding-right: 4px;
   }
 
-  /* ====== Toast & Modais Customizados ====== */
+  /* ====== Toast & Modais ====== */
   #toast {
     position: fixed;
     top: 24px;
@@ -592,19 +643,25 @@
 <body>
 
 <div id="app" role="application">
+  <!-- Botão Flutuante quando a Barra está Oculta -->
+  <button id="unhideBarBtn" title="Mostrar Barra Superior (Ctrl+B)">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    <span>Mostrar Barra</span>
+  </button>
+
   <!-- ====== Barra Superior de Ferramentas ====== -->
   <header id="controls" role="toolbar" aria-label="Barra de ferramentas do ditado">
     <div class="controls-left">
-      <button id="micBtn" class="primary" title="Atalhos: Esc">
+      <button id="micBtn" class="primary" title="Iniciar/Parar Ditado (Esc)">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-        <span id="micBtnText">Iniciar (Esc)</span>
+        <span id="micBtnText" class="btn-text">Iniciar (Esc)</span>
       </button>
 
-      <!-- Grupo do Botão de IA + Engrenagem de Configuração -->
+      <!-- Grupo do Botão de IA + Engrenagem -->
       <div style="display:inline-flex; gap:2px;">
         <button id="aiBtn" title="Atalho: F10 | Corrigir ortografia e gramática com IA">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2z"/></svg>
-          Corrigir com IA (F10)
+          <span class="btn-text">Corrigir com IA (F10)</span>
         </button>
         <button id="aiConfigBtn" class="icon-only" title="Configurar Chave de API da IA">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -613,7 +670,7 @@
 
       <button id="copyBtn" title="Atalho: F4">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        Copiar (F4)
+        <span class="btn-text">Copiar (F4)</span>
       </button>
 
       <button id="undoBtn" title="Atalho: Ctrl+U" class="icon-only">
@@ -626,17 +683,18 @@
 
       <button id="newBtn" title="Atalho: F9 ou Ctrl+N">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-        Nova Nota (F9)
+        <span class="btn-text">Nova Nota (F9)</span>
       </button>
 
       <button id="clearBtn" class="warn" title="Atalho: F8">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-        Limpar (F8)
+        <span class="btn-text">Limpar (F8)</span>
       </button>
 
-      <div id="fontControls">
+      <!-- Seletor de Tamanho de Fonte (Escala Quase Ilimitada) -->
+      <div id="fontControls" title="Ajuste de tamanho da fonte (8px a 200px)">
         <button id="fontDec" class="icon-only" style="border:none;background:transparent;">A-</button>
-        <input id="fontRange" type="range" min="14" max="36" value="18" />
+        <input id="fontRange" type="range" min="8" max="200" value="18" />
         <button id="fontInc" class="icon-only" style="border:none;background:transparent;">A+</button>
         <span id="fontSizeVal">18px</span>
       </div>
@@ -645,18 +703,23 @@
     <div class="controls-right">
       <label class="toggle" title="Pontuação inteligente no ditado (funciona apenas no Microsoft Edge)">
         <input type="checkbox" id="autoPunct" checked />
-        <span>Pontuação (Edge)</span>
+        <span class="btn-text">Pontuação (Edge)</span>
       </label>
 
       <label class="toggle" title="Caixa alta em todo texto ditado">
         <input type="checkbox" id="allCaps" />
-        <span>Caixa Alta</span>
+        <span class="btn-text">Caixa Alta</span>
       </label>
 
-      <label class="toggle" title="Envia o texto ditado imediatamente ao pressionar Enter ou pontuação final (., !, ?, ;). Útil no Google Chrome.">
+      <label class="toggle" title="Envia o texto ditado imediatamente ao pressionar Enter ou pontuação final">
         <input type="checkbox" id="quickSend" />
-        <span>Envio Imediato</span>
+        <span class="btn-text">Envio Imediato</span>
       </label>
+
+      <!-- Ferramenta de Alternância da Barra (Normal / Ícones Apenas / Oculta) -->
+      <button id="barModeBtn" class="icon-only" title="Alternar Barra (Normal / Ícones / Ocultar - Atalho: Ctrl+B ou F6)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
 
       <button id="themeToggleBtn" class="icon-only" title="Alternar Modo Escuro / Claro">
         <svg id="themeIconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -665,7 +728,7 @@
 
       <button id="notesToggle" title="Atalho: F2">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        Notas (F2)
+        <span class="btn-text">Notas (F2)</span>
       </button>
 
       <div id="status" aria-live="polite">Pronto</div>
@@ -683,7 +746,7 @@
             <span id="wordCount">0 palavras</span>
             <span id="charCount">0 caracteres</span>
           </div>
-          <span style="opacity: 0.7;">Pressione <strong>Esc</strong> para falar</span>
+          <span style="opacity: 0.7;">Pressione <strong>Esc</strong> para falar | <strong>Ctrl+B</strong> alternar barra</span>
         </div>
       </div>
     </div>
@@ -796,6 +859,10 @@ const autoPunct = document.getElementById('autoPunct');
 const allCaps = document.getElementById('allCaps');
 const quickSend = document.getElementById('quickSend');
 
+/* Elementos de Controle da Barra */
+const barModeBtn = document.getElementById('barModeBtn');
+const unhideBarBtn = document.getElementById('unhideBarBtn');
+
 /* DOM Elementos da Correção por IA */
 const aiBtn = document.getElementById('aiBtn');
 const aiConfigBtn = document.getElementById('aiConfigBtn');
@@ -810,7 +877,6 @@ const aiModelInput = document.getElementById('aiModelInput');
 
 const QUICK_SEND_PUNCT = new Set(['.', ',', ';', '/', '-', '!', '?', ':']);
 
-/* Funcionamento Original do Envio Imediato */
 output.addEventListener('keydown', (e) => {
   if(!quickSend.checked || !recognition || !lastInterim) return;
 
@@ -846,10 +912,14 @@ let notes = [];
 const STORAGE_KEY = 'ditado_notes_v2';
 const FONT_STORAGE_KEY = 'ditado_fontsize';
 const THEME_STORAGE_KEY = 'ditado_theme';
+const BAR_MODE_STORAGE_KEY = 'ditado_bar_mode';
 const HISTORY_LIMIT = 300;
 const MAX_NOTES = 500;
 let currentNoteIndex = null;
 let lastInterim = '';
+
+/* Modo da Barra: 'full' (Normal) | 'compact' (Ícones apenas) | 'hidden' (Oculta) */
+let currentBarMode = 'full';
 
 /* Armazenamento das Configurações de IA */
 const AI_KEY_STORAGE = 'ditado_ai_key';
@@ -862,6 +932,48 @@ const DEFAULT_AI_MODELS = {
   openrouter: 'google/gemini-2.0-flash-001',
   openai: 'gpt-4o-mini'
 };
+
+/* ====== Ferramenta de Alternância da Barra Superior ====== */
+function setBarMode(mode, save = true) {
+  currentBarMode = mode;
+  document.body.classList.remove('bar-compact', 'bar-hidden');
+  
+  if (mode === 'compact') {
+    document.body.classList.add('bar-compact');
+    barModeBtn.title = "Modo Atual: Ícones Apenas (Clique para Ocultar Barra - Ctrl+B)";
+  } else if (mode === 'hidden') {
+    document.body.classList.add('bar-hidden');
+  } else {
+    barModeBtn.title = "Modo Atual: Normal (Clique para Ícones Apenas - Ctrl+B)";
+  }
+
+  if (save) {
+    localStorage.setItem(BAR_MODE_STORAGE_KEY, mode);
+  }
+}
+
+function cycleBarMode() {
+  if (currentBarMode === 'full') {
+    setBarMode('compact');
+    showToast('Modo Compacto: Apenas Ícones');
+  } else if (currentBarMode === 'compact') {
+    setBarMode('hidden');
+    showToast('Barra Oculta (Clique no botão no canto para voltar)');
+  } else {
+    setBarMode('full');
+    showToast('Barra Expandida');
+  }
+}
+
+barModeBtn.addEventListener('click', cycleBarMode);
+unhideBarBtn.addEventListener('click', () => {
+  setBarMode('full');
+  showToast('Barra Expandida');
+});
+
+// Restaura estado da barra
+const savedBarMode = localStorage.getItem(BAR_MODE_STORAGE_KEY) || 'full';
+setBarMode(savedBarMode, false);
 
 /* ====== Gerenciamento de Tema ====== */
 function initTheme() {
@@ -1165,9 +1277,9 @@ async function copyAll(){
   }
 }
 
-/* ====== Tamanho da Fonte ====== */
+/* ====== Tamanho da Fonte (Ajuste Quase Ilimitado: 8px até 200px) ====== */
 function setFontSize(px){
-  const fontPx = Math.max(12, Math.min(36, Number(px)));
+  const fontPx = Math.max(6, Math.min(300, Number(px)));
   document.documentElement.style.setProperty('--font-size', fontPx + 'px');
   fontRange.value = fontPx;
   fontSizeVal.textContent = fontPx + 'px';
@@ -1175,8 +1287,18 @@ function setFontSize(px){
 }
 
 fontRange.addEventListener('input', ()=> setFontSize(fontRange.value));
-fontInc.addEventListener('click', ()=> setFontSize(Number(fontRange.value) + 2));
-fontDec.addEventListener('click', ()=> setFontSize(Number(fontRange.value) - 2));
+
+fontInc.addEventListener('click', ()=> {
+  const current = Number(fontRange.value);
+  const step = current >= 50 ? 10 : (current >= 30 ? 4 : 2);
+  setFontSize(current + step);
+});
+
+fontDec.addEventListener('click', ()=> {
+  const current = Number(fontRange.value);
+  const step = current > 50 ? 10 : (current > 30 ? 4 : 2);
+  setFontSize(current - step);
+});
 
 /* ====== Painel Lateral ====== */
 function openNotes(){ notesPanel.classList.add('open'); notesPanel.setAttribute('aria-hidden','false'); searchInput.focus(); }
@@ -1553,7 +1675,7 @@ async function correctWithAI() {
   status.textContent = 'IA corrigindo texto...';
   aiBtn.disabled = true;
 
-  const systemPrompt = "Você é um assistente especialista em revisão gramatical e ortográfica em português do Brasil. Sua única função é corrigir a ortografia, pontuação, concordância e o uso de maiúsculas e minúsculas do texto a seguir. Mantenha integralmente o sentido original e a estrutura dos parágrafos. NÃO adicione saudações, explicações, nem comentários como 'Aqui está o texto corrigido'. Retorne EXCLUSIVAMENTE o texto final corrigido. Se um texto (frase ou palavra) estiver totalmente em CAIXA ALTA, você deve manter em CAIXA ALTA, e isso é Prioridade.";
+  const systemPrompt = "Você é um assistente especialista em revisão gramatical e ortográfica em português do Brasil. Sua única função é corrigir a ortografia, pontuação, concordância e o uso de maiúsculas e minúsculas do texto a seguir. Mantenha integralmente o sentido original e a estrutura dos parágrafos. NÃO adicione saudações, explicações, nem comentários como 'Aqui está o texto corrigido'. Retorne EXCLUSIVAMENTE o texto final corrigido.";
 
   try {
     let correctedText = '';
@@ -1667,6 +1789,7 @@ window.addEventListener('keydown', (e) => {
   if(e.key === 'F9'){ e.preventDefault(); newNote(); return; }
   if(e.key === 'F2'){ e.preventDefault(); toggleNotes(); return; }
   if(e.key === 'F8'){ e.preventDefault(); clearEditor(); return; }
+  if(e.key === 'F6' || (e.ctrlKey && (e.key === 'b' || e.key === 'B'))){ e.preventDefault(); cycleBarMode(); return; }
   if(e.key === 'Escape'){ e.preventDefault(); toggleMic(); return; }
   if(e.key === 'F4'){ e.preventDefault(); copyAll(); return; }
   if(e.ctrlKey && (e.key === 'u' || e.key === 'U')){ e.preventDefault(); undo(); return; }
