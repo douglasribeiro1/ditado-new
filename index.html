@@ -4,649 +4,109 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Bloco de Notas com Ditado (PWA)</title>
-
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon.png">
 <link rel="apple-touch-icon" href="icon-512.png">
 <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="bg" x1="0%25" y1="0%25" x2="100%25" y2="100%25"><stop offset="0%25" stop-color="%230f172a"/><stop offset="100%25" stop-color="%23020617"/></linearGradient><linearGradient id="mic" x1="0%25" y1="0%25" x2="100%25" y2="100%25"><stop offset="0%25" stop-color="%2360a5fa"/><stop offset="100%25" stop-color="%232563eb"/></linearGradient></defs><rect width="512" height="512" rx="128" fill="url(%23bg)"/><g><rect x="216" y="128" width="80" height="160" rx="40" fill="url(%23mic)"/><path d="M160 256c0 53 43 96 96 96s96-43 96-96" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round" fill="none"/><line x1="256" y1="352" x2="256" y2="416" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round"/><line x1="208" y1="416" x2="304" y2="416" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round"/></g></svg>'>
 <meta name="theme-color" content="#0f172a">
-
-<!-- Google Fonts Inter para máxima legibilidade -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
   :root {
-    --font-size: 18px;
-    --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-    --controls-height: 64px;
-    --notes-panel-width: 380px;
-
-    /* Tema Escuro por Padrão (Dark Mode Premium) */
-    --bg-app: #090d16;
-    --bg-surface: #131b2e;
-    --bg-card: #1e293b;
-    --border-color: #2e3d56;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    --primary-color: #3b82f6;
-    --primary-hover: #2563eb;
-    --primary-glow: rgba(59, 130, 246, 0.25);
-    --recording-color: #ef4444;
-    --recording-glow: rgba(239, 68, 68, 0.4);
-    --warn-color: #f43f5e;
-    --input-bg: #0f172a;
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --font-size: 18px; --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    --controls-height: 64px; --notes-panel-width: 380px;
+    --bg-app: #090d16; --bg-surface: #131b2e; --bg-card: #1e293b; --border-color: #2e3d56;
+    --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+    --primary-color: #3b82f6; --primary-hover: #2563eb; --primary-glow: rgba(59, 130, 246, 0.25);
+    --recording-color: #ef4444; --recording-glow: rgba(239, 68, 68, 0.4); --warn-color: #f43f5e;
+    --input-bg: #0f172a; --shadow-sm: 0 2px 8px rgba(0,0,0,0.25); --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
   }
-
   [data-theme="light"] {
-    --bg-app: #f8fafc;
-    --bg-surface: #ffffff;
-    --bg-card: #f1f5f9;
-    --border-color: #e2e8f0;
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #94a3b8;
-    --primary-color: #2563eb;
-    --primary-hover: #1d4ed8;
-    --primary-glow: rgba(37, 99, 235, 0.15);
-    --recording-color: #dc2626;
-    --recording-glow: rgba(220, 38, 38, 0.3);
-    --warn-color: #e11d48;
-    --input-bg: #ffffff;
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --bg-app: #f8fafc; --bg-surface: #ffffff; --bg-card: #f1f5f9; --border-color: #e2e8f0;
+    --text-primary: #0f172a; --text-secondary: #475569; --text-muted: #94a3b8;
+    --primary-color: #2563eb; --primary-hover: #1d4ed8; --primary-glow: rgba(37, 99, 235, 0.15);
+    --recording-color: #dc2626; --recording-glow: rgba(220, 38, 38, 0.3); --warn-color: #e11d48;
+    --input-bg: #ffffff; --shadow-sm: 0 1px 3px rgba(0,0,0,0.05); --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
   }
-
   * { box-sizing: border-box; }
-  html, body {
-    height: 100%;
-    margin: 0;
-    font-family: var(--font-family);
-    background-color: var(--bg-app);
-    color: var(--text-primary);
-    overflow: hidden;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  #app {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-  }
-
-  /* ====== Barra Superior de Controles ====== */
-  #controls {
-    height: var(--controls-height);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 0 16px;
-    background: var(--bg-surface);
-    border-bottom: 1px solid var(--border-color);
-    box-shadow: var(--shadow-sm);
-    z-index: 10;
-    transition: all 0.2s ease;
-  }
-
-  .controls-left, .controls-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  /* ====== Estilização de Botões ====== */
-  button, .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 8px 14px;
-    font-family: var(--font-family);
-    font-size: 14px;
-    font-weight: 500;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-card);
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: all 0.15s ease;
-    user-select: none;
-    white-space: nowrap;
-  }
-
-  button:hover:not(:disabled) {
-    background: var(--border-color);
-    transform: translateY(-1px);
-  }
-
-  button:active:not(:disabled) {
-    transform: translateY(0);
-  }
-
-  button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  button.primary {
-    background: var(--primary-color);
-    color: #ffffff;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 12px var(--primary-glow);
-  }
-  button.primary:hover:not(:disabled) {
-    background: var(--primary-hover);
-    border-color: var(--primary-hover);
-  }
-
-  button.recording {
-    background: var(--recording-color) !important;
-    color: #ffffff !important;
-    border-color: var(--recording-color) !important;
-    animation: pulseMic 1.8s infinite;
-  }
-
-  @keyframes pulseMic {
-    0% { box-shadow: 0 0 0 0 var(--recording-glow); }
-    70% { box-shadow: 0 0 0 10px rgba(0, 0, 0, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
-  }
-
-  button.warn {
-    color: var(--warn-color);
-    border-color: rgba(244, 63, 94, 0.3);
-    background: rgba(244, 63, 94, 0.08);
-  }
-  button.warn:hover:not(:disabled) {
-    background: rgba(244, 63, 94, 0.2);
-    border-color: var(--warn-color);
-  }
-
-  button.icon-only {
-    padding: 8px;
-    width: 36px;
-    height: 36px;
-  }
-
-  /* ====== Controles de Fonte ====== */
-  #fontControls {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--bg-card);
-    padding: 4px 10px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-  }
-  #fontControls label {
-    font-size: 12px;
-    color: var(--text-secondary);
-    font-weight: 500;
-  }
-  #fontSizeVal {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-primary);
-    min-width: 42px;
-    text-align: center;
-  }
-  input[type="range"] {
-    width: 100px;
-    accent-color: var(--primary-color);
-    cursor: pointer;
-  }
-
-  /* ====== Checkboxes Estilizados ====== */
-  .toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-card);
-    font-size: 13px;
-    color: var(--text-secondary);
-    cursor: pointer;
-    user-select: none;
-  }
-  .toggle:hover {
-    color: var(--text-primary);
-    border-color: var(--text-muted);
-  }
-  .toggle input {
-    cursor: pointer;
-    width: 16px;
-    height: 16px;
-    accent-color: var(--primary-color);
-  }
-
-  #status {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    padding: 4px 10px;
-    border-radius: 20px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-  }
-
-  /* ====== Modos da Barra Superior ====== */
-  body.bar-compact #controls {
-    height: 48px;
-    padding: 0 10px;
-  }
-  body.bar-compact .btn-text,
-  body.bar-compact #fontControls label,
-  body.bar-compact #fontSizeVal {
-    display: none !important;
-  }
-  body.bar-compact button, body.bar-compact .toggle {
-    padding: 6px 10px;
-  }
-  body.bar-compact input[type="range"] {
-    width: 70px;
-  }
-
-  body.bar-hidden #controls {
-    display: none !important;
-  }
-
-  #unhideBarBtn {
-    position: fixed;
-    top: 12px;
-    right: 20px;
-    z-index: 999;
-    display: none;
-    background: var(--bg-surface);
-    border: 1px solid var(--primary-color);
-    box-shadow: var(--shadow-md), 0 0 12px var(--primary-glow);
-    border-radius: 20px;
-    padding: 8px 16px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-  #unhideBarBtn:hover {
-    background: var(--primary-color);
-    color: #ffffff;
-    transform: translateY(2px);
-  }
-  body.bar-hidden #unhideBarBtn {
-    display: inline-flex !important;
-  }
-
-  /* ====== Área Principal do Editor ====== */
-  #main {
-    display: flex;
-    flex: 1 1 auto;
-    min-height: 0;
-    position: relative;
-  }
-
-  #editor {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
-    box-sizing: border-box;
-    min-width: 0;
-    background: var(--bg-app);
-  }
-
-  .editor-wrapper {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .editor-wrapper:focus-within {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px var(--primary-glow);
-  }
-
-  #output {
-    width: 100%;
-    flex: 1 1 auto;
-    font-family: var(--font-family);
-    font-size: var(--font-size);
-    line-height: 1.6;
-    padding: 24px;
-    border: none;
-    resize: none;
-    outline: none;
-    background: transparent;
-    color: var(--text-primary);
-    overflow-y: auto;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-
-  #output::placeholder {
-    color: var(--text-muted);
-  }
-
-  /* ====== Rodapé do Editor ====== */
-  #editorFooter {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 20px;
-    background: var(--bg-surface);
-    border-top: 1px solid var(--border-color);
-    font-size: 12px;
-    color: var(--text-secondary);
-    user-select: none;
-  }
-  
-  .stats-group {
-    display: flex;
-    gap: 16px;
-    font-weight: 500;
-  }
-
-  /* ====== Painel Lateral de Notas ====== */
-  #notesPanel {
-    width: 0;
-    transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-    overflow: hidden;
-    border-left: 1px solid var(--border-color);
-    background: var(--bg-surface);
-    display: flex;
-    flex-direction: column;
-    z-index: 20;
-  }
-
-  #notesPanel.open {
-    width: var(--notes-panel-width);
-  }
-
-  #notesHeader {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 16px;
-    border-bottom: 1px solid var(--border-color);
-    background: var(--bg-surface);
-  }
-
-  .notes-header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  #searchInput {
-    width: 100%;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background: var(--input-bg);
-    color: var(--text-primary);
-    font-family: var(--font-family);
-    font-size: 13px;
-    outline: none;
-  }
-  #searchInput:focus {
-    border-color: var(--primary-color);
-  }
-
-  #notesList {
-    padding: 16px;
-    overflow-y: auto;
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .note-card {
-    padding: 14px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    font-size: 14px;
-    line-height: 1.45;
-    position: relative;
-    transition: all 0.15s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    cursor: pointer;
-  }
-
-  .note-card:hover {
-    border-color: var(--primary-color);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .note-card.active {
-    border-color: var(--primary-color);
-    background: var(--bg-surface);
-  }
-
-  .note-card .text-preview {
-    color: var(--text-primary);
-    white-space: pre-wrap;
-    word-break: break-word;
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .note-card .meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 11px;
-    color: var(--text-secondary);
-    margin-top: 4px;
-    border-top: 1px solid var(--border-color);
-    padding-top: 6px;
-  }
-
-  .note-card .actions {
-    display: flex;
-    gap: 6px;
-  }
-
-  /* ====== Overlay de Ditado em Tempo Real ====== */
-  #dictateOverlay {
-    position: fixed;
-    left: 50%;
-    bottom: 24px;
-    transform: translateX(-50%) translateY(100px);
-    width: fit-content;
-    min-width: 300px;
-    max-width: min(840px, 94vw);
-    max-height: 55vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 14px;
-    padding: 16px 22px;
-    background: var(--bg-surface);
-    color: var(--text-primary);
-    border: 1px solid var(--primary-color);
-    border-radius: 20px;
-    box-shadow: var(--shadow-md), 0 0 28px var(--primary-glow);
-    z-index: 100;
-    opacity: 0;
-    pointer-events: none;
-    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease, width 0.15s ease, height 0.15s ease;
-    overflow: hidden;
-  }
-
-  #dictateOverlay.open {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .overlay-content {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    flex: 1 1 auto;
-    min-width: 0;
-    width: 100%;
-  }
-
-  .live-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--recording-color);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-    padding-top: 3px;
-    flex-shrink: 0;
-  }
-
-  .live-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--recording-color);
-    animation: blinkDot 1s infinite alternate;
-  }
-
-  @keyframes blinkDot {
-    from { opacity: 0.3; }
-    to { opacity: 1; }
-  }
-
-  #overlayText {
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 1.55;
-    color: var(--text-primary);
-    white-space: pre-wrap;
-    word-break: break-word;
-    overflow-y: auto;
-    max-height: calc(55vh - 36px);
-    flex: 1 1 auto;
-    padding-right: 4px;
-  }
-
-  /* ====== Toast & Modais ====== */
-  #toast {
-    position: fixed;
-    top: 24px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-20px);
-    background: var(--bg-surface);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    padding: 10px 20px;
-    border-radius: 30px;
-    font-size: 14px;
-    font-weight: 500;
-    z-index: 1000;
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.2s ease;
-    box-shadow: var(--shadow-md);
-  }
-  #toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  .modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-  }
-
-  .modal-backdrop.open {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .modal-card {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 24px;
-    max-width: 440px;
-    width: 90%;
-    box-shadow: var(--shadow-md);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .modal-card h3 {
-    margin: 0;
-    font-size: 18px;
-    color: var(--text-primary);
-  }
-
-  .modal-card p {
-    margin: 0;
-    font-size: 14px;
-    color: var(--text-secondary);
-  }
-
-  .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-
-  @media (max-width: 800px) {
-    #controls {
-      height: auto;
-      padding: 12px;
-    }
-    #notesPanel.open {
-      width: 100%;
-      position: absolute;
-      left: 0;
-      top: var(--controls-height);
-      height: calc(100vh - var(--controls-height));
-    }
-  }
+  html, body { height: 100%; margin: 0; font-family: var(--font-family); background-color: var(--bg-app); color: var(--text-primary); overflow: hidden; -webkit-font-smoothing: antialiased; }
+  #app { display: flex; flex-direction: column; height: 100vh; }
+  #controls { height: var(--controls-height); display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 16px; background: var(--bg-surface); border-bottom: 1px solid var(--border-color); box-shadow: var(--shadow-sm); z-index: 10; transition: all 0.2s ease; }
+  .controls-left, .controls-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  button, .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 14px; font-family: var(--font-family); font-size: 14px; font-weight: 500; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); cursor: pointer; transition: all 0.15s ease; user-select: none; white-space: nowrap; }
+  button:hover:not(:disabled) { background: var(--border-color); transform: translateY(-1px); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  button.primary { background: var(--primary-color); color: #fff; border-color: var(--primary-color); box-shadow: 0 0 12px var(--primary-glow); }
+  button.primary:hover:not(:disabled) { background: var(--primary-hover); border-color: var(--primary-hover); }
+  button.recording { background: var(--recording-color) !important; color: #fff !important; border-color: var(--recording-color) !important; animation: pulseMic 1.8s infinite; }
+  @keyframes pulseMic { 0% { box-shadow: 0 0 0 0 var(--recording-glow); } 70% { box-shadow: 0 0 0 10px rgba(0,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); } }
+  button.warn { color: var(--warn-color); border-color: rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.08); }
+  button.warn:hover:not(:disabled) { background: rgba(244, 63, 94, 0.2); border-color: var(--warn-color); }
+  button.icon-only { padding: 8px; width: 36px; height: 36px; }
+  #fontControls { display: flex; align-items: center; gap: 6px; background: var(--bg-card); padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border-color); }
+  #fontControls label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+  #fontSizeVal { font-size: 13px; font-weight: 600; color: var(--text-primary); min-width: 42px; text-align: center; }
+  input[type="range"] { width: 100px; accent-color: var(--primary-color); cursor: pointer; }
+  .toggle { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); font-size: 13px; color: var(--text-secondary); cursor: pointer; user-select: none; }
+  .toggle:hover { color: var(--text-primary); border-color: var(--text-muted); }
+  .toggle input { cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary-color); }
+  #status { font-size: 13px; font-weight: 500; color: var(--text-secondary); padding: 4px 10px; border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-color); }
+  body.bar-compact #controls { height: 48px; padding: 0 10px; }
+  body.bar-compact .btn-text, body.bar-compact #fontControls label, body.bar-compact #fontSizeVal { display: none !important; }
+  body.bar-compact button, body.bar-compact .toggle { padding: 6px 10px; }
+  body.bar-compact input[type="range"] { width: 70px; }
+  body.bar-hidden #controls { display: none !important; }
+  #unhideBarBtn { position: fixed; top: 12px; right: 20px; z-index: 999; display: none; background: var(--bg-surface); border: 1px solid var(--primary-color); box-shadow: var(--shadow-md), 0 0 12px var(--primary-glow); border-radius: 20px; padding: 8px 16px; font-size: 13px; font-weight: 600; color: var(--text-primary); cursor: pointer; transition: all 0.2s ease; }
+  #unhideBarBtn:hover { background: var(--primary-color); color: #ffffff; transform: translateY(2px); }
+  body.bar-hidden #unhideBarBtn { display: inline-flex !important; }
+  #main { display: flex; flex: 1 1 auto; min-height: 0; position: relative; }
+  #editor { flex: 1 1 auto; display: flex; flex-direction: column; padding: 16px; min-width: 0; background: var(--bg-app); }
+  .editor-wrapper { display: flex; flex-direction: column; flex: 1 1 auto; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--shadow-sm); overflow: hidden; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+  .editor-wrapper:focus-within { border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-glow); }
+  #output { width: 100%; flex: 1 1 auto; font-family: var(--font-family); font-size: var(--font-size); line-height: 1.6; padding: 24px; border: none; resize: none; outline: none; background: transparent; color: var(--text-primary); overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
+  #output::placeholder { color: var(--text-muted); }
+  #editorFooter { display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; background: var(--bg-surface); border-top: 1px solid var(--border-color); font-size: 12px; color: var(--text-secondary); user-select: none; }
+  .stats-group { display: flex; gap: 16px; font-weight: 500; }
+  #notesPanel { width: 0; transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; border-left: 1px solid var(--border-color); background: var(--bg-surface); display: flex; flex-direction: column; z-index: 20; }
+  #notesPanel.open { width: var(--notes-panel-width); }
+  #notesHeader { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-bottom: 1px solid var(--border-color); background: var(--bg-surface); }
+  .notes-header-top { display: flex; align-items: center; justify-content: space-between; }
+  #searchInput { width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-primary); font-family: var(--font-family); font-size: 13px; outline: none; }
+  #searchInput:focus { border-color: var(--primary-color); }
+  #notesList { padding: 16px; overflow-y: auto; flex: 1 1 auto; display: flex; flex-direction: column; gap: 12px; }
+  .note-card { padding: 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; font-size: 14px; line-height: 1.45; transition: all 0.15s ease; display: flex; flex-direction: column; gap: 8px; cursor: pointer; }
+  .note-card:hover { border-color: var(--primary-color); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+  .note-card.active { border-color: var(--primary-color); background: var(--bg-surface); }
+  .note-card .text-preview { color: var(--text-primary); white-space: pre-wrap; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+  .note-card .meta { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-top: 4px; border-top: 1px solid var(--border-color); padding-top: 6px; }
+  .note-card .actions { display: flex; gap: 6px; }
+  #dictateOverlay { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(100px); width: fit-content; min-width: 300px; max-width: min(840px, 94vw); max-height: 55vh; display: flex; align-items: flex-start; gap: 14px; padding: 16px 22px; background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--primary-color); border-radius: 20px; box-shadow: var(--shadow-md), 0 0 28px var(--primary-glow); z-index: 100; opacity: 0; pointer-events: none; transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease; overflow: hidden; }
+  #dictateOverlay.open { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+  .overlay-content { display: flex; align-items: flex-start; gap: 14px; flex: 1 1 auto; min-width: 0; width: 100%; }
+  .live-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--recording-color); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; padding-top: 3px; }
+  .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--recording-color); animation: blinkDot 1s infinite alternate; }
+  @keyframes blinkDot { from { opacity: 0.3; } to { opacity: 1; } }
+  #overlayText { font-size: 16px; font-weight: 500; line-height: 1.55; color: var(--text-primary); white-space: pre-wrap; word-break: break-word; overflow-y: auto; max-height: calc(55vh - 36px); flex: 1 1 auto; }
+  #toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-20px); background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px 20px; border-radius: 30px; font-size: 14px; font-weight: 500; z-index: 1000; opacity: 0; pointer-events: none; transition: all 0.2s ease; box-shadow: var(--shadow-md); }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+  .modal-backdrop.open { opacity: 1; pointer-events: auto; }
+  .modal-card { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; max-width: 440px; width: 90%; box-shadow: var(--shadow-md); display: flex; flex-direction: column; gap: 16px; }
+  .modal-card h3 { margin: 0; font-size: 18px; color: var(--text-primary); }
+  .modal-card p { margin: 0; font-size: 14px; color: var(--text-secondary); }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+  @media (max-width: 800px) { #controls { height: auto; padding: 12px; } #notesPanel.open { width: 100%; position: absolute; left: 0; top: var(--controls-height); height: calc(100vh - var(--controls-height)); } }
 </style>
 </head>
 <body>
 
 <div id="app" role="application">
-  <!-- Botão Flutuante quando a Barra está Oculta -->
   <button id="unhideBarBtn" title="Mostrar Barra Superior (Ctrl+B)">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
     <span>Mostrar Barra</span>
   </button>
 
-  <!-- ====== Barra Superior de Ferramentas ====== -->
   <header id="controls" role="toolbar" aria-label="Barra de ferramentas do ditado">
     <div class="controls-left">
       <button id="micBtn" class="primary" title="Iniciar/Parar Ditado (Esc)">
@@ -654,7 +114,6 @@
         <span id="micBtnText" class="btn-text">Iniciar (Esc)</span>
       </button>
 
-      <!-- Grupo do Botão de IA + Engrenagem -->
       <div style="display:inline-flex; gap:2px;">
         <button id="aiBtn" title="Atalho: F10 | Corrigir ortografia e gramática com IA">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2z"/></svg>
@@ -688,7 +147,6 @@
         <span class="btn-text">Limpar (F8)</span>
       </button>
 
-      <!-- Seletor de Tamanho de Fonte -->
       <div id="fontControls" title="Ajuste de tamanho da fonte (8px a 200px)">
         <button id="fontDec" class="icon-only" style="border:none;background:transparent;">A-</button>
         <input id="fontRange" type="range" min="8" max="200" value="18" />
@@ -713,7 +171,6 @@
         <span class="btn-text">Envio Imediato</span>
       </label>
 
-      <!-- Ferramenta de Alternância da Barra -->
       <button id="barModeBtn" class="icon-only" title="Alternar Barra (Normal / Ícones / Ocultar - Atalho: Ctrl+B ou F6)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
@@ -732,12 +189,10 @@
     </div>
   </header>
 
-  <!-- ====== Área Principal do Editor ====== -->
   <main id="main">
     <div id="editor">
       <div class="editor-wrapper">
         <textarea id="output" placeholder="O texto ditado ou digitado aparecerá aqui..." aria-label="Área de texto ditado"></textarea>
-        
         <div id="editorFooter">
           <div class="stats-group">
             <span id="wordCount">0 palavras</span>
@@ -748,7 +203,6 @@
       </div>
     </div>
 
-    <!-- ====== Painel Lateral de Notas Salvas ====== -->
     <aside id="notesPanel" aria-hidden="true">
       <div id="notesHeader">
         <div class="notes-header-top">
@@ -767,18 +221,13 @@
   </main>
 </div>
 
-<!-- ====== Overlay de Status de Voz ====== -->
 <div id="dictateOverlay" aria-hidden="true">
   <div class="overlay-content">
-    <div class="live-badge">
-      <div class="live-dot"></div>
-      Ouvindo
-    </div>
+    <div class="live-badge"><div class="live-dot"></div>Ouvindo</div>
     <div id="overlayText">Aguardando fala...</div>
   </div>
 </div>
 
-<!-- ====== Componentes Flutuantes ====== -->
 <div id="toast" role="status">Copiado</div>
 
 <div id="confirmModal" class="modal-backdrop" aria-hidden="true">
@@ -792,7 +241,6 @@
   </div>
 </div>
 
-<!-- ====== Modal de Configuração de API da IA ====== -->
 <div id="aiModal" class="modal-backdrop" aria-hidden="true">
   <div class="modal-card">
     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -832,1069 +280,413 @@
 </div>
 
 <script>
-/* ====== Referências DOM ====== */
-const output = document.getElementById('output');
-const micBtn = document.getElementById('micBtn');
-const micBtnText = document.getElementById('micBtnText');
-const copyBtn = document.getElementById('copyBtn');
-const undoBtn = document.getElementById('undoBtn');
-const redoBtn = document.getElementById('redoBtn');
-const newBtn = document.getElementById('newBtn');
-const clearBtn = document.getElementById('clearBtn');
-const notesToggle = document.getElementById('notesToggle');
-const notesPanel = document.getElementById('notesPanel');
-const notesList = document.getElementById('notesList');
-const searchInput = document.getElementById('searchInput');
-const closeNotesBtn = document.getElementById('closeNotesBtn');
-const deleteAllBtn = document.getElementById('deleteAllBtn');
-const status = document.getElementById('status');
-const fontRange = document.getElementById('fontRange');
-const fontSizeVal = document.getElementById('fontSizeVal');
-const fontInc = document.getElementById('fontInc');
-const fontDec = document.getElementById('fontDec');
-const autoPunct = document.getElementById('autoPunct');
-const allCaps = document.getElementById('allCaps');
-const quickSend = document.getElementById('quickSend');
-
-/* Elementos de Controle da Barra */
-const barModeBtn = document.getElementById('barModeBtn');
-const unhideBarBtn = document.getElementById('unhideBarBtn');
-
-/* DOM Elementos da Correção por IA */
-const aiBtn = document.getElementById('aiBtn');
-const aiConfigBtn = document.getElementById('aiConfigBtn');
-const aiModal = document.getElementById('aiModal');
-const closeAiModalBtn = document.getElementById('closeAiModalBtn');
-const cancelAiModalBtn = document.getElementById('cancelAiModalBtn');
-const saveAiModalBtn = document.getElementById('saveAiModalBtn');
-const clearAiKeyBtn = document.getElementById('clearAiKeyBtn');
-const aiProviderSelect = document.getElementById('aiProviderSelect');
-const aiApiKeyInput = document.getElementById('aiApiKeyInput');
-const aiModelInput = document.getElementById('aiModelInput');
+/* DOM Elementos */
+const output = document.getElementById('output'), micBtn = document.getElementById('micBtn'), micBtnText = document.getElementById('micBtnText');
+const copyBtn = document.getElementById('copyBtn'), undoBtn = document.getElementById('undoBtn'), redoBtn = document.getElementById('redoBtn');
+const newBtn = document.getElementById('newBtn'), clearBtn = document.getElementById('clearBtn'), notesToggle = document.getElementById('notesToggle');
+const notesPanel = document.getElementById('notesPanel'), notesList = document.getElementById('notesList'), searchInput = document.getElementById('searchInput');
+const closeNotesBtn = document.getElementById('closeNotesBtn'), deleteAllBtn = document.getElementById('deleteAllBtn'), status = document.getElementById('status');
+const fontRange = document.getElementById('fontRange'), fontSizeVal = document.getElementById('fontSizeVal'), fontInc = document.getElementById('fontInc'), fontDec = document.getElementById('fontDec');
+const autoPunct = document.getElementById('autoPunct'), allCaps = document.getElementById('allCaps'), quickSend = document.getElementById('quickSend');
+const barModeBtn = document.getElementById('barModeBtn'), unhideBarBtn = document.getElementById('unhideBarBtn');
+const aiBtn = document.getElementById('aiBtn'), aiConfigBtn = document.getElementById('aiConfigBtn'), aiModal = document.getElementById('aiModal');
+const closeAiModalBtn = document.getElementById('closeAiModalBtn'), cancelAiModalBtn = document.getElementById('cancelAiModalBtn'), saveAiModalBtn = document.getElementById('saveAiModalBtn'), clearAiKeyBtn = document.getElementById('clearAiKeyBtn');
+const aiProviderSelect = document.getElementById('aiProviderSelect'), aiApiKeyInput = document.getElementById('aiApiKeyInput'), aiModelInput = document.getElementById('aiModelInput');
+const themeToggleBtn = document.getElementById('themeToggleBtn'), themeIconSun = document.getElementById('themeIconSun'), themeIconMoon = document.getElementById('themeIconMoon');
+const wordCountEl = document.getElementById('wordCount'), charCountEl = document.getElementById('charCount');
+const overlay = document.getElementById('dictateOverlay'), overlayText = document.getElementById('overlayText'), toastEl = document.getElementById('toast');
+const confirmModal = document.getElementById('confirmModal'), cancelModalBtn = document.getElementById('cancelModalBtn'), confirmModalBtn = document.getElementById('confirmModalBtn');
 
 const QUICK_SEND_PUNCT = new Set(['.', ',', ';', '/', '-', '!', '?', ':']);
+const DEFAULT_AI_MODELS = { gemini: 'gemini-2.0-flash', groq: 'llama-3.3-70b-versatile', openrouter: 'google/gemini-2.0-flash-001', openai: 'gpt-4o-mini' };
 
+/* LocalStorage Keys & Estado */
+const STORAGE_KEY = 'ditado_notes_v2', FONT_STORAGE_KEY = 'ditado_fontsize', THEME_STORAGE_KEY = 'ditado_theme', BAR_MODE_STORAGE_KEY = 'ditado_bar_mode';
+const AUTO_PUNCT_STORAGE_KEY = 'ditado_auto_punct', ALL_CAPS_STORAGE_KEY = 'ditado_all_caps', QUICK_SEND_STORAGE_KEY = 'ditado_quick_send';
+const AI_KEY_STORAGE = 'ditado_ai_key', AI_PROVIDER_STORAGE = 'ditado_ai_provider', AI_MODEL_STORAGE = 'ditado_ai_model';
+const HISTORY_LIMIT = 300, MAX_NOTES = 500;
+
+let saveTimer = null, history = [], redoStack = [], notes = [], currentNoteIndex = null;
+let lastInterim = '', ignoreFinalForText = '', isFlushRestarting = false, currentBarMode = 'full';
+
+/* Enter e Pontuação no Teclado */
 output.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     if (lastInterim && lastInterim.trim()) {
-      // Quando HÁ texto no buffer: apenas envia o texto do buffer, SEM inserir quebra de linha
       e.preventDefault();
       flushInterimKeyboard();
-    } else {
-      // Quando NÃO HÁ texto no buffer: deixa o Enter funcionar normalmente (inserindo a quebra de linha \n)
     }
     return;
   }
-
   if (quickSend.checked && recognition && lastInterim && QUICK_SEND_PUNCT.has(e.key)) {
     e.preventDefault();
     flushInterimKeyboard();
   }
 });
 
-const themeToggleBtn = document.getElementById('themeToggleBtn');
-const themeIconSun = document.getElementById('themeIconSun');
-const themeIconMoon = document.getElementById('themeIconMoon');
-
-const wordCountEl = document.getElementById('wordCount');
-const charCountEl = document.getElementById('charCount');
-
-const overlay = document.getElementById('dictateOverlay');
-const overlayText = document.getElementById('overlayText');
-const toastEl = document.getElementById('toast');
-
-const confirmModal = document.getElementById('confirmModal');
-const cancelModalBtn = document.getElementById('cancelModalBtn');
-const confirmModalBtn = document.getElementById('confirmModalBtn');
-
-/* ====== Estado e Armazenamento ====== */
-let saveTimer = null;
-const autosaveDelay = 1500;
-let history = [];
-let redoStack = [];
-let notes = [];
-const STORAGE_KEY = 'ditado_notes_v2';
-const FONT_STORAGE_KEY = 'ditado_fontsize';
-const THEME_STORAGE_KEY = 'ditado_theme';
-const BAR_MODE_STORAGE_KEY = 'ditado_bar_mode';
-const AUTO_PUNCT_STORAGE_KEY = 'ditado_auto_punct';
-const ALL_CAPS_STORAGE_KEY = 'ditado_all_caps';
-const QUICK_SEND_STORAGE_KEY = 'ditado_quick_send';
-const HISTORY_LIMIT = 300;
-const MAX_NOTES = 500;
-let currentNoteIndex = null;
-let lastInterim = '';
-let ignoreFinalForText = ''; 
-let isFlushRestarting = false; // Flag para reinício transparente de sessão de áudio no Enter
-
-/* Modo da Barra: 'full' | 'compact' | 'hidden' */
-let currentBarMode = 'full';
-
-/* Armazenamento das Configurações de IA */
-const AI_KEY_STORAGE = 'ditado_ai_key';
-const AI_PROVIDER_STORAGE = 'ditado_ai_provider';
-const AI_MODEL_STORAGE = 'ditado_ai_model';
-
-const DEFAULT_AI_MODELS = {
-  gemini: 'gemini-2.0-flash',
-  groq: 'llama-3.3-70b-versatile',
-  openrouter: 'google/gemini-2.0-flash-001',
-  openai: 'gpt-4o-mini'
-};
-
-/* ====== Persistência das Opções dos Checkboxes ====== */
+/* Persistência de Opções */
 function initToggles() {
-  const savedAutoPunct = localStorage.getItem(AUTO_PUNCT_STORAGE_KEY);
-  if (savedAutoPunct !== null) {
-    autoPunct.checked = savedAutoPunct === 'true';
-  }
-
-  const savedAllCaps = localStorage.getItem(ALL_CAPS_STORAGE_KEY);
-  if (savedAllCaps !== null) {
-    allCaps.checked = savedAllCaps === 'true';
-  }
-
-  const savedQuickSend = localStorage.getItem(QUICK_SEND_STORAGE_KEY);
-  if (savedQuickSend !== null) {
-    quickSend.checked = savedQuickSend === 'true';
-  }
+  const ap = localStorage.getItem(AUTO_PUNCT_STORAGE_KEY), ac = localStorage.getItem(ALL_CAPS_STORAGE_KEY), qs = localStorage.getItem(QUICK_SEND_STORAGE_KEY);
+  if (ap !== null) autoPunct.checked = ap === 'true';
+  if (ac !== null) allCaps.checked = ac === 'true';
+  if (qs !== null) quickSend.checked = qs === 'true';
 }
+autoPunct.addEventListener('change', () => localStorage.setItem(AUTO_PUNCT_STORAGE_KEY, autoPunct.checked));
+allCaps.addEventListener('change', () => localStorage.setItem(ALL_CAPS_STORAGE_KEY, allCaps.checked));
+quickSend.addEventListener('change', () => localStorage.setItem(QUICK_SEND_STORAGE_KEY, quickSend.checked));
 
-autoPunct.addEventListener('change', () => {
-  localStorage.setItem(AUTO_PUNCT_STORAGE_KEY, autoPunct.checked);
-});
-
-allCaps.addEventListener('change', () => {
-  localStorage.setItem(ALL_CAPS_STORAGE_KEY, allCaps.checked);
-});
-
-quickSend.addEventListener('change', () => {
-  localStorage.setItem(QUICK_SEND_STORAGE_KEY, quickSend.checked);
-});
-
-/* ====== Ferramenta de Alternância da Barra Superior ====== */
+/* Alternância da Barra Superior */
 function setBarMode(mode, save = true) {
   currentBarMode = mode;
   document.body.classList.remove('bar-compact', 'bar-hidden');
-  
-  if (mode === 'compact') {
-    document.body.classList.add('bar-compact');
-    barModeBtn.title = "Modo Atual: Ícones Apenas (Clique para Ocultar Barra - Ctrl+B)";
-  } else if (mode === 'hidden') {
-    document.body.classList.add('bar-hidden');
-  } else {
-    barModeBtn.title = "Modo Atual: Normal (Clique para Ícones Apenas - Ctrl+B)";
-  }
-
-  if (save) {
-    localStorage.setItem(BAR_MODE_STORAGE_KEY, mode);
-  }
+  if (mode === 'compact') document.body.classList.add('bar-compact');
+  else if (mode === 'hidden') document.body.classList.add('bar-hidden');
+  if (save) localStorage.setItem(BAR_MODE_STORAGE_KEY, mode);
 }
 
 function cycleBarMode() {
-  if (currentBarMode === 'full') {
-    setBarMode('compact');
-    showToast('Modo Compacto: Apenas Ícones');
-  } else if (currentBarMode === 'compact') {
-    setBarMode('hidden');
-    showToast('Barra Oculta (Clique no botão no canto para voltar)');
-  } else {
-    setBarMode('full');
-    showToast('Barra Expandida');
-  }
+  if (currentBarMode === 'full') { setBarMode('compact'); showToast('Modo Compacto: Apenas Ícones'); }
+  else if (currentBarMode === 'compact') { setBarMode('hidden'); showToast('Barra Oculta'); }
+  else { setBarMode('full'); showToast('Barra Expandida'); }
 }
-
 barModeBtn.addEventListener('click', cycleBarMode);
-unhideBarBtn.addEventListener('click', () => {
-  setBarMode('full');
-  showToast('Barra Expandida');
-});
+unhideBarBtn.addEventListener('click', () => { setBarMode('full'); showToast('Barra Expandida'); });
 
-const savedBarMode = localStorage.getItem(BAR_MODE_STORAGE_KEY) || 'full';
-setBarMode(savedBarMode, false);
-
-/* ====== Gerenciamento de Tema ====== */
+/* Tema */
 function initTheme() {
-  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-  if (savedTheme) {
-    setTheme(savedTheme, false);
-  } else {
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    setTheme(prefersDark ? 'dark' : 'light', false);
-  }
+  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  setTheme(savedTheme, false);
 }
 
 function setTheme(theme, saveUserChoice = true) {
   document.documentElement.setAttribute('data-theme', theme);
-  if (saveUserChoice) {
-    localStorage.setItem(THEME_STORAGE_KEY, theme);
-  }
-  if (theme === 'dark') {
-    themeIconSun.style.display = 'none';
-    themeIconMoon.style.display = 'block';
-  } else {
-    themeIconSun.style.display = 'block';
-    themeIconMoon.style.display = 'none';
-  }
+  if (saveUserChoice) localStorage.setItem(THEME_STORAGE_KEY, theme);
+  themeIconSun.style.display = theme === 'dark' ? 'none' : 'block';
+  themeIconMoon.style.display = theme === 'dark' ? 'block' : 'none';
 }
+themeToggleBtn.addEventListener('click', () => setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
 
-if (window.matchMedia) {
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    if (!localStorage.getItem(THEME_STORAGE_KEY)) {
-      setTheme(e.matches ? 'dark' : 'light', false);
-    }
-  });
-}
-
-themeToggleBtn.addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme');
-  setTheme(current === 'dark' ? 'light' : 'dark', true);
-});
-
-/* ====== Utilitários ====== */
+/* Utilitários & Notas */
 function nowLabel(ts){ return new Date(ts).toLocaleString(); }
 function persistNotes(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(notes)); }
-function loadNotes(){ 
-  try{ notes = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }catch(e){ notes = []; } 
-  renderNotes(); 
-}
+function loadNotes(){ try{ notes = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }catch(e){ notes = []; } renderNotes(); }
 
 function updateStats() {
   const text = output.value || '';
-  const chars = text.length;
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-  
   wordCountEl.textContent = `${words} ${words === 1 ? 'palavra' : 'palavras'}`;
-  charCountEl.textContent = `${chars} ${chars === 1 ? 'caractere' : 'caracteres'}`;
+  charCountEl.textContent = `${text.length} ${text.length === 1 ? 'caractere' : 'caracteres'}`;
 }
 
 function renderNotes(filter = ''){
   notesList.innerHTML = '';
   const query = filter.toLowerCase().trim();
   const filtered = notes.filter(n => !query || n.text.toLowerCase().includes(query));
-
-  if(filtered.length === 0){ 
-    notesList.innerHTML = `<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center;">${notes.length === 0 ? 'Nenhuma nota salva' : 'Nenhuma nota encontrada'}</div>`; 
-    return; 
-  }
+  if(filtered.length === 0){ notesList.innerHTML = `<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center;">${notes.length === 0 ? 'Nenhuma nota salva' : 'Nenhuma nota encontrada'}</div>`; return; }
 
   filtered.forEach((n) => {
     const realIdx = notes.indexOf(n);
     const el = document.createElement('div');
     el.className = `note-card ${realIdx === currentNoteIndex ? 'active' : ''}`;
-    
-    const textNode = document.createElement('div');
-    textNode.className = 'text-preview';
-    textNode.textContent = n.text;
-    el.appendChild(textNode);
-
-    const meta = document.createElement('div');
-    meta.className = 'meta';
-    meta.innerHTML = `<span>${nowLabel(n.t)}</span>`;
-    
-    const actions = document.createElement('div');
-    actions.className = 'actions';
-    
-    const loadBtn = document.createElement('button');
-    loadBtn.style.padding = '4px 8px';
-    loadBtn.style.fontSize = '12px';
-    loadBtn.textContent = 'Carregar';
-    
-    const delBtn = document.createElement('button');
-    delBtn.className = 'warn';
-    delBtn.style.padding = '4px 8px';
-    delBtn.style.fontSize = '12px';
-    delBtn.textContent = 'Excluir';
-
-    actions.appendChild(loadBtn);
-    actions.appendChild(delBtn);
-    meta.appendChild(actions);
-    el.appendChild(meta);
-
-    loadBtn.addEventListener('click', (e)=> { 
-      e.stopPropagation();
-      loadNote(realIdx); 
-      closeNotes(); 
-    });
-
-    delBtn.addEventListener('click', (e)=> {
-      e.stopPropagation();
-      deleteSingleNote(realIdx);
-    });
-
-    el.addEventListener('click', () => {
-      loadNote(realIdx);
-      closeNotes();
-    });
-
+    el.innerHTML = `<div class="text-preview">${n.text}</div><div class="meta"><span>${nowLabel(n.t)}</span><div class="actions"><button style="padding:4px 8px;font-size:12px;">Carregar</button><button class="warn" style="padding:4px 8px;font-size:12px;">Excluir</button></div></div>`;
+    el.querySelector('button:nth-child(1)').addEventListener('click', (e)=>{ e.stopPropagation(); loadNote(realIdx); closeNotes(); });
+    el.querySelector('button:nth-child(2)').addEventListener('click', (e)=>{ e.stopPropagation(); deleteSingleNote(realIdx); });
+    el.addEventListener('click', () => { loadNote(realIdx); closeNotes(); });
     notesList.appendChild(el);
   });
 }
 
 function deleteSingleNote(idx) {
   if(currentNoteIndex !== null){
-    if(idx === currentNoteIndex){
-      currentNoteIndex = null;
-    } else if(idx < currentNoteIndex){
-      currentNoteIndex = currentNoteIndex - 1;
-    }
+    if(idx === currentNoteIndex) currentNoteIndex = null;
+    else if(idx < currentNoteIndex) currentNoteIndex--;
   }
-  notes.splice(idx,1);
-  persistNotes();
-  renderNotes(searchInput.value);
-  status.textContent = 'Nota excluída';
-  setTimeout(()=> status.textContent = 'Pronto', 900);
+  notes.splice(idx,1); persistNotes(); renderNotes(searchInput.value);
 }
-
 searchInput.addEventListener('input', () => renderNotes(searchInput.value));
 
-/* ====== Salvamento automático ====== */
-function scheduleAutoSave(){ 
-  clearTimeout(saveTimer); 
-  saveTimer = setTimeout(()=> { saveCurrentAsNote(); }, autosaveDelay); 
-}
+/* Salvamento Automático & Histórico */
+function scheduleAutoSave(){ clearTimeout(saveTimer); saveTimer = setTimeout(saveCurrentAsNote, autosaveDelay); }
 
 function saveCurrentAsNote(){
-  const text = output.value.trim();
-  if(!text) return;
-
+  const text = output.value.trim(); if(!text) return;
   if(currentNoteIndex !== null && notes[currentNoteIndex]){
     if(notes[currentNoteIndex].text === text) return;
-    notes[currentNoteIndex].text = text;
-    notes[currentNoteIndex].t = Date.now();
-    persistNotes();
-    renderNotes(searchInput.value);
-    status.textContent = 'Salvo';
-    setTimeout(()=> status.textContent = 'Pronto', 900);
-    return;
-  }
-
-  if(notes.length > 0 && notes[0].text === text){
-    notes[0].t = Date.now();
-    persistNotes();
-    renderNotes(searchInput.value);
+    notes[currentNoteIndex].text = text; notes[currentNoteIndex].t = Date.now();
+  } else {
+    if(notes.length > 0 && notes[0].text === text){ notes[0].t = Date.now(); renderNotes(searchInput.value); currentNoteIndex = 0; return; }
+    notes.unshift({ text, t: Date.now() }); if(notes.length > MAX_NOTES) notes.length = MAX_NOTES;
     currentNoteIndex = 0;
-    status.textContent = 'Salvo';
-    setTimeout(()=> status.textContent = 'Pronto', 900);
-    return;
   }
-
-  notes.unshift({ text, t: Date.now() });
-  if(notes.length > MAX_NOTES) notes.length = MAX_NOTES;
-  persistNotes();
-  renderNotes(searchInput.value);
-  currentNoteIndex = 0;
-  status.textContent = 'Salvo';
-  setTimeout(()=> status.textContent = 'Pronto', 900);
+  persistNotes(); renderNotes(searchInput.value); status.textContent = 'Salvo'; setTimeout(()=> status.textContent = 'Pronto', 900);
 }
 
-/* ====== Histórico ====== */
-function pushHistory(value){
-  if(history.length && history[history.length-1] === value) return;
-  history.push(value);
-  if(history.length > HISTORY_LIMIT) history.shift();
-  redoStack = [];
-}
+function pushHistory(value){ if(history.length && history[history.length-1] === value) return; history.push(value); if(history.length > HISTORY_LIMIT) history.shift(); redoStack = []; }
+function undo(){ if(history.length <= 1) return; redoStack.push(history.pop()); output.value = history[history.length-1] || ''; output.focus(); updateStats(); scheduleAutoSave(); }
+function redo(){ if(!redoStack.length) return; const next = redoStack.pop(); output.value = next; pushHistory(next); output.focus(); updateStats(); scheduleAutoSave(); }
 
-function undo(){
-  if(history.length <= 1) return;
-  const cur = history.pop();
-  redoStack.push(cur);
-  const prev = history[history.length-1] || '';
-  output.value = prev;
-  output.focus();
-  updateStats();
-  scheduleAutoSave();
-  status.textContent = 'Desfeito';
-  setTimeout(()=> status.textContent = 'Pronto', 700);
-}
+function newNote(){ saveCurrentAsNote(); output.value = ''; history = ['']; redoStack = []; currentNoteIndex = null; updateStats(); }
+function clearEditor(){ output.value = ''; pushHistory(output.value); currentNoteIndex = null; updateStats(); }
+function loadNote(idx){ const n = notes[idx]; if(!n) return; output.value = n.text; history = [n.text]; redoStack = []; currentNoteIndex = idx; updateStats(); renderNotes(searchInput.value); }
 
-function redo(){
-  if(redoStack.length === 0) return;
-  const next = redoStack.pop();
-  output.value = next;
-  pushHistory(next);
-  output.focus();
-  updateStats();
-  scheduleAutoSave();
-  status.textContent = 'Refeito';
-  setTimeout(()=> status.textContent = 'Pronto', 700);
-}
+function promptDeleteAllNotes() { if(notes.length) confirmModal.classList.add('open'); }
+cancelModalBtn.addEventListener('click', () => confirmModal.classList.remove('open'));
+confirmModalBtn.addEventListener('click', () => { notes = []; persistNotes(); renderNotes(); currentNoteIndex = null; confirmModal.classList.remove('open'); });
 
-/* ====== Operações no Editor ====== */
-function newNote(){
-  saveCurrentAsNote();
-  output.value = '';
-  history = [''];
-  redoStack = [];
-  currentNoteIndex = null;
-  updateStats();
-  status.textContent = 'Nova nota';
-  setTimeout(()=> status.textContent = 'Pronto', 700);
-}
-
-function clearEditor(){
-  output.value = '';
-  pushHistory(output.value);
-  currentNoteIndex = null;
-  updateStats();
-  status.textContent = 'Limpo';
-  setTimeout(()=> status.textContent = 'Pronto', 700);
-}
-
-function loadNote(idx){
-  const n = notes[idx];
-  if(!n) return;
-  output.value = n.text;
-  history = [n.text];
-  redoStack = [];
-  currentNoteIndex = idx;
-  updateStats();
-  renderNotes(searchInput.value);
-  status.textContent = 'Nota carregada';
-  setTimeout(()=> status.textContent = 'Pronto', 700);
-}
-
-/* ====== Modal de Confirmação para Excluir Todas ====== */
-function promptDeleteAllNotes() {
-  if(!notes.length) return;
-  confirmModal.classList.add('open');
-  confirmModal.setAttribute('aria-hidden', 'false');
-}
-
-cancelModalBtn.addEventListener('click', () => {
-  confirmModal.classList.remove('open');
-  confirmModal.setAttribute('aria-hidden', 'true');
-});
-
-confirmModalBtn.addEventListener('click', () => {
-  notes = [];
-  persistNotes();
-  renderNotes();
-  currentNoteIndex = null;
-  confirmModal.classList.remove('open');
-  confirmModal.setAttribute('aria-hidden', 'true');
-  status.textContent = 'Todas as notas excluídas';
-  setTimeout(()=> status.textContent = 'Pronto', 900);
-});
-
-/* ====== Copiar & Toast ====== */
+/* Toast & Copiar */
 let __toastTimer = null;
-function showToast(message = 'Copiado', ms = 1400){
-  if(!toastEl) return;
-  toastEl.textContent = message;
-  toastEl.classList.add('show');
-  clearTimeout(__toastTimer);
-  __toastTimer = setTimeout(() => {
-    toastEl.classList.remove('show');
-  }, ms);
-}
+function showToast(message = 'Copiado', ms = 1400){ toastEl.textContent = message; toastEl.classList.add('show'); clearTimeout(__toastTimer); __toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms); }
 
 async function copyAll(){
-  try{
-    const textToCopy = output.value || '';
-    if(!textToCopy){
-      showToast('Nada para copiar');
-      return;
-    }
-
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      await navigator.clipboard.writeText(textToCopy);
-    } else {
-      output.select();
-      document.execCommand('copy');
-      try { window.getSelection().removeAllRanges(); } catch(e){}
-    }
-
-    showToast('Copiado para a área de transferência');
-    status.textContent = 'Copiado';
-    setTimeout(()=> status.textContent = 'Pronto', 900);
-  }catch(e){
-    console.error('Erro ao copiar:', e);
-    showToast('Erro ao copiar');
-  }
+  const text = output.value || ''; if(!text) return showToast('Nada para copiar');
+  if(navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(text);
+  else { output.select(); document.execCommand('copy'); }
+  showToast('Copiado para a área de transferência');
 }
 
-/* ====== Tamanho da Fonte ====== */
+/* Tamanho de Fonte */
 function setFontSize(px){
   const fontPx = Math.max(6, Math.min(300, Number(px)));
   document.documentElement.style.setProperty('--font-size', fontPx + 'px');
-  fontRange.value = fontPx;
-  fontSizeVal.textContent = fontPx + 'px';
-  localStorage.setItem(FONT_STORAGE_KEY, fontPx);
+  fontRange.value = fontPx; fontSizeVal.textContent = fontPx + 'px'; localStorage.setItem(FONT_STORAGE_KEY, fontPx);
 }
-
 fontRange.addEventListener('input', ()=> setFontSize(fontRange.value));
+fontInc.addEventListener('click', ()=> setFontSize(Number(fontRange.value) + (Number(fontRange.value) >= 50 ? 10 : (Number(fontRange.value) >= 30 ? 4 : 2))));
+fontDec.addEventListener('click', ()=> setFontSize(Number(fontRange.value) - (Number(fontRange.value) > 50 ? 10 : (Number(fontRange.value) > 30 ? 4 : 2))));
 
-fontInc.addEventListener('click', ()=> {
-  const current = Number(fontRange.value);
-  const step = current >= 50 ? 10 : (current >= 30 ? 4 : 2);
-  setFontSize(current + step);
-});
+function openNotes(){ notesPanel.classList.add('open'); searchInput.focus(); }
+function closeNotes(){ notesPanel.classList.remove('open'); }
+function toggleNotes(){ notesPanel.classList.contains('open') ? closeNotes() : openNotes(); }
 
-fontDec.addEventListener('click', ()=> {
-  const current = Number(fontRange.value);
-  const step = current > 50 ? 10 : (current > 30 ? 4 : 2);
-  setFontSize(current - step);
-});
-
-/* ====== Painel Lateral ====== */
-function openNotes(){ notesPanel.classList.add('open'); notesPanel.setAttribute('aria-hidden','false'); searchInput.focus(); }
-function closeNotes(){ notesPanel.classList.remove('open'); notesPanel.setAttribute('aria-hidden','true'); }
-function toggleNotes(){ if(notesPanel.classList.contains('open')) closeNotes(); else openNotes(); }
-
-/* ====== Processamento de Texto e Ditado ====== */
-function stripPunctuation(s){ return s.replace(/[.,!?;:—–\-()\"'«»“”…]/g, '').replace(/\s+/g,' ').trim(); }
-
-/* Conversão de Pontuação Falada e Ajuste de Espaçamento */
+/* Processamento de Voz e Pontuação */
 const SPOKEN_PUNCT = [
-  { re: /\b(ponto e vírgula)\b/gi, out: ';' },
-  { re: /\b(ponto de interrogação)\b/gi, out: '?' },
-  { re: /\b(ponto de exclamação)\b/gi, out: '!' },
-  { re: /\b(ponto final)\b/gi, out: '.' },
-  { re: /\b(dois pontos)\b/gi, out: ':' },
-  { re: /\b(novo parágrafo|nova linha)\b/gi, out: '\n' },
-  { re: /\b(vírgula)\b/gi, out: ',' },
-  { re: /\b(interrogação)\b/gi, out: '?' },
-  { re: /\b(exclamação)\b/gi, out: '!' },
-  { re: /\b(ponto)\b/gi, out: '.' }
+  { re: /\b(ponto e vírgula)\b/gi, out: ';' }, { re: /\b(ponto de interrogação)\b/gi, out: '?' },
+  { re: /\b(ponto de exclamação)\b/gi, out: '!' }, { re: /\b(ponto final)\b/gi, out: '.' },
+  { re: /\b(dois pontos)\b/gi, out: ':' }, { re: /\b(novo parágrafo|nova linha)\b/gi, out: '\n' },
+  { re: /\b(vírgula)\b/gi, out: ',' }, { re: /\b(interrogação)\b/gi, out: '?' },
+  { re: /\b(exclamação)\b/gi, out: '!' }, { re: /\b(ponto)\b/gi, out: '.' }
 ];
-
-function formatPunctuationSpacing(text) {
-  return text
-    .replace(/\s+([.,!?;:])(?=\s|$)/g, '$1')  // Remove espaço ANTES da pontuação ("olá ," -> "olá,")
-    .replace(/([.,!?;:])([A-Za-zÀ-ÿ])/g, '$1 $2'); // Garante espaço DEPOIS da pontuação ("olá,tudo" -> "olá, tudo")
-}
 
 function convertSpokenPunct(text){
   if(!text) return '';
   let out = text;
-  for(const p of SPOKEN_PUNCT){
-    out = out.replace(p.re, p.out);
-  }
-  return formatPunctuationSpacing(out);
+  for(const p of SPOKEN_PUNCT) out = out.replace(p.re, p.out);
+  return out.replace(/\s+([.,!?;:])(?=\s|$)/g, '$1').replace(/([.,!?;:])([A-Za-zÀ-ÿ])/g, '$1 $2');
 }
 
 function analyzeInsertionContext(prefix) {
-  const trimmed = prefix.trimEnd();
-  if (trimmed.length === 0) return { capitalize: true, prefixAppend: "" };
-  
-  const trailingWhitespace = prefix.slice(trimmed.length);
-  const hasNewline = /[\r\n]/.test(trailingWhitespace);
-  const lastChar = trimmed.charAt(trimmed.length - 1);
-  
-  if (hasNewline) return { capitalize: true, prefixAppend: "" };
-  if (/[.!?]/.test(lastChar)) {
-    return { capitalize: true, prefixAppend: trailingWhitespace.length === 0 ? " " : "" };
-  }
-  return { capitalize: false, prefixAppend: trailingWhitespace.length === 0 ? " " : "" };
+  const trimmed = prefix.trimEnd(); if (trimmed.length === 0) return { capitalize: true, prefixAppend: "" };
+  if (/[\r\n]/.test(prefix.slice(trimmed.length))) return { capitalize: true, prefixAppend: "" };
+  return { capitalize: /[.!?]/.test(trimmed.slice(-1)), prefixAppend: " " };
 }
 
 function insertAtCursor(textToInsert){
-  const start = output.selectionStart;
-  const end = output.selectionEnd;
-  const before = output.value.slice(0, start);
-  const after = output.value.slice(end);
-
-  const newValue = before + textToInsert + after;
-  output.value = newValue;
-  const newPos = before.length + textToInsert.length;
-  output.setSelectionRange(newPos, newPos);
-  output.focus();
-  updateStats();
+  const start = output.selectionStart, end = output.selectionEnd;
+  output.value = output.value.slice(0, start) + textToInsert + output.value.slice(end);
+  const newPos = start + textToInsert.length; output.setSelectionRange(newPos, newPos); output.focus(); updateStats();
 }
-
-/* ====== Reconhecimento de Voz ====== */
-const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition = null;
 
 function processAndInsert(finalText, keepPunct){
   if(!finalText || !finalText.trim()) return;
-
-  /* Converte palavras de pontuação falada (ex: "vírgula" -> ",") */
   finalText = convertSpokenPunct(finalText);
+  const context = analyzeInsertionContext(output.value.slice(0, output.selectionStart || output.value.length));
 
-  const insertPos = (typeof output.selectionStart === 'number') ? output.selectionStart : output.value.length;
-  const before = output.value.slice(0, insertPos);
-  const context = analyzeInsertionContext(before);
+  if(allCaps.checked) finalText = finalText.toUpperCase();
+  else finalText = context.capitalize ? finalText.charAt(0).toUpperCase() + finalText.slice(1) : finalText.charAt(0).toLowerCase() + finalText.slice(1);
 
-  if(allCaps.checked){
-    finalText = finalText.toUpperCase();
-  } else {
-    if(context.capitalize){
-      finalText = finalText.charAt(0).toUpperCase() + finalText.slice(1);
-    } else {
-      finalText = finalText.charAt(0).toLowerCase() + finalText.slice(1);
-    }
-  }
-
-  finalText = context.prefixAppend + finalText;
-  insertAtCursor(finalText);
-
-  if(currentNoteIndex !== null && notes[currentNoteIndex]){
-    notes[currentNoteIndex].text = output.value;
-    notes[currentNoteIndex].t = Date.now();
-    persistNotes();
-    renderNotes(searchInput.value);
-  } else {
-    saveCurrentAsNote();
-  }
-
-  pushHistory(output.value);
-  scheduleAutoSave();
-
-  lastInterim = '';
-  
-  if (recognizing || userWantsRecording) {
-    overlayText.textContent = 'Ouvindo...';
-  } else {
-    hideOverlay();
-  }
+  insertAtCursor(context.prefixAppend + finalText);
+  currentNoteIndex !== null && notes[currentNoteIndex] ? (notes[currentNoteIndex].text = output.value) : saveCurrentAsNote();
+  pushHistory(output.value); scheduleAutoSave(); lastInterim = '';
+  recognizing || userWantsRecording ? (overlayText.textContent = 'Ouvindo...') : hideOverlay();
 }
 
 function flushInterim(){
   if(!lastInterim || !lastInterim.trim()) return;
   const textToFlush = lastInterim.trim();
-
   processAndInsert(textToFlush, true);
-  lastInterim = '';
-  ignoreFinalForText = '';
-
-  if (recognizing || userWantsRecording) {
-    overlayText.textContent = 'Ouvindo...';
-  } else {
-    hideOverlay();
-  }
+  lastInterim = ''; ignoreFinalForText = '';
+  recognizing || userWantsRecording ? (overlayText.textContent = 'Ouvindo...') : hideOverlay();
 }
 
-/* Envio Imediato no Enter com Reinício Limpo em Segundo Plano (SEM quebra de linha) */
 function flushInterimKeyboard(){
   if(!lastInterim || !lastInterim.trim()) return;
-  
   const textToFlush = lastInterim.trim();
-  lastInterim = '';
-  ignoreFinalForText = '';
-  
+  lastInterim = ''; ignoreFinalForText = '';
   processAndInsert(textToFlush, true);
 
-  // Reinicia a sessão de áudio em segundo plano para limpar o buffer do Chrome sem piscar
   if (userWantsRecording && recognition) {
-    try {
-      isFlushRestarting = true;
-      recognition.abort();
-    } catch(e){}
+    try { isFlushRestarting = true; recognition.abort(); } catch(e){}
   }
 }
 
-let recognizing = false;
-let userWantsRecording = false;
-let reconnectTimer = null;
-let reconnectAttempts = 0;
-const MAX_RECONNECT = 5;
+let recognizing = false, userWantsRecording = false, reconnectTimer = null, reconnectAttempts = 0;
 
 function setMicState(state){
-  micBtn.disabled = false;
-  micBtn.classList.remove('recording');
-  
-  if(state === 'recording'){
-    micBtn.classList.add('recording');
-    micBtnText.textContent = 'Parar (Esc)';
-  } else if(state === 'reconnecting'){
-    if (userWantsRecording) {
-      micBtn.classList.add('recording');
-      micBtnText.textContent = 'Parar (Esc)';
-    } else {
-      micBtnText.textContent = 'Reconectando…';
-      micBtn.disabled = true;
-    }
+  micBtn.disabled = false; micBtn.classList.remove('recording');
+  if(state === 'recording' || (state === 'reconnecting' && userWantsRecording)){
+    micBtn.classList.add('recording'); micBtnText.textContent = 'Parar (Esc)';
   } else {
-    micBtnText.textContent = 'Iniciar (Esc)';
+    micBtnText.textContent = state === 'reconnecting' ? 'Reconectando…' : 'Iniciar (Esc)';
+    if(state === 'reconnecting') micBtn.disabled = true;
   }
 }
 
 function buildRecognition(){
   if(!SpeechRecognitionAPI) return null;
   const r = new SpeechRecognitionAPI();
-  r.lang = 'pt-BR';
-  r.interimResults = true;
-  r.continuous = true;
+  r.lang = 'pt-BR'; r.interimResults = true; r.continuous = true;
 
   r.onstart = () => {
-    recognizing = true;
-    reconnectAttempts = 0;
-    setMicState('recording');
-    status.textContent = 'Gravando...';
-    showOverlay('Ouvindo voz...');
-    lastInterim = '';
-    ignoreFinalForText = '';
+    recognizing = true; reconnectAttempts = 0; setMicState('recording');
+    status.textContent = 'Gravando...'; showOverlay('Ouvindo voz...'); lastInterim = ''; ignoreFinalForText = '';
   };
 
   r.onresult = (e) => {
-    let interim = '';
-    let final = '';
+    let interim = '', final = '';
     for(let i = e.resultIndex; i < e.results.length; i++){
-      const t = e.results[i][0].transcript;
-      if(e.results[i].isFinal) final += t;
-      else interim += t;
+      if(e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
     }
-
-    if(interim && interim.trim()){
-      lastInterim = interim.trim();
-      showOverlay(convertSpokenPunct(lastInterim));
-    } else {
-      lastInterim = '';
-      if(recognizing || userWantsRecording){
-        showOverlay('Ouvindo...');
-      }
-    }
-
-    if(final && final.trim()){
-      processAndInsert(final.trim());
-    }
+    if(interim && interim.trim()){ lastInterim = interim.trim(); showOverlay(convertSpokenPunct(lastInterim)); }
+    else { lastInterim = ''; if(recognizing || userWantsRecording) showOverlay('Ouvindo...'); }
+    if(final && final.trim()) processAndInsert(final.trim());
   };
 
   r.onerror = (ev) => {
-    console.error('Erro de fala:', ev.error);
     recognizing = false;
-
-    if(ev.error === 'not-allowed' || ev.error === 'service-not-allowed'){
-      userWantsRecording = false;
-      setMicState('idle');
-      hideOverlay();
-      status.textContent = 'Permissão de microfone negada';
-      setTimeout(()=> status.textContent = 'Pronto', 3000);
-      return;
-    }
-
-    if(ev.error !== 'no-speech'){
-      status.textContent = 'Erro no microfone (' + ev.error + ')';
-      setTimeout(()=> status.textContent = recognizing ? 'Gravando...' : 'Pronto', 1500);
-    }
-
+    if(ev.error === 'not-allowed'){ userWantsRecording = false; setMicState('idle'); hideOverlay(); return; }
     if(userWantsRecording && !isFlushRestarting) scheduleReconnect();
   };
 
   r.onend = () => {
     recognizing = false;
-
-    // Se o reinício foi disparado pelo Enter no Envio Imediato
     if(isFlushRestarting){
       isFlushRestarting = false;
-      if(userWantsRecording){
-        try {
-          recognition = buildRecognition();
-          recognition.start();
-        } catch(e) {
-          scheduleReconnect();
-        }
-      }
+      if(userWantsRecording){ try { recognition = buildRecognition(); recognition.start(); } catch(e) { scheduleReconnect(); } }
       return;
     }
-
-    if(userWantsRecording){
-      scheduleReconnect();
-    } else {
-      lastInterim = '';
-      ignoreFinalForText = '';
-      hideOverlay();
-      setMicState('idle');
-      status.textContent = 'Pronto';
-    }
+    userWantsRecording ? scheduleReconnect() : (lastInterim = '', ignoreFinalForText = '', hideOverlay(), setMicState('idle'), status.textContent = 'Pronto');
   };
-
   return r;
 }
 
 function scheduleReconnect(){
-  if(reconnectAttempts >= MAX_RECONNECT){
-    userWantsRecording = false;
-    setMicState('idle');
-    hideOverlay();
-    status.textContent = 'Microfone em espera. Clique para reiniciar.';
-    setTimeout(()=> status.textContent = 'Pronto', 3000);
-    return;
-  }
-  reconnectAttempts++;
-  setMicState('reconnecting');
+  if(reconnectAttempts >= 5){ userWantsRecording = false; setMicState('idle'); hideOverlay(); return; }
+  reconnectAttempts++; setMicState('reconnecting');
   clearTimeout(reconnectTimer);
-  reconnectTimer = setTimeout(()=> {
-    if(!userWantsRecording) return;
-    recognition = buildRecognition();
-    try{ recognition.start(); } catch(e){ scheduleReconnect(); }
-  }, 100);
+  reconnectTimer = setTimeout(()=> { if(!userWantsRecording) return; recognition = buildRecognition(); try{ recognition.start(); } catch(e){ scheduleReconnect(); } }, 100);
 }
 
-if(SpeechRecognitionAPI){
-  recognition = buildRecognition();
-} else {
-  micBtn.disabled = true;
-  status.textContent = 'Navegador sem suporte a fala';
-}
+if(SpeechRecognitionAPI) recognition = buildRecognition();
+else { micBtn.disabled = true; status.textContent = 'Navegador sem suporte a fala'; }
 
 function toggleMic(){
   if(!SpeechRecognitionAPI) return;
   if(!userWantsRecording){
-    userWantsRecording = true;
-    reconnectAttempts = 0;
-    clearTimeout(reconnectTimer);
-    recognition = buildRecognition();
-    try{
-      recognition.start();
-    } catch(e){
-      userWantsRecording = false;
-      setMicState('idle');
-      hideOverlay();
-      status.textContent = 'Erro ao iniciar microfone';
-      setTimeout(()=> status.textContent = 'Pronto', 2000);
-    }
+    userWantsRecording = true; reconnectAttempts = 0; clearTimeout(reconnectTimer); recognition = buildRecognition();
+    try{ recognition.start(); } catch(e){ userWantsRecording = false; setMicState('idle'); hideOverlay(); }
   } else {
-    userWantsRecording = false;
-    clearTimeout(reconnectTimer);
-    recognizing = false;
-    setMicState('idle');
-    status.textContent = 'Pronto';
-    hideOverlay();
+    userWantsRecording = false; clearTimeout(reconnectTimer); recognizing = false; setMicState('idle'); status.textContent = 'Pronto'; hideOverlay();
     try{ recognition.stop(); } catch(e){}
   }
 }
 
-function showOverlay(text){
-  overlayText.textContent = text || 'Ouvindo...';
-  if(!overlay.classList.contains('open')){
-    overlay.classList.add('open');
-    overlay.setAttribute('aria-hidden','false');
-  }
-  requestAnimationFrame(() => {
-    overlayText.scrollTop = overlayText.scrollHeight;
-  });
-}
+function showOverlay(text){ overlayText.textContent = text || 'Ouvindo...'; if(!overlay.classList.contains('open')) overlay.classList.add('open'); }
+function hideOverlay(){ overlay.classList.remove('open'); overlayText.textContent = ''; }
 
-function hideOverlay(){ 
-  overlay.classList.remove('open'); 
-  overlay.setAttribute('aria-hidden','true'); 
-  overlayText.textContent = ''; 
-}
-
-/* ====== Lógica do Modal e Correção por IA ====== */
-aiProviderSelect.addEventListener('change', () => {
-  const p = aiProviderSelect.value;
-  aiModelInput.placeholder = `Padrão: ${DEFAULT_AI_MODELS[p] || ''}`;
-});
+/* ====== Modal de IA & Correção ====== */
+aiProviderSelect.addEventListener('change', () => aiModelInput.placeholder = `Padrão: ${DEFAULT_AI_MODELS[aiProviderSelect.value] || ''}`);
 
 function openAiConfigModal() {
-  const key = localStorage.getItem(AI_KEY_STORAGE) || '';
-  const provider = localStorage.getItem(AI_PROVIDER_STORAGE) || 'gemini';
-  const model = localStorage.getItem(AI_MODEL_STORAGE) || '';
-
-  aiProviderSelect.value = provider;
-  aiApiKeyInput.value = key;
-  aiModelInput.value = model;
-  aiModelInput.placeholder = `Padrão: ${DEFAULT_AI_MODELS[provider] || ''}`;
-
-  clearAiKeyBtn.style.display = key ? 'block' : 'none';
-
-  aiModal.classList.add('open');
-  aiModal.setAttribute('aria-hidden', 'false');
+  const k = localStorage.getItem(AI_KEY_STORAGE) || '', p = localStorage.getItem(AI_PROVIDER_STORAGE) || 'gemini', m = localStorage.getItem(AI_MODEL_STORAGE) || '';
+  aiProviderSelect.value = p; aiApiKeyInput.value = k; aiModelInput.value = m;
+  clearAiKeyBtn.style.display = k ? 'block' : 'none'; aiModal.classList.add('open');
 }
 
-function closeAiModal() {
-  aiModal.classList.remove('open');
-  aiModal.setAttribute('aria-hidden', 'true');
-}
-
-closeAiModalBtn.addEventListener('click', closeAiModal);
-cancelAiModalBtn.addEventListener('click', closeAiModal);
-aiConfigBtn.addEventListener('click', openAiConfigModal);
+function closeAiModal() { aiModal.classList.remove('open'); }
+closeAiModalBtn.addEventListener('click', closeAiModal); cancelAiModalBtn.addEventListener('click', closeAiModal); aiConfigBtn.addEventListener('click', openAiConfigModal);
 
 clearAiKeyBtn.addEventListener('click', () => {
-  localStorage.removeItem(AI_KEY_STORAGE);
-  localStorage.removeItem(AI_PROVIDER_STORAGE);
-  localStorage.removeItem(AI_MODEL_STORAGE);
-  aiApiKeyInput.value = '';
-  aiModelInput.value = '';
-  clearAiKeyBtn.style.display = 'none';
-  showToast('Chave de API removida');
+  localStorage.removeItem(AI_KEY_STORAGE); localStorage.removeItem(AI_PROVIDER_STORAGE); localStorage.removeItem(AI_MODEL_STORAGE);
+  aiApiKeyInput.value = ''; clearAiKeyBtn.style.display = 'none'; showToast('Chave de API removida');
 });
 
 saveAiModalBtn.addEventListener('click', () => {
-  const key = aiApiKeyInput.value.trim();
-  if(!key) {
-    showToast('Por favor, insira uma chave de API');
-    return;
-  }
-  localStorage.setItem(AI_KEY_STORAGE, key);
-  localStorage.setItem(AI_PROVIDER_STORAGE, aiProviderSelect.value);
-  localStorage.setItem(AI_MODEL_STORAGE, aiModelInput.value.trim());
-  closeAiModal();
-  showToast('Configurações de IA salvas');
-  
-  if(output.value.trim()){
-    correctWithAI();
-  }
+  const k = aiApiKeyInput.value.trim(); if(!k) return showToast('Insira uma chave de API');
+  localStorage.setItem(AI_KEY_STORAGE, k); localStorage.setItem(AI_PROVIDER_STORAGE, aiProviderSelect.value); localStorage.setItem(AI_MODEL_STORAGE, aiModelInput.value.trim());
+  closeAiModal(); showToast('Configurações de IA salvas'); if(output.value.trim()) correctWithAI();
 });
 
 async function correctWithAI() {
-  const text = output.value.trim();
-  if (!text) {
-    showToast('Nada para corrigir');
-    return;
-  }
-
-  const apiKey = localStorage.getItem(AI_KEY_STORAGE);
-  if (!apiKey) {
-    openAiConfigModal();
-    return;
-  }
+  const text = output.value.trim(); if (!text) return showToast('Nada para corrigir');
+  const apiKey = localStorage.getItem(AI_KEY_STORAGE); if (!apiKey) return openAiConfigModal();
 
   const provider = localStorage.getItem(AI_PROVIDER_STORAGE) || 'gemini';
-  let model = localStorage.getItem(AI_MODEL_STORAGE) || DEFAULT_AI_MODELS[provider];
-  if (!model) model = DEFAULT_AI_MODELS[provider];
+  const model = localStorage.getItem(AI_MODEL_STORAGE) || DEFAULT_AI_MODELS[provider];
 
-  status.textContent = 'IA corrigindo texto...';
-  aiBtn.disabled = true;
-
-  /* Prompt Aprimorado com regra estrita de CAIXA ALTA */
+  status.textContent = 'IA corrigindo texto...'; aiBtn.disabled = true;
   const systemPrompt = "Você é um assistente especialista em revisão gramatical e ortográfica em português do Brasil. Sua única função é corrigir a ortografia, pontuação, concordância e o uso de maiúsculas e minúsculas do texto a seguir. REGRA OBRIGATÓRIA: Identifique e MANTENHA RIGOROSAMENTE em CAIXA ALTA (MAIÚSCULAS) quaisquer palavras, siglas ou frases que já estejam em CAIXA ALTA no texto original. Mantenha integralmente o sentido original e a estrutura dos parágrafos. NÃO adicione saudações, explicações, nem comentários como 'Aqui está o texto corrigido'. Retorne EXCLUSIVAMENTE o texto final corrigido.";
 
   try {
-    let correctedText = '';
-
+    let result = '';
     if (provider === 'gemini') {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-      const resp = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{ text: `${systemPrompt}\n\nTexto para correção:\n${text}` }]
-          }]
-        })
+      const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: `${systemPrompt}\n\nTexto para correção:\n${text}` }] }] })
       });
-
-      if (!resp.ok) {
-        const errData = await resp.json().catch(() => ({}));
-        throw new Error(errData.error?.message || `Erro HTTP ${resp.status}`);
-      }
-
       const data = await resp.json();
-      correctedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
+      result = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     } else {
-      let endpoint = 'https://api.openai.com/v1/chat/completions';
-      if (provider === 'groq') endpoint = 'https://api.groq.com/openai/v1/chat/completions';
-      if (provider === 'openrouter') endpoint = 'https://openrouter.ai/api/v1/chat/completions';
-
+      let endpoint = provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions' : (provider === 'openrouter' ? 'https://openrouter.ai/api/v1/chat/completions' : 'https://api.openai.com/v1/chat/completions');
       const resp = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: model,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: text }
-          ],
-          temperature: 0.2
-        })
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify({ model, messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: text }], temperature: 0.2 })
       });
-
-      if (!resp.ok) {
-        const errData = await resp.json().catch(() => ({}));
-        throw new Error(errData.error?.message || `Erro HTTP ${resp.status}`);
-      }
-
       const data = await resp.json();
-      correctedText = data.choices?.[0]?.message?.content || '';
+      result = data.choices?.[0]?.message?.content || '';
     }
 
-    correctedText = correctedText.trim();
-    if (correctedText) {
-      output.value = correctedText;
-      pushHistory(output.value);
-      updateStats();
-      scheduleAutoSave();
-      
-      if (currentNoteIndex !== null && notes[currentNoteIndex]) {
-        notes[currentNoteIndex].text = output.value;
-        notes[currentNoteIndex].t = Date.now();
-        persistNotes();
-        renderNotes(searchInput.value);
-      } else {
-        saveCurrentAsNote();
-      }
-      showToast('Texto corrigido pela IA!');
-      status.textContent = 'Texto corrigido com sucesso';
-    } else {
-      throw new Error('A resposta da IA veio vazia');
-    }
+    if (result.trim()) {
+      output.value = result.trim(); pushHistory(output.value); updateStats(); scheduleAutoSave();
+      showToast('Texto corrigido pela IA!'); status.textContent = 'Texto corrigido com sucesso';
+    } else throw new Error('Resposta vazia');
   } catch (err) {
-    console.error('Erro ao chamar a IA:', err);
-    showToast('Erro ao corrigir: ' + err.message, 2500);
-    status.textContent = 'Erro na IA';
+    showToast('Erro ao corrigir: ' + err.message, 2500); status.textContent = 'Erro na IA';
   } finally {
-    aiBtn.disabled = false;
-    setTimeout(() => { 
-      if (status.textContent === 'Texto corrigido com sucesso' || status.textContent === 'Erro na IA') {
-        status.textContent = 'Pronto';
-      }
-    }, 2000);
+    aiBtn.disabled = false; setTimeout(() => { if (status.textContent.includes('sucesso') || status.textContent.includes('Erro')) status.textContent = 'Pronto'; }, 2000);
   }
 }
 
 aiBtn.addEventListener('click', correctWithAI);
 
-/* ====== Eventos do Usuário ====== */
-micBtn.addEventListener('click', toggleMic);
-copyBtn.addEventListener('click', copyAll);
-undoBtn.addEventListener('click', undo);
-redoBtn.addEventListener('click', redo);
-newBtn.addEventListener('click', newNote);
-clearBtn.addEventListener('click', clearEditor);
-notesToggle.addEventListener('click', toggleNotes);
-closeNotesBtn.addEventListener('click', closeNotes);
+/* ====== Eventos ====== */
+micBtn.addEventListener('click', toggleMic); copyBtn.addEventListener('click', copyAll);
+undoBtn.addEventListener('click', undo); redoBtn.addEventListener('click', redo);
+newBtn.addEventListener('click', newNote); clearBtn.addEventListener('click', clearEditor);
+notesToggle.addEventListener('click', toggleNotes); closeNotesBtn.addEventListener('click', closeNotes);
 deleteAllBtn.addEventListener('click', promptDeleteAllNotes);
+output.addEventListener('input', () => { updateStats(); pushHistory(output.value); scheduleAutoSave(); });
 
-output.addEventListener('input', () => {
-  updateStats();
-  pushHistory(output.value);
-  scheduleAutoSave();
-});
-
-/* ====== Atalhos de Teclado ====== */
+/* Atalhos de Teclado */
 window.addEventListener('keydown', (e) => {
-  if(e.key === 'F10'){ e.preventDefault(); correctWithAI(); return; }
-  if(e.key === 'F9'){ e.preventDefault(); newNote(); return; }
-  if(e.key === 'F2'){ e.preventDefault(); toggleNotes(); return; }
-  if(e.key === 'F8'){ e.preventDefault(); clearEditor(); return; }
-  if(e.key === 'F6' || (e.ctrlKey && (e.key === 'b' || e.key === 'B'))){ e.preventDefault(); cycleBarMode(); return; }
-  if(e.key === 'Escape'){ e.preventDefault(); toggleMic(); return; }
-  if(e.key === 'F4'){ e.preventDefault(); copyAll(); return; }
-  if(e.ctrlKey && (e.key === 'u' || e.key === 'U')){ e.preventDefault(); undo(); return; }
-  if((e.ctrlKey && (e.key === 'y' || e.key === 'Y')) || (e.ctrlKey && e.shiftKey && (e.key === 'Z'))){
-    e.preventDefault();
-    redo();
-    return;
-  }
-  if(e.ctrlKey && (e.key === 'n' || e.key === 'N')){ e.preventDefault(); newNote(); return; }
-  if(e.ctrlKey && e.shiftKey && e.key === 'Delete'){ e.preventDefault(); promptDeleteAllNotes(); return; }
+  const k = e.key.toLowerCase();
+  if(e.key === 'F10'){ e.preventDefault(); correctWithAI(); }
+  else if(e.key === 'F9' || (e.ctrlKey && k === 'n')){ e.preventDefault(); newNote(); }
+  else if(e.key === 'F2'){ e.preventDefault(); toggleNotes(); }
+  else if(e.key === 'F8'){ e.preventDefault(); clearEditor(); }
+  else if(e.key === 'F6' || (e.ctrlKey && k === 'b')){ e.preventDefault(); cycleBarMode(); }
+  else if(e.key === 'Escape'){ e.preventDefault(); toggleMic(); }
+  else if(e.key === 'F4'){ e.preventDefault(); copyAll(); }
+  else if(e.ctrlKey && k === 'u'){ e.preventDefault(); undo(); }
+  else if((e.ctrlKey && k === 'y') || (e.ctrlKey && e.shiftKey && k === 'z')){ e.preventDefault(); redo(); }
+  else if(e.ctrlKey && e.shiftKey && e.key === 'Delete'){ e.preventDefault(); promptDeleteAllNotes(); }
 });
 
-/* ====== Inicialização ====== */
-initTheme();
-initToggles();
-loadNotes();
-pushHistory(output.value || '');
+/* Inicialização */
+initTheme(); initToggles(); loadNotes(); pushHistory(output.value || '');
+setFontSize(localStorage.getItem(FONT_STORAGE_KEY) || 18); updateStats();
 
-const initialFontSize = localStorage.getItem(FONT_STORAGE_KEY) || 18;
-setFontSize(initialFontSize);
-updateStats();
-
-/* ====== Service Worker (PWA) ====== */
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('service-worker.js').catch(err => console.warn('PWA:', err));
-}
+if('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js').catch(()=>{});
 </script>
 </body>
 </html>
