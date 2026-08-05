@@ -1421,8 +1421,41 @@ function insertAtCursor(textToInsert){
 const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
 
+/* ====== Deduplicação Antirrepetição (Proteção contra bug do Chrome Android) ====== */
+function deduplicateNewText(newText, existingText) {
+  if (!newText || !newText.trim()) return '';
+  if (!existingText || !existingText.trim()) return newText.trim();
+
+  const cleanNew = newText.trim();
+  const cleanExisting = existingText.trim();
+
+  const existingWords = cleanExisting.split(/\s+/);
+  const newWords = cleanNew.split(/\s+/);
+
+  const maxCheck = Math.min(existingWords.length, newWords.length);
+  for (let overlapLength = maxCheck; overlapLength > 0; overlapLength--) {
+    const existingSuffix = existingWords.slice(-overlapLength).join(' ').toLowerCase().replace(/[.,!?;:]/g, '');
+    const newPrefix = newWords.slice(0, overlapLength).join(' ').toLowerCase().replace(/[.,!?;:]/g, '');
+
+    if (existingSuffix === newPrefix) {
+      const deltaWords = newWords.slice(overlapLength);
+      return deltaWords.join(' ');
+    }
+  }
+
+  return cleanNew;
+}
+
 function processAndInsert(finalText, keepPunct){
   if(!finalText || !finalText.trim()) return;
+
+  const insertPos = (typeof output.selectionStart === 'number') ? output.selectionStart : output.value.length;
+  const before = output.value.slice(0, insertPos);
+
+  /* Deduplicação contra sobreposição de frases acumuladas pelo Chrome Android */
+  const deduplicated = deduplicateNewText(finalText, before);
+  if(!deduplicated || !deduplicated.trim()) return;
+  finalText = deduplicated;
 
   /* Converte palavras de pontuação falada (ex: "vírgula" -> ",") */
   finalText = convertSpokenPunct(finalText);
