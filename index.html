@@ -11,7 +11,7 @@
 <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="bg" x1="0%25" y1="0%25" x2="100%25" y2="100%25"><stop offset="0%25" stop-color="%230f172a"/><stop offset="100%25" stop-color="%23020617"/></linearGradient><linearGradient id="mic" x1="0%25" y1="0%25" x2="100%25" y2="100%25"><stop offset="0%25" stop-color="%2360a5fa"/><stop offset="100%25" stop-color="%232563eb"/></linearGradient></defs><rect width="512" height="512" rx="128" fill="url(%23bg)"/><g><rect x="216" y="128" width="80" height="160" rx="40" fill="url(%23mic)"/><path d="M160 256c0 53 43 96 96 96s96-43 96-96" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round" fill="none"/><line x1="256" y1="352" x2="256" y2="416" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round"/><line x1="208" y1="416" x2="304" y2="416" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round"/></g></svg>'>
 <meta name="theme-color" content="#0f172a">
 
-<!-- Google Fonts Inter para fonte Sans Serif de alta legibilidade -->
+<!-- Google Fonts Inter para máxima legibilidade -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
 <style>
   :root {
     --font-size: 18px;
-    --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
     --controls-height: 64px;
     --notes-panel-width: 380px;
 
@@ -875,12 +875,19 @@ const aiModelInput = document.getElementById('aiModelInput');
 const QUICK_SEND_PUNCT = new Set(['.', ',', ';', '/', '-', '!', '?', ':']);
 
 output.addEventListener('keydown', (e) => {
-  if(!quickSend.checked || !recognition || !lastInterim) return;
+  if (e.key === 'Enter') {
+    if (lastInterim && lastInterim.trim()) {
+      // Quando HÁ texto no buffer: envia o texto e cancela a quebra de linha
+      e.preventDefault();
+      flushInterimKeyboard();
+    } else {
+      // Quando NÃO HÁ texto no buffer: o Enter pula a linha (\n) normalmente
+    }
+    return;
+  }
 
-  if(e.key === 'Enter'){
+  if (quickSend.checked && recognition && lastInterim && QUICK_SEND_PUNCT.has(e.key)) {
     e.preventDefault();
-    flushInterimKeyboard();
-  } else if(QUICK_SEND_PUNCT.has(e.key)){
     flushInterimKeyboard();
   }
 });
@@ -917,6 +924,8 @@ const HISTORY_LIMIT = 300;
 const MAX_NOTES = 500;
 let currentNoteIndex = null;
 let lastInterim = '';
+let flushedText = ''; // Trava de comparação para impedir repetição no 2º Enter
+let isFlushRestarting = false; 
 
 /* Modo da Barra: 'full' | 'compact' | 'hidden' */
 let currentBarMode = 'full';
@@ -1306,7 +1315,7 @@ async function copyAll(){
   }
 }
 
-/* ====== Tamanho da Fonte (Ajuste Quase Ilimitado: 8px até 200px) ====== */
+/* ====== Tamanho da Fonte ====== */
 function setFontSize(px){
   const fontPx = Math.max(6, Math.min(300, Number(px)));
   document.documentElement.style.setProperty('--font-size', fontPx + 'px');
@@ -1398,14 +1407,12 @@ function insertAtCursor(textToInsert){
 /* ====== Reconhecimento de Voz ====== */
 const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
-let suppressNextFinal = false;
 
 function processAndInsert(finalText, keepPunct){
-  finalText = convertSpokenPunct(finalText);
+  if(!finalText || !finalText.trim()) return;
 
-  if(!keepPunct && !autoPunct.checked){
-    // se o usuário desligou pontuação inteligente e não é pontuação falada explícita
-  }
+  /* Converte palavras de pontuação falada (ex: "vírgula" -> ",") */
+  finalText = convertSpokenPunct(finalText);
 
   const insertPos = (typeof output.selectionStart === 'number') ? output.selectionStart : output.value.length;
   const before = output.value.slice(0, insertPos);
@@ -1446,20 +1453,41 @@ function processAndInsert(finalText, keepPunct){
 }
 
 function flushInterim(){
-  if(!lastInterim) return;
-  const converted = convertSpokenPunct(lastInterim);
-  suppressNextFinal = true;
-  processAndInsert(converted, true);
-}
+  if(!lastInterim || !lastInterim.trim()) return;
+  const textToFlush = lastInterim.trim();
 
-function flushInterimKeyboard(){
-  if(!lastInterim) return;
-  flushInterim();
+  flushedText = textToFlush.toLowerCase();
   lastInterim = '';
+
+  processAndInsert(textToFlush, true);
+
   if (recognizing || userWantsRecording) {
     overlayText.textContent = 'Ouvindo...';
   } else {
     hideOverlay();
+  }
+}
+
+/* Envio Imediato no Enter com Reinício Limpo e Zera do Buffer */
+function flushInterimKeyboard(){
+  if(!lastInterim || !lastInterim.trim()) return;
+  
+  const textToFlush = lastInterim.trim();
+  flushedText = textToFlush.toLowerCase(); // Bloqueia repetições do Chrome
+  lastInterim = '';
+  
+  processAndInsert(textToFlush, true);
+
+  if (overlayText) {
+    overlayText.textContent = 'Ouvindo...';
+  }
+
+  // Reinicia o motor de voz em segundo plano para limpar o áudio temporário do Chrome
+  if (userWantsRecording && recognition) {
+    try {
+      isFlushRestarting = true;
+      recognition.abort();
+    } catch(e){}
   }
 }
 
@@ -1503,6 +1531,7 @@ function buildRecognition(){
     status.textContent = 'Gravando...';
     showOverlay('Ouvindo voz...');
     lastInterim = '';
+    flushedText = '';
   };
 
   r.onresult = (e) => {
@@ -1515,21 +1544,47 @@ function buildRecognition(){
     }
 
     if(interim && interim.trim()){
-      lastInterim = interim.trim();
-      showOverlay(convertSpokenPunct(lastInterim));
+      const normInterim = interim.trim().toLowerCase();
+
+      // Se o Chrome tentar repovoar o buffer com a frase exata já enviada no Enter
+      if(flushedText && normInterim === flushedText){
+        lastInterim = '';
+        showOverlay('Ouvindo...');
+      }
+      // Se o usuário continuou a falar a mesma frase, aproveita apenas o trecho novo
+      else if(flushedText && normInterim.startsWith(flushedText)){
+        const newSpeech = interim.trim().slice(flushedText.length).trim();
+        if(newSpeech){
+          lastInterim = newSpeech;
+          showOverlay(convertSpokenPunct(lastInterim));
+        } else {
+          lastInterim = '';
+          showOverlay('Ouvindo...');
+        }
+      }
+      else {
+        flushedText = ''; // Nova fala iniciada, reseta a trava
+        lastInterim = interim.trim();
+        showOverlay(convertSpokenPunct(lastInterim));
+      }
+    } else {
+      lastInterim = '';
+      if(recognizing || userWantsRecording){
+        showOverlay('Ouvindo...');
+      }
     }
 
     if(final && final.trim()){
-      if(suppressNextFinal){
-        suppressNextFinal = false;
+      const normFinal = final.trim().toLowerCase();
+      
+      // Se o resultado final for a frase que já inserimos no Enter
+      if(flushedText && (normFinal === flushedText || flushedText.includes(normFinal))){
+        flushedText = '';
         lastInterim = '';
-        if (recognizing || userWantsRecording) {
-          overlayText.textContent = 'Ouvindo...';
-        } else {
-          hideOverlay();
-        }
         return;
       }
+      
+      flushedText = '';
       processAndInsert(final.trim());
     }
   };
@@ -1552,16 +1607,30 @@ function buildRecognition(){
       setTimeout(()=> status.textContent = recognizing ? 'Gravando...' : 'Pronto', 1500);
     }
 
-    if(userWantsRecording) scheduleReconnect();
+    if(userWantsRecording && !isFlushRestarting) scheduleReconnect();
   };
 
   r.onend = () => {
     recognizing = false;
 
+    if(isFlushRestarting){
+      isFlushRestarting = false;
+      if(userWantsRecording){
+        try {
+          recognition = buildRecognition();
+          recognition.start();
+        } catch(e) {
+          scheduleReconnect();
+        }
+      }
+      return;
+    }
+
     if(userWantsRecording){
       scheduleReconnect();
     } else {
       lastInterim = '';
+      flushedText = '';
       hideOverlay();
       setMicState('idle');
       status.textContent = 'Pronto';
@@ -1719,7 +1788,8 @@ async function correctWithAI() {
   status.textContent = 'IA corrigindo texto...';
   aiBtn.disabled = true;
 
-  const systemPrompt = "Você é um assistente especialista em revisão gramatical e ortográfica em português do Brasil. Sua única função é corrigir a ortografia, pontuação, concordância e o uso de maiúsculas e minúsculas do texto a seguir. Mantenha integralmente o sentido original e a estrutura dos parágrafos. NÃO adicione saudações, explicações, nem comentários como 'Aqui está o texto corrigido'. Retorne EXCLUSIVAMENTE o texto final corrigido. Se uma palavra ou frase estiver totalmente escrita como caixa alta, você deve manter dessa forma, sem alterar. Isso é prioridade.";
+  /* Prompt Aprimorado com regra estrita de CAIXA ALTA */
+  const systemPrompt = "Você é um assistente especialista em revisão gramatical e ortográfica em português do Brasil. Sua única função é corrigir a ortografia, pontuação, concordância e o uso de maiúsculas e minúsculas do texto a seguir. REGRA OBRIGATÓRIA: Identifique e MANTENHA RIGOROSAMENTE em CAIXA ALTA (MAIÚSCULAS) quaisquer palavras, siglas ou frases que já estejam em CAIXA ALTA no texto original. Mantenha integralmente o sentido original e a estrutura dos parágrafos. NÃO adicione saudações, explicações, nem comentários como 'Aqui está o texto corrigido'. Retorne EXCLUSIVAMENTE o texto final corrigido.";
 
   try {
     let correctedText = '';
