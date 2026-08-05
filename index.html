@@ -1766,8 +1766,8 @@ async function correctWithAI() {
   status.textContent = 'IA corrigindo texto...';
   aiBtn.disabled = true;
 
-  /* Prompt Aprimorado com regra estrita de CAIXA ALTA */
-  const systemPrompt = "Você é um assistente especialista em revisão gramatical e ortográfica em português do Brasil. Sua única função é corrigir a ortografia, pontuação, concordância e o uso de maiúsculas e minúsculas do texto a seguir. REGRA OBRIGATÓRIA: Identifique e MANTENHA RIGOROSAMENTE em CAIXA ALTA (MAIÚSCULAS) quaisquer palavras, siglas ou frases que já estejam em CAIXA ALTA no texto original. Mantenha integralmente o sentido original e a estrutura dos parágrafos. NÃO adicione saudações, explicações, nem comentários como 'Aqui está o texto corrigido'. Retorne EXCLUSIVAMENTE o texto final corrigido.";
+  /* Prompt de Fidelidade Extrema para Ditado por Voz */
+  const systemPrompt = "Você é um revisor de texto e ditado em português do Brasil. Sua única função é aplicar as regras de ortografia, gramática, pontuação e capitalização (maiúsculas/minúsculas) ao texto fornecido.\n\nREGRA DE FIDELIDADE EXTREMA: Seja o mais fiel possível ao texto original. NÃO reescreva frases, NÃO mude o vocabulário, NÃO substitua palavras por sinônimos e NÃO altere o estilo do autor. Apenas remova hesitações de fala (como 'é...', 'tipo assim', repetições acidentais de palavras por gagueira) e ajuste pontuação, ortografia e concordância.\n\nREGRA DE CAIXA ALTA: Mantenha rigorosamente em CAIXA ALTA (MAIÚSCULAS) quaisquer palavras, siglas ou trechos que já estejam em CAIXA ALTA no texto original.\n\nResponda EXCLUSIVAMENTE com o texto final corrigido, sem saudações, introduções ou comentários.";
 
   try {
     let correctedText = '';
@@ -1778,9 +1778,15 @@ async function correctWithAI() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          system_instruction: {
+            parts: [{ text: systemPrompt }]
+          },
           contents: [{
-            parts: [{ text: `${systemPrompt}\n\nTexto para correção:\n${text}` }]
-          }]
+            parts: [{ text: text }]
+          }],
+          generationConfig: {
+            temperature: 0.2
+          }
         })
       });
 
