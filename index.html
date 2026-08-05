@@ -80,12 +80,13 @@
 
   /* ====== Barra Superior de Controles ====== */
   #controls {
-    height: var(--controls-height);
+    min-height: 50px;
+    height: auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 0 16px;
+    gap: 8px;
+    padding: 6px 14px;
     background: var(--bg-surface);
     border-bottom: 1px solid var(--border-color);
     box-shadow: var(--shadow-sm);
@@ -96,7 +97,7 @@
   .controls-left, .controls-right {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
   }
 
@@ -105,10 +106,11 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 8px 14px;
+    gap: 5px;
+    padding: 6px 10px;
+    height: 34px;
     font-family: var(--font-family);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     border-radius: 8px;
     border: 1px solid var(--border-color);
@@ -118,6 +120,7 @@
     transition: all 0.15s ease;
     user-select: none;
     white-space: nowrap;
+    box-sizing: border-box;
   }
 
   button:hover:not(:disabled) {
@@ -138,7 +141,7 @@
     background: var(--primary-color);
     color: #ffffff;
     border-color: var(--primary-color);
-    box-shadow: 0 0 12px var(--primary-glow);
+    box-shadow: 0 0 10px var(--primary-glow);
   }
   button.primary:hover:not(:disabled) {
     background: var(--primary-hover);
@@ -169,35 +172,37 @@
   }
 
   button.icon-only {
-    padding: 8px;
-    width: 36px;
-    height: 36px;
+    padding: 6px;
+    width: 34px;
+    height: 34px;
   }
 
   /* ====== Controles de Fonte ====== */
   #fontControls {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     background: var(--bg-card);
-    padding: 4px 10px;
+    padding: 3px 8px;
+    height: 34px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
+    box-sizing: border-box;
   }
   #fontControls label {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-secondary);
     font-weight: 500;
   }
   #fontSizeVal {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text-primary);
-    min-width: 42px;
+    min-width: 38px;
     text-align: center;
   }
   input[type="range"] {
-    width: 100px;
+    width: 75px;
     accent-color: var(--primary-color);
     cursor: pointer;
   }
@@ -206,15 +211,17 @@
   .toggle {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
+    gap: 6px;
+    padding: 5px 10px;
+    height: 34px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
     background: var(--bg-card);
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-secondary);
     cursor: pointer;
     user-select: none;
+    box-sizing: border-box;
   }
   .toggle:hover {
     color: var(--text-primary);
@@ -222,25 +229,30 @@
   }
   .toggle input {
     cursor: pointer;
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     accent-color: var(--primary-color);
   }
 
   #status {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     color: var(--text-secondary);
-    padding: 4px 10px;
-    border-radius: 20px;
+    padding: 4px 9px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 8px;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
+    box-sizing: border-box;
   }
 
   /* ====== Modos da Barra Superior ====== */
   body.bar-compact #controls {
-    height: 48px;
-    padding: 0 10px;
+    min-height: 44px;
+    height: auto;
+    padding: 4px 10px;
   }
   body.bar-compact .btn-text,
   body.bar-compact #fontControls label,
@@ -248,10 +260,11 @@
     display: none !important;
   }
   body.bar-compact button, body.bar-compact .toggle {
-    padding: 6px 10px;
+    padding: 5px 8px;
+    height: 32px;
   }
   body.bar-compact input[type="range"] {
-    width: 70px;
+    width: 65px;
   }
 
   body.bar-hidden #controls {
@@ -649,50 +662,50 @@
   <!-- ====== Barra Superior de Ferramentas ====== -->
   <header id="controls" role="toolbar" aria-label="Barra de ferramentas do ditado">
     <div class="controls-left">
-      <button id="micBtn" class="primary" title="Iniciar/Parar Ditado (Esc)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+      <button id="micBtn" class="primary" title="Iniciar/Parar Ditado (Atalho: Esc)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
         <span id="micBtnText" class="btn-text">Iniciar (Esc)</span>
       </button>
 
       <!-- Grupo do Botão de IA + Engrenagem -->
       <div style="display:inline-flex; gap:2px;">
-        <button id="aiBtn" title="Atalho: F10 | Corrigir ortografia e gramática com IA">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2z"/></svg>
-          <span class="btn-text">Corrigir com IA (F10)</span>
+        <button id="aiBtn" title="Corrigir ortografia e gramática com IA (Atalho: F10)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2z"/></svg>
+          <span class="btn-text">Corrigir com IA</span>
         </button>
         <button id="aiConfigBtn" class="icon-only" title="Configurar Chave de API da IA">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
       </div>
 
-      <button id="copyBtn" title="Atalho: F4">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        <span class="btn-text">Copiar (F4)</span>
+      <button id="copyBtn" title="Copiar todo o texto (Atalho: F4)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span class="btn-text">Copiar</span>
       </button>
 
-      <button id="undoBtn" title="Atalho: Ctrl+U" class="icon-only">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+      <button id="undoBtn" title="Desfazer (Ctrl+U)" class="icon-only">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
       </button>
 
-      <button id="redoBtn" title="Atalho: Ctrl+Y" class="icon-only">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+      <button id="redoBtn" title="Refazer (Ctrl+Y)" class="icon-only">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
       </button>
 
-      <button id="newBtn" title="Atalho: F9 ou Ctrl+N">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-        <span class="btn-text">Nova Nota (F9)</span>
+      <button id="newBtn" title="Criar nova nota (Atalho: F9 ou Ctrl+N)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        <span class="btn-text">Nova Nota</span>
       </button>
 
-      <button id="clearBtn" class="warn" title="Atalho: F8">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-        <span class="btn-text">Limpar (F8)</span>
+      <button id="clearBtn" class="warn" title="Limpar caixa de texto (Atalho: F8)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        <span class="btn-text">Limpar</span>
       </button>
 
       <!-- Seletor de Tamanho de Fonte -->
       <div id="fontControls" title="Ajuste de tamanho da fonte (8px a 200px)">
-        <button id="fontDec" class="icon-only" style="border:none;background:transparent;">A-</button>
+        <button id="fontDec" class="icon-only" style="border:none;background:transparent;width:22px;height:22px;padding:0;">A-</button>
         <input id="fontRange" type="range" min="8" max="200" value="18" />
-        <button id="fontInc" class="icon-only" style="border:none;background:transparent;">A+</button>
+        <button id="fontInc" class="icon-only" style="border:none;background:transparent;width:22px;height:22px;padding:0;">A+</button>
         <span id="fontSizeVal">18px</span>
       </div>
     </div>
@@ -700,7 +713,7 @@
     <div class="controls-right">
       <label class="toggle" title="Pontuação inteligente no ditado (funciona apenas no Microsoft Edge)">
         <input type="checkbox" id="autoPunct" checked />
-        <span class="btn-text">Pontuação (Edge)</span>
+        <span class="btn-text">Pontuação</span>
       </label>
 
       <label class="toggle" title="Caixa alta em todo texto ditado">
@@ -710,22 +723,22 @@
 
       <label class="toggle" title="Envia o texto ditado imediatamente ao pressionar Enter no teclado">
         <input type="checkbox" id="quickSend" />
-        <span class="btn-text">Envio Imediato</span>
+        <span class="btn-text">Auto-envio</span>
       </label>
 
       <!-- Ferramenta de Alternância da Barra -->
       <button id="barModeBtn" class="icon-only" title="Alternar Barra (Normal / Ícones / Ocultar - Atalho: Ctrl+B ou F6)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
 
       <button id="themeToggleBtn" class="icon-only" title="Alternar Modo Escuro / Claro">
-        <svg id="themeIconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="themeIconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="themeIconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
 
-      <button id="notesToggle" title="Atalho: F2">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        <span class="btn-text">Notas (F2)</span>
+      <button id="notesToggle" title="Painel de notas salvas (Atalho: F2)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span class="btn-text">Notas</span>
       </button>
 
       <div id="status" aria-live="polite">Pronto</div>
