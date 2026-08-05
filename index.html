@@ -11,7 +11,7 @@
 <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="bg" x1="0%25" y1="0%25" x2="100%25" y2="100%25"><stop offset="0%25" stop-color="%230f172a"/><stop offset="100%25" stop-color="%23020617"/></linearGradient><linearGradient id="mic" x1="0%25" y1="0%25" x2="100%25" y2="100%25"><stop offset="0%25" stop-color="%2360a5fa"/><stop offset="100%25" stop-color="%232563eb"/></linearGradient></defs><rect width="512" height="512" rx="128" fill="url(%23bg)"/><g><rect x="216" y="128" width="80" height="160" rx="40" fill="url(%23mic)"/><path d="M160 256c0 53 43 96 96 96s96-43 96-96" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round" fill="none"/><line x1="256" y1="352" x2="256" y2="416" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round"/><line x1="208" y1="416" x2="304" y2="416" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round"/></g></svg>'>
 <meta name="theme-color" content="#0f172a">
 
-<!-- Google Fonts Inter para máxima legibilidade -->
+<!-- Google Fonts Inter para fonte Sans Serif de alta legibilidade -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
 <style>
   :root {
     --font-size: 18px;
-    --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     --controls-height: 64px;
     --notes-panel-width: 380px;
 
@@ -80,13 +80,12 @@
 
   /* ====== Barra Superior de Controles ====== */
   #controls {
-    min-height: 50px;
-    height: auto;
+    height: var(--controls-height);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    padding: 6px 14px;
+    gap: 12px;
+    padding: 0 16px;
     background: var(--bg-surface);
     border-bottom: 1px solid var(--border-color);
     box-shadow: var(--shadow-sm);
@@ -97,7 +96,7 @@
   .controls-left, .controls-right {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     flex-wrap: wrap;
   }
 
@@ -106,11 +105,10 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    padding: 6px 10px;
-    height: 34px;
+    gap: 6px;
+    padding: 8px 14px;
     font-family: var(--font-family);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
     border-radius: 8px;
     border: 1px solid var(--border-color);
@@ -120,7 +118,6 @@
     transition: all 0.15s ease;
     user-select: none;
     white-space: nowrap;
-    box-sizing: border-box;
   }
 
   button:hover:not(:disabled) {
@@ -141,7 +138,7 @@
     background: var(--primary-color);
     color: #ffffff;
     border-color: var(--primary-color);
-    box-shadow: 0 0 10px var(--primary-glow);
+    box-shadow: 0 0 12px var(--primary-glow);
   }
   button.primary:hover:not(:disabled) {
     background: var(--primary-hover);
@@ -172,37 +169,35 @@
   }
 
   button.icon-only {
-    padding: 6px;
-    width: 34px;
-    height: 34px;
+    padding: 8px;
+    width: 36px;
+    height: 36px;
   }
 
   /* ====== Controles de Fonte ====== */
   #fontControls {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     background: var(--bg-card);
-    padding: 3px 8px;
-    height: 34px;
+    padding: 4px 10px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
-    box-sizing: border-box;
   }
   #fontControls label {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-secondary);
     font-weight: 500;
   }
   #fontSizeVal {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text-primary);
-    min-width: 38px;
+    min-width: 42px;
     text-align: center;
   }
   input[type="range"] {
-    width: 75px;
+    width: 100px;
     accent-color: var(--primary-color);
     cursor: pointer;
   }
@@ -211,17 +206,15 @@
   .toggle {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 5px 10px;
-    height: 34px;
+    gap: 8px;
+    padding: 6px 12px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
     background: var(--bg-card);
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-secondary);
     cursor: pointer;
     user-select: none;
-    box-sizing: border-box;
   }
   .toggle:hover {
     color: var(--text-primary);
@@ -229,30 +222,25 @@
   }
   .toggle input {
     cursor: pointer;
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     accent-color: var(--primary-color);
   }
 
   #status {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--text-secondary);
-    padding: 4px 9px;
-    height: 34px;
-    display: inline-flex;
-    align-items: center;
-    border-radius: 8px;
+    padding: 4px 10px;
+    border-radius: 20px;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    box-sizing: border-box;
   }
 
   /* ====== Modos da Barra Superior ====== */
   body.bar-compact #controls {
-    min-height: 44px;
-    height: auto;
-    padding: 4px 10px;
+    height: 48px;
+    padding: 0 10px;
   }
   body.bar-compact .btn-text,
   body.bar-compact #fontControls label,
@@ -260,11 +248,10 @@
     display: none !important;
   }
   body.bar-compact button, body.bar-compact .toggle {
-    padding: 5px 8px;
-    height: 32px;
+    padding: 6px 10px;
   }
   body.bar-compact input[type="range"] {
-    width: 65px;
+    width: 70px;
   }
 
   body.bar-hidden #controls {
@@ -662,50 +649,50 @@
   <!-- ====== Barra Superior de Ferramentas ====== -->
   <header id="controls" role="toolbar" aria-label="Barra de ferramentas do ditado">
     <div class="controls-left">
-      <button id="micBtn" class="primary" title="Iniciar/Parar Ditado (Atalho: Esc)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+      <button id="micBtn" class="primary" title="Iniciar/Parar Ditado (Esc)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
         <span id="micBtnText" class="btn-text">Iniciar (Esc)</span>
       </button>
 
       <!-- Grupo do Botão de IA + Engrenagem -->
       <div style="display:inline-flex; gap:2px;">
-        <button id="aiBtn" title="Corrigir ortografia e gramática com IA (Atalho: F10)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2z"/></svg>
-          <span class="btn-text">Corrigir com IA</span>
+        <button id="aiBtn" title="Atalho: F10 | Corrigir ortografia e gramática com IA">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2z"/></svg>
+          <span class="btn-text">Corrigir com IA (F10)</span>
         </button>
         <button id="aiConfigBtn" class="icon-only" title="Configurar Chave de API da IA">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
       </div>
 
-      <button id="copyBtn" title="Copiar todo o texto (Atalho: F4)">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        <span class="btn-text">Copiar</span>
+      <button id="copyBtn" title="Atalho: F4">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span class="btn-text">Copiar (F4)</span>
       </button>
 
-      <button id="undoBtn" title="Desfazer (Ctrl+U)" class="icon-only">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+      <button id="undoBtn" title="Atalho: Ctrl+U" class="icon-only">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
       </button>
 
-      <button id="redoBtn" title="Refazer (Ctrl+Y)" class="icon-only">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+      <button id="redoBtn" title="Atalho: Ctrl+Y" class="icon-only">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
       </button>
 
-      <button id="newBtn" title="Criar nova nota (Atalho: F9 ou Ctrl+N)">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-        <span class="btn-text">Nova Nota</span>
+      <button id="newBtn" title="Atalho: F9 ou Ctrl+N">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        <span class="btn-text">Nova Nota (F9)</span>
       </button>
 
-      <button id="clearBtn" class="warn" title="Limpar caixa de texto (Atalho: F8)">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-        <span class="btn-text">Limpar</span>
+      <button id="clearBtn" class="warn" title="Atalho: F8">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        <span class="btn-text">Limpar (F8)</span>
       </button>
 
       <!-- Seletor de Tamanho de Fonte -->
       <div id="fontControls" title="Ajuste de tamanho da fonte (8px a 200px)">
-        <button id="fontDec" class="icon-only" style="border:none;background:transparent;width:22px;height:22px;padding:0;">A-</button>
+        <button id="fontDec" class="icon-only" style="border:none;background:transparent;">A-</button>
         <input id="fontRange" type="range" min="8" max="200" value="18" />
-        <button id="fontInc" class="icon-only" style="border:none;background:transparent;width:22px;height:22px;padding:0;">A+</button>
+        <button id="fontInc" class="icon-only" style="border:none;background:transparent;">A+</button>
         <span id="fontSizeVal">18px</span>
       </div>
     </div>
@@ -713,7 +700,7 @@
     <div class="controls-right">
       <label class="toggle" title="Pontuação inteligente no ditado (funciona apenas no Microsoft Edge)">
         <input type="checkbox" id="autoPunct" checked />
-        <span class="btn-text">Pontuação</span>
+        <span class="btn-text">Pontuação (Edge)</span>
       </label>
 
       <label class="toggle" title="Caixa alta em todo texto ditado">
@@ -723,22 +710,22 @@
 
       <label class="toggle" title="Envia o texto ditado imediatamente ao pressionar Enter no teclado">
         <input type="checkbox" id="quickSend" />
-        <span class="btn-text">Auto-envio</span>
+        <span class="btn-text">Envio Imediato</span>
       </label>
 
       <!-- Ferramenta de Alternância da Barra -->
       <button id="barModeBtn" class="icon-only" title="Alternar Barra (Normal / Ícones / Ocultar - Atalho: Ctrl+B ou F6)">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
 
       <button id="themeToggleBtn" class="icon-only" title="Alternar Modo Escuro / Claro">
-        <svg id="themeIconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        <svg id="themeIconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="themeIconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
 
-      <button id="notesToggle" title="Painel de notas salvas (Atalho: F2)">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        <span class="btn-text">Notas</span>
+      <button id="notesToggle" title="Atalho: F2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span class="btn-text">Notas (F2)</span>
       </button>
 
       <div id="status" aria-live="polite">Pronto</div>
@@ -888,19 +875,12 @@ const aiModelInput = document.getElementById('aiModelInput');
 const QUICK_SEND_PUNCT = new Set(['.', ',', ';', '/', '-', '!', '?', ':']);
 
 output.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    if (lastInterim && lastInterim.trim()) {
-      // Quando HÁ texto no buffer: apenas envia o texto do buffer, SEM inserir quebra de linha
-      e.preventDefault();
-      flushInterimKeyboard();
-    } else {
-      // Quando NÃO HÁ texto no buffer: deixa o Enter funcionar normalmente (inserindo a quebra de linha \n)
-    }
-    return;
-  }
+  if(!quickSend.checked || !recognition || !lastInterim) return;
 
-  if (quickSend.checked && recognition && lastInterim && QUICK_SEND_PUNCT.has(e.key)) {
+  if(e.key === 'Enter'){
     e.preventDefault();
+    flushInterimKeyboard();
+  } else if(QUICK_SEND_PUNCT.has(e.key)){
     flushInterimKeyboard();
   }
 });
@@ -937,8 +917,6 @@ const HISTORY_LIMIT = 300;
 const MAX_NOTES = 500;
 let currentNoteIndex = null;
 let lastInterim = '';
-let ignoreFinalForText = ''; 
-let isFlushRestarting = false; // Flag para reinício transparente de sessão de áudio no Enter
 
 /* Modo da Barra: 'full' | 'compact' | 'hidden' */
 let currentBarMode = 'full';
@@ -1328,7 +1306,7 @@ async function copyAll(){
   }
 }
 
-/* ====== Tamanho da Fonte ====== */
+/* ====== Tamanho da Fonte (Ajuste Quase Ilimitado: 8px até 200px) ====== */
 function setFontSize(px){
   const fontPx = Math.max(6, Math.min(300, Number(px)));
   document.documentElement.style.setProperty('--font-size', fontPx + 'px');
@@ -1420,45 +1398,14 @@ function insertAtCursor(textToInsert){
 /* ====== Reconhecimento de Voz ====== */
 const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
-
-/* ====== Deduplicação Antirrepetição (Proteção contra bug do Chrome Android) ====== */
-function deduplicateNewText(newText, existingText) {
-  if (!newText || !newText.trim()) return '';
-  if (!existingText || !existingText.trim()) return newText.trim();
-
-  const cleanNew = newText.trim();
-  const cleanExisting = existingText.trim();
-
-  const existingWords = cleanExisting.split(/\s+/);
-  const newWords = cleanNew.split(/\s+/);
-
-  const maxCheck = Math.min(existingWords.length, newWords.length);
-  for (let overlapLength = maxCheck; overlapLength > 0; overlapLength--) {
-    const existingSuffix = existingWords.slice(-overlapLength).join(' ').toLowerCase().replace(/[.,!?;:]/g, '');
-    const newPrefix = newWords.slice(0, overlapLength).join(' ').toLowerCase().replace(/[.,!?;:]/g, '');
-
-    if (existingSuffix === newPrefix) {
-      const deltaWords = newWords.slice(overlapLength);
-      return deltaWords.join(' ');
-    }
-  }
-
-  return cleanNew;
-}
+let suppressNextFinal = false;
 
 function processAndInsert(finalText, keepPunct){
-  if(!finalText || !finalText.trim()) return;
-
-  const insertPos = (typeof output.selectionStart === 'number') ? output.selectionStart : output.value.length;
-  const before = output.value.slice(0, insertPos);
-
-  /* Deduplicação contra sobreposição de frases acumuladas pelo Chrome Android */
-  const deduplicated = deduplicateNewText(finalText, before);
-  if(!deduplicated || !deduplicated.trim()) return;
-  finalText = deduplicated;
-
-  /* Converte palavras de pontuação falada (ex: "vírgula" -> ",") */
   finalText = convertSpokenPunct(finalText);
+
+  if(!keepPunct && !autoPunct.checked){
+    // se o usuário desligou pontuação inteligente e não é pontuação falada explícita
+  }
 
   const insertPos = (typeof output.selectionStart === 'number') ? output.selectionStart : output.value.length;
   const before = output.value.slice(0, insertPos);
@@ -1499,36 +1446,20 @@ function processAndInsert(finalText, keepPunct){
 }
 
 function flushInterim(){
-  if(!lastInterim || !lastInterim.trim()) return;
-  const textToFlush = lastInterim.trim();
+  if(!lastInterim) return;
+  const converted = convertSpokenPunct(lastInterim);
+  suppressNextFinal = true;
+  processAndInsert(converted, true);
+}
 
-  processAndInsert(textToFlush, true);
+function flushInterimKeyboard(){
+  if(!lastInterim) return;
+  flushInterim();
   lastInterim = '';
-  ignoreFinalForText = '';
-
   if (recognizing || userWantsRecording) {
     overlayText.textContent = 'Ouvindo...';
   } else {
     hideOverlay();
-  }
-}
-
-/* Envio Imediato no Enter com Reinício Limpo em Segundo Plano (SEM quebra de linha) */
-function flushInterimKeyboard(){
-  if(!lastInterim || !lastInterim.trim()) return;
-  
-  const textToFlush = lastInterim.trim();
-  lastInterim = '';
-  ignoreFinalForText = '';
-  
-  processAndInsert(textToFlush, true);
-
-  // Reinicia a sessão de áudio em segundo plano para limpar o buffer do Chrome sem piscar
-  if (userWantsRecording && recognition) {
-    try {
-      isFlushRestarting = true;
-      recognition.abort();
-    } catch(e){}
   }
 }
 
@@ -1572,7 +1503,6 @@ function buildRecognition(){
     status.textContent = 'Gravando...';
     showOverlay('Ouvindo voz...');
     lastInterim = '';
-    ignoreFinalForText = '';
   };
 
   r.onresult = (e) => {
@@ -1587,14 +1517,19 @@ function buildRecognition(){
     if(interim && interim.trim()){
       lastInterim = interim.trim();
       showOverlay(convertSpokenPunct(lastInterim));
-    } else {
-      lastInterim = '';
-      if(recognizing || userWantsRecording){
-        showOverlay('Ouvindo...');
-      }
     }
 
     if(final && final.trim()){
+      if(suppressNextFinal){
+        suppressNextFinal = false;
+        lastInterim = '';
+        if (recognizing || userWantsRecording) {
+          overlayText.textContent = 'Ouvindo...';
+        } else {
+          hideOverlay();
+        }
+        return;
+      }
       processAndInsert(final.trim());
     }
   };
@@ -1617,31 +1552,16 @@ function buildRecognition(){
       setTimeout(()=> status.textContent = recognizing ? 'Gravando...' : 'Pronto', 1500);
     }
 
-    if(userWantsRecording && !isFlushRestarting) scheduleReconnect();
+    if(userWantsRecording) scheduleReconnect();
   };
 
   r.onend = () => {
     recognizing = false;
 
-    // Se o reinício foi disparado pelo Enter no Envio Imediato
-    if(isFlushRestarting){
-      isFlushRestarting = false;
-      if(userWantsRecording){
-        try {
-          recognition = buildRecognition();
-          recognition.start();
-        } catch(e) {
-          scheduleReconnect();
-        }
-      }
-      return;
-    }
-
     if(userWantsRecording){
       scheduleReconnect();
     } else {
       lastInterim = '';
-      ignoreFinalForText = '';
       hideOverlay();
       setMicState('idle');
       status.textContent = 'Pronto';
@@ -1799,8 +1719,7 @@ async function correctWithAI() {
   status.textContent = 'IA corrigindo texto...';
   aiBtn.disabled = true;
 
-  /* Prompt de Fidelidade Extrema para Ditado por Voz */
-  const systemPrompt = "Você é um revisor de texto e ditado em português do Brasil. Sua única função é aplicar as regras de ortografia, gramática, pontuação e capitalização (maiúsculas/minúsculas) ao texto fornecido.\n\nREGRA DE FIDELIDADE EXTREMA: Seja o mais fiel possível ao texto original. NÃO reescreva frases, NÃO mude o vocabulário, NÃO substitua palavras por sinônimos e NÃO altere o estilo do autor. Apenas remova hesitações de fala (como 'é...', 'tipo assim', repetições acidentais de palavras por gagueira) e ajuste pontuação, ortografia e concordância.\n\nREGRA DE CAIXA ALTA: Mantenha rigorosamente em CAIXA ALTA (MAIÚSCULAS) quaisquer palavras, siglas ou trechos que já estejam em CAIXA ALTA no texto original.\n\nResponda EXCLUSIVAMENTE com o texto final corrigido, sem saudações, introduções ou comentários.";
+  const systemPrompt = "Você é um assistente especialista em revisão gramatical e ortográfica em português do Brasil. Sua única função é corrigir a ortografia, pontuação, concordância e o uso de maiúsculas e minúsculas do texto a seguir. Mantenha integralmente o sentido original e a estrutura dos parágrafos. NÃO adicione saudações, explicações, nem comentários como 'Aqui está o texto corrigido'. Retorne EXCLUSIVAMENTE o texto final corrigido. Se uma palavra ou frase estiver totalmente escrita como caixa alta, você deve manter dessa forma, sem alterar. Isso é prioridade.";
 
   try {
     let correctedText = '';
@@ -1811,15 +1730,9 @@ async function correctWithAI() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: systemPrompt }]
-          },
           contents: [{
-            parts: [{ text: text }]
-          }],
-          generationConfig: {
-            temperature: 0.2
-          }
+            parts: [{ text: `${systemPrompt}\n\nTexto para correção:\n${text}` }]
+          }]
         })
       });
 
