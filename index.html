@@ -11,7 +11,6 @@
 <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="bg" x1="0%25" y1="0%25" x2="100%25" y2="100%25"><stop offset="0%25" stop-color="%230f172a"/><stop offset="100%25" stop-color="%23020617"/></linearGradient><linearGradient id="mic" x1="0%25" y1="0%25" x2="100%25" y2="100%25"><stop offset="0%25" stop-color="%2360a5fa"/><stop offset="100%25" stop-color="%232563eb"/></linearGradient></defs><rect width="512" height="512" rx="128" fill="url(%23bg)"/><g><rect x="216" y="128" width="80" height="160" rx="40" fill="url(%23mic)"/><path d="M160 256c0 53 43 96 96 96s96-43 96-96" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round" fill="none"/><line x1="256" y1="352" x2="256" y2="416" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round"/><line x1="208" y1="416" x2="304" y2="416" stroke="%2338bdf8" stroke-width="24" stroke-linecap="round"/></g></svg>'>
 <meta name="theme-color" content="#0f172a">
 
-<!-- Google Fonts Inter para máxima legibilidade -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -23,7 +22,6 @@
     --controls-height: 64px;
     --notes-panel-width: 380px;
 
-    /* Tema Escuro por Padrão (Dark Mode Premium) */
     --bg-app: #090d16;
     --bg-surface: #131b2e;
     --bg-card: #1e293b;
@@ -78,7 +76,6 @@
     height: 100vh;
   }
 
-  /* ====== Barra Superior de Controles ====== */
   #controls {
     height: var(--controls-height);
     display: flex;
@@ -100,7 +97,6 @@
     flex-wrap: wrap;
   }
 
-  /* ====== Estilização de Botões ====== */
   button, .btn {
     display: inline-flex;
     align-items: center;
@@ -125,14 +121,8 @@
     transform: translateY(-1px);
   }
 
-  button:active:not(:disabled) {
-    transform: translateY(0);
-  }
-
-  button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+  button:active:not(:disabled) { transform: translateY(0); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
 
   button.primary {
     background: var(--primary-color);
@@ -168,13 +158,10 @@
     border-color: var(--warn-color);
   }
 
-  button.icon-only {
-    padding: 8px;
-    width: 36px;
-    height: 36px;
-  }
+  button.icon-only { padding: 8px; width: 36px; height: 36px; }
+  .btn-group { display: inline-flex; gap: 2px; }
+  .font-btn { border: none; background: transparent; }
 
-  /* ====== Controles de Fonte ====== */
   #fontControls {
     display: flex;
     align-items: center;
@@ -184,11 +171,7 @@
     border-radius: 8px;
     border: 1px solid var(--border-color);
   }
-  #fontControls label {
-    font-size: 12px;
-    color: var(--text-secondary);
-    font-weight: 500;
-  }
+  #fontControls label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
   #fontSizeVal {
     font-size: 13px;
     font-weight: 600;
@@ -202,7 +185,6 @@
     cursor: pointer;
   }
 
-  /* ====== Checkboxes Estilizados ====== */
   .toggle {
     display: inline-flex;
     align-items: center;
@@ -216,16 +198,8 @@
     cursor: pointer;
     user-select: none;
   }
-  .toggle:hover {
-    color: var(--text-primary);
-    border-color: var(--text-muted);
-  }
-  .toggle input {
-    cursor: pointer;
-    width: 16px;
-    height: 16px;
-    accent-color: var(--primary-color);
-  }
+  .toggle:hover { color: var(--text-primary); border-color: var(--text-muted); }
+  .toggle input { cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary-color); }
 
   #status {
     font-size: 13px;
@@ -237,26 +211,13 @@
     border: 1px solid var(--border-color);
   }
 
-  /* ====== Modos da Barra Superior ====== */
-  body.bar-compact #controls {
-    height: 48px;
-    padding: 0 10px;
-  }
+  body.bar-compact #controls { height: 48px; padding: 0 10px; }
   body.bar-compact .btn-text,
   body.bar-compact #fontControls label,
-  body.bar-compact #fontSizeVal {
-    display: none !important;
-  }
-  body.bar-compact button, body.bar-compact .toggle {
-    padding: 6px 10px;
-  }
-  body.bar-compact input[type="range"] {
-    width: 70px;
-  }
-
-  body.bar-hidden #controls {
-    display: none !important;
-  }
+  body.bar-compact #fontSizeVal { display: none !important; }
+  body.bar-compact button, body.bar-compact .toggle { padding: 6px 10px; }
+  body.bar-compact input[type="range"] { width: 70px; }
+  body.bar-hidden #controls { display: none !important; }
 
   #unhideBarBtn {
     position: fixed;
@@ -280,11 +241,8 @@
     color: #ffffff;
     transform: translateY(2px);
   }
-  body.bar-hidden #unhideBarBtn {
-    display: inline-flex !important;
-  }
+  body.bar-hidden #unhideBarBtn { display: inline-flex !important; }
 
-  /* ====== Área Principal do Editor ====== */
   #main {
     display: flex;
     flex: 1 1 auto;
@@ -297,7 +255,6 @@
     display: flex;
     flex-direction: column;
     padding: 16px;
-    box-sizing: border-box;
     min-width: 0;
     background: var(--bg-app);
   }
@@ -336,11 +293,8 @@
     word-break: break-word;
   }
 
-  #output::placeholder {
-    color: var(--text-muted);
-  }
+  #output::placeholder { color: var(--text-muted); }
 
-  /* ====== Rodapé do Editor ====== */
   #editorFooter {
     display: flex;
     align-items: center;
@@ -353,13 +307,9 @@
     user-select: none;
   }
   
-  .stats-group {
-    display: flex;
-    gap: 16px;
-    font-weight: 500;
-  }
+  .stats-group { display: flex; gap: 16px; font-weight: 500; }
+  .text-hint { opacity: 0.7; }
 
-  /* ====== Painel Lateral de Notas ====== */
   #notesPanel {
     width: 0;
     transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1);
@@ -371,9 +321,7 @@
     z-index: 20;
   }
 
-  #notesPanel.open {
-    width: var(--notes-panel-width);
-  }
+  #notesPanel.open { width: var(--notes-panel-width); }
 
   #notesHeader {
     display: flex;
@@ -384,13 +332,10 @@
     background: var(--bg-surface);
   }
 
-  .notes-header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+  .notes-header-top { display: flex; align-items: center; justify-content: space-between; }
+  .notes-actions { display: flex; gap: 8px; }
 
-  #searchInput {
+  #searchInput, .form-input, .form-select {
     width: 100%;
     padding: 8px 12px;
     border-radius: 8px;
@@ -401,9 +346,8 @@
     font-size: 13px;
     outline: none;
   }
-  #searchInput:focus {
-    border-color: var(--primary-color);
-  }
+  #searchInput:focus, .form-input:focus, .form-select:focus { border-color: var(--primary-color); }
+  .form-input-mono { font-family: monospace; }
 
   #notesList {
     padding: 16px;
@@ -435,10 +379,7 @@
     box-shadow: var(--shadow-sm);
   }
 
-  .note-card.active {
-    border-color: var(--primary-color);
-    background: var(--bg-surface);
-  }
+  .note-card.active { border-color: var(--primary-color); background: var(--bg-surface); }
 
   .note-card .text-preview {
     color: var(--text-primary);
@@ -461,12 +402,9 @@
     padding-top: 6px;
   }
 
-  .note-card .actions {
-    display: flex;
-    gap: 6px;
-  }
+  .note-card .actions { display: flex; gap: 6px; }
+  .note-btn { padding: 4px 8px; font-size: 12px; }
 
-  /* ====== Overlay de Ditado em Tempo Real ====== */
   #dictateOverlay {
     position: fixed;
     left: 50%;
@@ -489,7 +427,7 @@
     z-index: 100;
     opacity: 0;
     pointer-events: none;
-    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease, width 0.15s ease, height 0.15s ease;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease;
     overflow: hidden;
   }
 
@@ -548,7 +486,6 @@
     padding-right: 4px;
   }
 
-  /* ====== Toast & Modais ====== */
   #toast {
     position: fixed;
     top: 24px;
@@ -567,10 +504,7 @@
     transition: all 0.2s ease;
     box-shadow: var(--shadow-md);
   }
-  #toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   .modal-backdrop {
     position: fixed;
@@ -586,10 +520,7 @@
     transition: opacity 0.2s ease;
   }
 
-  .modal-backdrop.open {
-    opacity: 1;
-    pointer-events: auto;
-  }
+  .modal-backdrop.open { opacity: 1; pointer-events: auto; }
 
   .modal-card {
     background: var(--bg-surface);
@@ -604,29 +535,19 @@
     gap: 16px;
   }
 
-  .modal-card h3 {
-    margin: 0;
-    font-size: 18px;
-    color: var(--text-primary);
-  }
+  .modal-card h3 { margin: 0; font-size: 18px; color: var(--text-primary); }
+  .modal-card p { margin: 0; font-size: 14px; color: var(--text-secondary); }
+  .modal-header-row { display: flex; justify-content: space-between; align-items: center; }
+  .modal-close-btn { border: none; background: transparent; font-size: 20px; cursor: pointer; color: var(--text-secondary); }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
 
-  .modal-card p {
-    margin: 0;
-    font-size: 14px;
-    color: var(--text-secondary);
-  }
-
-  .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-  }
+  .form-group-list { display: flex; flex-direction: column; gap: 12px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px; }
+  .btn-auto-left { margin-right: auto; }
+  .hidden { display: none !important; }
 
   @media (max-width: 800px) {
-    #controls {
-      height: auto;
-      padding: 12px;
-    }
+    #controls { height: auto; padding: 12px; }
     #notesPanel.open {
       width: 100%;
       position: absolute;
@@ -640,13 +561,11 @@
 <body>
 
 <div id="app" role="application">
-  <!-- Botão Flutuante quando a Barra está Oculta -->
   <button id="unhideBarBtn" title="Mostrar Barra Superior (Ctrl+B)">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
     <span>Mostrar Barra</span>
   </button>
 
-  <!-- ====== Barra Superior de Ferramentas ====== -->
   <header id="controls" role="toolbar" aria-label="Barra de ferramentas do ditado">
     <div class="controls-left">
       <button id="micBtn" class="primary" title="Iniciar/Parar Ditado (Esc)">
@@ -654,8 +573,7 @@
         <span id="micBtnText" class="btn-text">Iniciar (Esc)</span>
       </button>
 
-      <!-- Grupo do Botão de IA + Engrenagem -->
-      <div style="display:inline-flex; gap:2px;">
+      <div class="btn-group">
         <button id="aiBtn" title="Atalho: F10 | Corrigir ortografia e gramática com IA">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2z"/></svg>
           <span class="btn-text">Corrigir com IA (F10)</span>
@@ -688,11 +606,10 @@
         <span class="btn-text">Limpar (F8)</span>
       </button>
 
-      <!-- Seletor de Tamanho de Fonte -->
       <div id="fontControls" title="Ajuste de tamanho da fonte (8px a 200px)">
-        <button id="fontDec" class="icon-only" style="border:none;background:transparent;">A-</button>
+        <button id="fontDec" class="icon-only font-btn">A-</button>
         <input id="fontRange" type="range" min="8" max="200" value="18" />
-        <button id="fontInc" class="icon-only" style="border:none;background:transparent;">A+</button>
+        <button id="fontInc" class="icon-only font-btn">A+</button>
         <span id="fontSizeVal">18px</span>
       </div>
     </div>
@@ -713,13 +630,12 @@
         <span class="btn-text">Envio Imediato</span>
       </label>
 
-      <!-- Ferramenta de Alternância da Barra -->
       <button id="barModeBtn" class="icon-only" title="Alternar Barra (Normal / Ícones / Ocultar - Atalho: Ctrl+B ou F6)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
 
       <button id="themeToggleBtn" class="icon-only" title="Alternar Modo Escuro / Claro">
-        <svg id="themeIconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="themeIconSun" class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
 
@@ -732,7 +648,6 @@
     </div>
   </header>
 
-  <!-- ====== Área Principal do Editor ====== -->
   <main id="main">
     <div id="editor">
       <div class="editor-wrapper">
@@ -743,17 +658,16 @@
             <span id="wordCount">0 palavras</span>
             <span id="charCount">0 caracteres</span>
           </div>
-          <span style="opacity: 0.7;">Pressione <strong>Esc</strong> para falar | <strong>Ctrl+B</strong> alternar barra</span>
+          <span class="text-hint">Pressione <strong>Esc</strong> para falar | <strong>Ctrl+B</strong> alternar barra</span>
         </div>
       </div>
     </div>
 
-    <!-- ====== Painel Lateral de Notas Salvas ====== -->
     <aside id="notesPanel" aria-hidden="true">
       <div id="notesHeader">
         <div class="notes-header-top">
           <strong style="font-size:16px;">Notas Salvas</strong>
-          <div style="display:flex;gap:8px;">
+          <div class="notes-actions">
             <button id="deleteAllBtn" class="warn icon-only" title="Excluir todas (Ctrl+Shift+Delete)">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
             </button>
@@ -767,18 +681,13 @@
   </main>
 </div>
 
-<!-- ====== Overlay de Status de Voz ====== -->
 <div id="dictateOverlay" aria-hidden="true">
   <div class="overlay-content">
-    <div class="live-badge">
-      <div class="live-dot"></div>
-      Ouvindo
-    </div>
+    <div class="live-badge"><div class="live-dot"></div>Ouvindo</div>
     <div id="overlayText">Aguardando fala...</div>
   </div>
 </div>
 
-<!-- ====== Componentes Flutuantes ====== -->
 <div id="toast" role="status">Copiado</div>
 
 <div id="confirmModal" class="modal-backdrop" aria-hidden="true">
@@ -792,19 +701,18 @@
   </div>
 </div>
 
-<!-- ====== Modal de Configuração de API da IA ====== -->
 <div id="aiModal" class="modal-backdrop" aria-hidden="true">
   <div class="modal-card">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h3 style="margin:0;">Configurar IA para Correção</h3>
-      <button id="closeAiModalBtn" style="border:none; background:transparent; font-size:20px; cursor:pointer; color:var(--text-secondary);">&times;</button>
+    <div class="modal-header-row">
+      <h3>Configurar IA para Correção</h3>
+      <button id="closeAiModalBtn" class="modal-close-btn">&times;</button>
     </div>
     <p>Insira sua chave de API para habilitar a correção por Inteligência Artificial. A chave será gravada <strong>apenas no LocalStorage do seu navegador</strong> neste computador.</p>
     
-    <div style="display:flex; flex-direction:column; gap:12px;">
+    <div class="form-group-list">
       <div>
-        <label style="font-size:12px; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">PROVEDOR DE IA:</label>
-        <select id="aiProviderSelect" style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid var(--border-color); background:var(--input-bg); color:var(--text-primary); outline:none;">
+        <label class="form-label">PROVEDOR DE IA:</label>
+        <select id="aiProviderSelect" class="form-select">
           <option value="gemini">Google Gemini (Grátis / Recomendado)</option>
           <option value="groq">Groq (Ultra Rápido / Grátis)</option>
           <option value="openrouter">OpenRouter</option>
@@ -813,18 +721,18 @@
       </div>
 
       <div>
-        <label style="font-size:12px; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">CHAVE DE API (API KEY):</label>
-        <input type="password" id="aiApiKeyInput" placeholder="Cole sua chave aqui..." style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid var(--border-color); background:var(--input-bg); color:var(--text-primary); font-family:monospace; outline:none;" />
+        <label class="form-label">CHAVE DE API (API KEY):</label>
+        <input type="password" id="aiApiKeyInput" class="form-input form-input-mono" placeholder="Cole sua chave aqui..." />
       </div>
 
       <div>
-        <label style="font-size:12px; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">MODELO DE LINGUAGEM (OPCIONAL):</label>
-        <input type="text" id="aiModelInput" placeholder="Ex: gemini-2.0-flash, llama-3.3-70b-versatile..." style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid var(--border-color); background:var(--input-bg); color:var(--text-primary); outline:none;" />
+        <label class="form-label">MODELO DE LINGUAGEM (OPCIONAL):</label>
+        <input type="text" id="aiModelInput" class="form-input" placeholder="Ex: gemini-2.0-flash, llama-3.3-70b-versatile..." />
       </div>
     </div>
 
-    <div class="modal-actions" style="margin-top:8px;">
-      <button id="clearAiKeyBtn" class="warn" style="margin-right:auto; display:none;">Remover Chave</button>
+    <div class="modal-actions">
+      <button id="clearAiKeyBtn" class="warn btn-auto-left hidden">Remover Chave</button>
       <button id="cancelAiModalBtn">Cancelar</button>
       <button id="saveAiModalBtn" class="primary">Salvar e Continuar</button>
     </div>
@@ -832,575 +740,377 @@
 </div>
 
 <script>
-/* ====== Referências DOM ====== */
-const output = document.getElementById('output');
-const micBtn = document.getElementById('micBtn');
-const micBtnText = document.getElementById('micBtnText');
-const copyBtn = document.getElementById('copyBtn');
-const undoBtn = document.getElementById('undoBtn');
-const redoBtn = document.getElementById('redoBtn');
-const newBtn = document.getElementById('newBtn');
-const clearBtn = document.getElementById('clearBtn');
-const notesToggle = document.getElementById('notesToggle');
-const notesPanel = document.getElementById('notesPanel');
-const notesList = document.getElementById('notesList');
-const searchInput = document.getElementById('searchInput');
-const closeNotesBtn = document.getElementById('closeNotesBtn');
-const deleteAllBtn = document.getElementById('deleteAllBtn');
-const status = document.getElementById('status');
-const fontRange = document.getElementById('fontRange');
-const fontSizeVal = document.getElementById('fontSizeVal');
-const fontInc = document.getElementById('fontInc');
-const fontDec = document.getElementById('fontDec');
-const autoPunct = document.getElementById('autoPunct');
-const allCaps = document.getElementById('allCaps');
-const quickSend = document.getElementById('quickSend');
+/* ====== Helper DOM & Utilitários ====== */
+const $ = id => document.getElementById(id);
 
-/* Elementos de Controle da Barra */
-const barModeBtn = document.getElementById('barModeBtn');
-const unhideBarBtn = document.getElementById('unhideBarBtn');
-
-/* DOM Elementos da Correção por IA */
-const aiBtn = document.getElementById('aiBtn');
-const aiConfigBtn = document.getElementById('aiConfigBtn');
-const aiModal = document.getElementById('aiModal');
-const closeAiModalBtn = document.getElementById('closeAiModalBtn');
-const cancelAiModalBtn = document.getElementById('cancelAiModalBtn');
-const saveAiModalBtn = document.getElementById('saveAiModalBtn');
-const clearAiKeyBtn = document.getElementById('clearAiKeyBtn');
-const aiProviderSelect = document.getElementById('aiProviderSelect');
-const aiApiKeyInput = document.getElementById('aiApiKeyInput');
-const aiModelInput = document.getElementById('aiModelInput');
-
-const QUICK_SEND_PUNCT = new Set(['.', ',', ';', '/', '-', '!', '?', ':']);
-
-output.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    if (lastInterim && lastInterim.trim()) {
-      // Quando HÁ texto no buffer: envia o texto e cancela a quebra de linha
-      e.preventDefault();
-      flushInterimKeyboard();
-    } else {
-      // Quando NÃO HÁ texto no buffer: o Enter pula a linha (\n) normalmente
-    }
-    return;
-  }
-
-  if (quickSend.checked && recognition && lastInterim && QUICK_SEND_PUNCT.has(e.key)) {
-    e.preventDefault();
-    flushInterimKeyboard();
-  }
-});
-
-const themeToggleBtn = document.getElementById('themeToggleBtn');
-const themeIconSun = document.getElementById('themeIconSun');
-const themeIconMoon = document.getElementById('themeIconMoon');
-
-const wordCountEl = document.getElementById('wordCount');
-const charCountEl = document.getElementById('charCount');
-
-const overlay = document.getElementById('dictateOverlay');
-const overlayText = document.getElementById('overlayText');
-const toastEl = document.getElementById('toast');
-
-const confirmModal = document.getElementById('confirmModal');
-const cancelModalBtn = document.getElementById('cancelModalBtn');
-const confirmModalBtn = document.getElementById('confirmModalBtn');
-
-/* ====== Estado e Armazenamento ====== */
-let saveTimer = null;
-const autosaveDelay = 1500;
-let history = [];
-let redoStack = [];
-let notes = [];
-const STORAGE_KEY = 'ditado_notes_v2';
-const FONT_STORAGE_KEY = 'ditado_fontsize';
-const THEME_STORAGE_KEY = 'ditado_theme';
-const BAR_MODE_STORAGE_KEY = 'ditado_bar_mode';
-const AUTO_PUNCT_STORAGE_KEY = 'ditado_auto_punct';
-const ALL_CAPS_STORAGE_KEY = 'ditado_all_caps';
-const QUICK_SEND_STORAGE_KEY = 'ditado_quick_send';
-const HISTORY_LIMIT = 300;
-const MAX_NOTES = 500;
-let currentNoteIndex = null;
-let lastInterim = '';
-let flushedText = ''; // Trava de comparação para impedir repetição no 2º Enter
-let isFlushRestarting = false; 
-
-/* Modo da Barra: 'full' | 'compact' | 'hidden' */
-let currentBarMode = 'full';
-
-/* Armazenamento das Configurações de IA */
-const AI_KEY_STORAGE = 'ditado_ai_key';
-const AI_PROVIDER_STORAGE = 'ditado_ai_provider';
-const AI_MODEL_STORAGE = 'ditado_ai_model';
-
-const DEFAULT_AI_MODELS = {
-  gemini: 'gemini-2.0-flash',
-  groq: 'llama-3.3-70b-versatile',
-  openrouter: 'google/gemini-2.0-flash-001',
-  openai: 'gpt-4o-mini'
+const els = {
+  output: $('output'), micBtn: $('micBtn'), micBtnText: $('micBtnText'), copyBtn: $('copyBtn'),
+  undoBtn: $('undoBtn'), redoBtn: $('redoBtn'), newBtn: $('newBtn'), clearBtn: $('clearBtn'),
+  notesToggle: $('notesToggle'), notesPanel: $('notesPanel'), notesList: $('notesList'),
+  searchInput: $('searchInput'), closeNotesBtn: $('closeNotesBtn'), deleteAllBtn: $('deleteAllBtn'),
+  status: $('status'), fontRange: $('fontRange'), fontSizeVal: $('fontSizeVal'),
+  fontInc: $('fontInc'), fontDec: $('fontDec'), autoPunct: $('autoPunct'),
+  allCaps: $('allCaps'), quickSend: $('quickSend'), barModeBtn: $('barModeBtn'),
+  unhideBarBtn: $('unhideBarBtn'), aiBtn: $('aiBtn'), aiConfigBtn: $('aiConfigBtn'),
+  aiModal: $('aiModal'), closeAiModalBtn: $('closeAiModalBtn'), cancelAiModalBtn: $('cancelAiModalBtn'),
+  saveAiModalBtn: $('saveAiModalBtn'), clearAiKeyBtn: $('clearAiKeyBtn'), aiProviderSelect: $('aiProviderSelect'),
+  aiApiKeyInput: $('aiApiKeyInput'), aiModelInput: $('aiModelInput'), themeToggleBtn: $('themeToggleBtn'),
+  themeIconSun: $('themeIconSun'), themeIconMoon: $('themeIconMoon'), wordCountEl: $('wordCount'),
+  charCountEl: $('charCount'), overlay: $('dictateOverlay'), overlayText: $('overlayText'),
+  toastEl: $('toast'), confirmModal: $('confirmModal'), cancelModalBtn: $('cancelModalBtn'),
+  confirmModalBtn: $('confirmModalBtn')
 };
 
-/* ====== Persistência das Opções dos Checkboxes ====== */
-function initToggles() {
-  const savedAutoPunct = localStorage.getItem(AUTO_PUNCT_STORAGE_KEY);
-  if (savedAutoPunct !== null) {
-    autoPunct.checked = savedAutoPunct === 'true';
-  }
+const QUICK_SEND_PUNCT = new Set(['.', ',', ';', '/', '-', '!', '?', ':']);
+const STORAGE_KEYS = {
+  NOTES: 'ditado_notes_v2', FONT: 'ditado_fontsize', THEME: 'ditado_theme',
+  BAR_MODE: 'ditado_bar_mode', AUTO_PUNCT: 'ditado_auto_punct', ALL_CAPS: 'ditado_all_caps',
+  QUICK_SEND: 'ditado_quick_send', AI_KEY: 'ditado_ai_key', AI_PROVIDER: 'ditado_ai_provider',
+  AI_MODEL: 'ditado_ai_model'
+};
 
-  const savedAllCaps = localStorage.getItem(ALL_CAPS_STORAGE_KEY);
-  if (savedAllCaps !== null) {
-    allCaps.checked = savedAllCaps === 'true';
-  }
+const DEFAULT_AI_MODELS = {
+  gemini: 'gemini-2.0-flash', groq: 'llama-3.3-70b-versatile',
+  openrouter: 'google/gemini-2.0-flash-001', openai: 'gpt-4o-mini'
+};
 
-  const savedQuickSend = localStorage.getItem(QUICK_SEND_STORAGE_KEY);
-  if (savedQuickSend !== null) {
-    quickSend.checked = savedQuickSend === 'true';
-  }
+/* ====== Estado da Aplicação ====== */
+let saveTimer = null;
+let history = [], redoStack = [], notes = [];
+let currentNoteIndex = null;
+let lastInterim = '', flushedText = '';
+let isFlushRestarting = false, recognizing = false, userWantsRecording = false;
+let reconnectTimer = null, reconnectAttempts = 0, currentBarMode = 'full';
+const autosaveDelay = 1500, HISTORY_LIMIT = 300, MAX_NOTES = 500, MAX_RECONNECT = 5;
+
+/* ====== Helpers de UI e Modal ====== */
+function setStatus(msg, timeout = 0) {
+  els.status.textContent = msg;
+  if (timeout) setTimeout(() => els.status.textContent = 'Pronto', timeout);
 }
 
-autoPunct.addEventListener('change', () => {
-  localStorage.setItem(AUTO_PUNCT_STORAGE_KEY, autoPunct.checked);
+function toggleModal(modal, open) {
+  modal.classList.toggle('open', open);
+  modal.setAttribute('aria-hidden', !open);
+}
+
+let __toastTimer = null;
+function showToast(message = 'Copiado', ms = 1400) {
+  els.toastEl.textContent = message;
+  els.toastEl.classList.add('show');
+  clearTimeout(__toastTimer);
+  __toastTimer = setTimeout(() => els.toastEl.classList.remove('show'), ms);
+}
+
+/* ====== Inicialização de Toggles e Tema ====== */
+function initToggles() {
+  const getBool = (key, defaultVal) => {
+    const v = localStorage.getItem(key);
+    return v !== null ? v === 'true' : defaultVal;
+  };
+  els.autoPunct.checked = getBool(STORAGE_KEYS.AUTO_PUNCT, true);
+  els.allCaps.checked = getBool(STORAGE_KEYS.ALL_CAPS, false);
+  els.quickSend.checked = getBool(STORAGE_KEYS.QUICK_SEND, false);
+}
+
+els.autoPunct.addEventListener('change', () => localStorage.setItem(STORAGE_KEYS.AUTO_PUNCT, els.autoPunct.checked));
+els.allCaps.addEventListener('change', () => localStorage.setItem(STORAGE_KEYS.ALL_CAPS, els.allCaps.checked));
+els.quickSend.addEventListener('change', () => localStorage.setItem(STORAGE_KEYS.QUICK_SEND, els.quickSend.checked));
+
+function setTheme(theme, save = true) {
+  document.documentElement.setAttribute('data-theme', theme);
+  if (save) localStorage.setItem(STORAGE_KEYS.THEME, theme);
+  const isDark = theme === 'dark';
+  els.themeIconSun.classList.toggle('hidden', isDark);
+  els.themeIconMoon.classList.toggle('hidden', !isDark);
+}
+
+function initTheme() {
+  const saved = localStorage.getItem(STORAGE_KEYS.THEME);
+  if (saved) setTheme(saved, false);
+  else setTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light', false);
+}
+
+els.themeToggleBtn.addEventListener('click', () => {
+  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
 });
 
-allCaps.addEventListener('change', () => {
-  localStorage.setItem(ALL_CAPS_STORAGE_KEY, allCaps.checked);
-});
-
-quickSend.addEventListener('change', () => {
-  localStorage.setItem(QUICK_SEND_STORAGE_KEY, quickSend.checked);
-});
-
-/* ====== Ferramenta de Alternância da Barra Superior ====== */
+/* ====== Modo da Barra Superior ====== */
 function setBarMode(mode, save = true) {
   currentBarMode = mode;
   document.body.classList.remove('bar-compact', 'bar-hidden');
-  
   if (mode === 'compact') {
     document.body.classList.add('bar-compact');
-    barModeBtn.title = "Modo Atual: Ícones Apenas (Clique para Ocultar Barra - Ctrl+B)";
+    els.barModeBtn.title = "Modo Atual: Ícones Apenas (Clique para Ocultar Barra - Ctrl+B)";
   } else if (mode === 'hidden') {
     document.body.classList.add('bar-hidden');
   } else {
-    barModeBtn.title = "Modo Atual: Normal (Clique para Ícones Apenas - Ctrl+B)";
+    els.barModeBtn.title = "Modo Atual: Normal (Clique para Ícones Apenas - Ctrl+B)";
   }
-
-  if (save) {
-    localStorage.setItem(BAR_MODE_STORAGE_KEY, mode);
-  }
+  if (save) localStorage.setItem(STORAGE_KEYS.BAR_MODE, mode);
 }
 
 function cycleBarMode() {
-  if (currentBarMode === 'full') {
-    setBarMode('compact');
-    showToast('Modo Compacto: Apenas Ícones');
-  } else if (currentBarMode === 'compact') {
-    setBarMode('hidden');
-    showToast('Barra Oculta (Clique no botão no canto para voltar)');
-  } else {
-    setBarMode('full');
-    showToast('Barra Expandida');
-  }
+  const modes = { full: 'compact', compact: 'hidden', hidden: 'full' };
+  const msgs = { compact: 'Modo Compacto: Apenas Ícones', hidden: 'Barra Oculta (Clique no botão no canto para voltar)', full: 'Barra Expandida' };
+  const next = modes[currentBarMode] || 'full';
+  setBarMode(next);
+  showToast(msgs[next]);
 }
 
-barModeBtn.addEventListener('click', cycleBarMode);
-unhideBarBtn.addEventListener('click', () => {
-  setBarMode('full');
-  showToast('Barra Expandida');
-});
+els.barModeBtn.addEventListener('click', cycleBarMode);
+els.unhideBarBtn.addEventListener('click', () => { setBarMode('full'); showToast('Barra Expandida'); });
+setBarMode(localStorage.getItem(STORAGE_KEYS.BAR_MODE) || 'full', false);
 
-const savedBarMode = localStorage.getItem(BAR_MODE_STORAGE_KEY) || 'full';
-setBarMode(savedBarMode, false);
+/* ====== Gestão de Notas & Persistência ====== */
+const persistNotes = () => localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(notes));
 
-/* ====== Gerenciamento de Tema ====== */
-function initTheme() {
-  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-  if (savedTheme) {
-    setTheme(savedTheme, false);
-  } else {
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    setTheme(prefersDark ? 'dark' : 'light', false);
-  }
-}
-
-function setTheme(theme, saveUserChoice = true) {
-  document.documentElement.setAttribute('data-theme', theme);
-  if (saveUserChoice) {
-    localStorage.setItem(THEME_STORAGE_KEY, theme);
-  }
-  if (theme === 'dark') {
-    themeIconSun.style.display = 'none';
-    themeIconMoon.style.display = 'block';
-  } else {
-    themeIconSun.style.display = 'block';
-    themeIconMoon.style.display = 'none';
-  }
-}
-
-if (window.matchMedia) {
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    if (!localStorage.getItem(THEME_STORAGE_KEY)) {
-      setTheme(e.matches ? 'dark' : 'light', false);
-    }
-  });
-}
-
-themeToggleBtn.addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme');
-  setTheme(current === 'dark' ? 'light' : 'dark', true);
-});
-
-/* ====== Utilitários ====== */
-function nowLabel(ts){ return new Date(ts).toLocaleString(); }
-function persistNotes(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(notes)); }
-function loadNotes(){ 
-  try{ notes = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }catch(e){ notes = []; } 
-  renderNotes(); 
+function loadNotes() {
+  try { notes = JSON.parse(localStorage.getItem(STORAGE_KEYS.NOTES) || '[]'); } catch(e) { notes = []; }
+  renderNotes();
 }
 
 function updateStats() {
-  const text = output.value || '';
+  const text = els.output.value || '';
   const chars = text.length;
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-  
-  wordCountEl.textContent = `${words} ${words === 1 ? 'palavra' : 'palavras'}`;
-  charCountEl.textContent = `${chars} ${chars === 1 ? 'caractere' : 'caracteres'}`;
+  els.wordCountEl.textContent = `${words} ${words === 1 ? 'palavra' : 'palavras'}`;
+  els.charCountEl.textContent = `${chars} ${chars === 1 ? 'caractere' : 'caracteres'}`;
 }
 
-function renderNotes(filter = ''){
-  notesList.innerHTML = '';
+function renderNotes(filter = '') {
   const query = filter.toLowerCase().trim();
-  const filtered = notes.filter(n => !query || n.text.toLowerCase().includes(query));
+  const filtered = notes.map((n, i) => ({ ...n, realIdx: i })).filter(n => !query || n.text.toLowerCase().includes(query));
 
-  if(filtered.length === 0){ 
-    notesList.innerHTML = `<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center;">${notes.length === 0 ? 'Nenhuma nota salva' : 'Nenhuma nota encontrada'}</div>`; 
-    return; 
+  if (!filtered.length) {
+    els.notesList.innerHTML = `<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center;">${notes.length === 0 ? 'Nenhuma nota salva' : 'Nenhuma nota encontrada'}</div>`;
+    return;
   }
 
-  filtered.forEach((n) => {
-    const realIdx = notes.indexOf(n);
-    const el = document.createElement('div');
-    el.className = `note-card ${realIdx === currentNoteIndex ? 'active' : ''}`;
-    
-    const textNode = document.createElement('div');
-    textNode.className = 'text-preview';
-    textNode.textContent = n.text;
-    el.appendChild(textNode);
-
-    const meta = document.createElement('div');
-    meta.className = 'meta';
-    meta.innerHTML = `<span>${nowLabel(n.t)}</span>`;
-    
-    const actions = document.createElement('div');
-    actions.className = 'actions';
-    
-    const loadBtn = document.createElement('button');
-    loadBtn.style.padding = '4px 8px';
-    loadBtn.style.fontSize = '12px';
-    loadBtn.textContent = 'Carregar';
-    
-    const delBtn = document.createElement('button');
-    delBtn.className = 'warn';
-    delBtn.style.padding = '4px 8px';
-    delBtn.style.fontSize = '12px';
-    delBtn.textContent = 'Excluir';
-
-    actions.appendChild(loadBtn);
-    actions.appendChild(delBtn);
-    meta.appendChild(actions);
-    el.appendChild(meta);
-
-    loadBtn.addEventListener('click', (e)=> { 
-      e.stopPropagation();
-      loadNote(realIdx); 
-      closeNotes(); 
-    });
-
-    delBtn.addEventListener('click', (e)=> {
-      e.stopPropagation();
-      deleteSingleNote(realIdx);
-    });
-
-    el.addEventListener('click', () => {
-      loadNote(realIdx);
-      closeNotes();
-    });
-
-    notesList.appendChild(el);
-  });
+  els.notesList.innerHTML = filtered.map(n => `
+    <div class="note-card ${n.realIdx === currentNoteIndex ? 'active' : ''}" data-idx="${n.realIdx}">
+      <div class="text-preview">${escapeHtml(n.text)}</div>
+      <div class="meta">
+        <span>${new Date(n.t).toLocaleString()}</span>
+        <div class="actions">
+          <button class="note-btn load-btn">Carregar</button>
+          <button class="note-btn warn del-btn">Excluir</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
 }
+
+function escapeHtml(str) {
+  return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
+}
+
+els.notesList.addEventListener('click', (e) => {
+  const card = e.target.closest('.note-card');
+  if (!card) return;
+  const idx = parseInt(card.dataset.idx, 10);
+  if (e.target.classList.contains('del-btn')) {
+    deleteSingleNote(idx);
+  } else {
+    loadNote(idx);
+    closeNotes();
+  }
+});
 
 function deleteSingleNote(idx) {
-  if(currentNoteIndex !== null){
-    if(idx === currentNoteIndex){
-      currentNoteIndex = null;
-    } else if(idx < currentNoteIndex){
-      currentNoteIndex = currentNoteIndex - 1;
-    }
+  if (currentNoteIndex !== null) {
+    if (idx === currentNoteIndex) currentNoteIndex = null;
+    else if (idx < currentNoteIndex) currentNoteIndex--;
   }
-  notes.splice(idx,1);
+  notes.splice(idx, 1);
   persistNotes();
-  renderNotes(searchInput.value);
-  status.textContent = 'Nota excluída';
-  setTimeout(()=> status.textContent = 'Pronto', 900);
+  renderNotes(els.searchInput.value);
+  setStatus('Nota excluída', 900);
 }
 
-searchInput.addEventListener('input', () => renderNotes(searchInput.value));
+els.searchInput.addEventListener('input', () => renderNotes(els.searchInput.value));
 
-/* ====== Salvamento automático ====== */
-function scheduleAutoSave(){ 
-  clearTimeout(saveTimer); 
-  saveTimer = setTimeout(()=> { saveCurrentAsNote(); }, autosaveDelay); 
+/* ====== Salvamento & Histórico ====== */
+function scheduleAutoSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveCurrentAsNote, autosaveDelay);
 }
 
-function saveCurrentAsNote(){
-  const text = output.value.trim();
-  if(!text) return;
+function saveCurrentAsNote() {
+  const text = els.output.value.trim();
+  if (!text) return;
 
-  if(currentNoteIndex !== null && notes[currentNoteIndex]){
-    if(notes[currentNoteIndex].text === text) return;
+  if (currentNoteIndex !== null && notes[currentNoteIndex]) {
+    if (notes[currentNoteIndex].text === text) return;
     notes[currentNoteIndex].text = text;
     notes[currentNoteIndex].t = Date.now();
-    persistNotes();
-    renderNotes(searchInput.value);
-    status.textContent = 'Salvo';
-    setTimeout(()=> status.textContent = 'Pronto', 900);
-    return;
-  }
-
-  if(notes.length > 0 && notes[0].text === text){
+  } else if (notes.length > 0 && notes[0].text === text) {
     notes[0].t = Date.now();
-    persistNotes();
-    renderNotes(searchInput.value);
     currentNoteIndex = 0;
-    status.textContent = 'Salvo';
-    setTimeout(()=> status.textContent = 'Pronto', 900);
-    return;
+  } else {
+    notes.unshift({ text, t: Date.now() });
+    if (notes.length > MAX_NOTES) notes.length = MAX_NOTES;
+    currentNoteIndex = 0;
   }
-
-  notes.unshift({ text, t: Date.now() });
-  if(notes.length > MAX_NOTES) notes.length = MAX_NOTES;
   persistNotes();
-  renderNotes(searchInput.value);
-  currentNoteIndex = 0;
-  status.textContent = 'Salvo';
-  setTimeout(()=> status.textContent = 'Pronto', 900);
+  renderNotes(els.searchInput.value);
+  setStatus('Salvo', 900);
 }
 
-/* ====== Histórico ====== */
-function pushHistory(value){
-  if(history.length && history[history.length-1] === value) return;
+function pushHistory(value) {
+  if (history.length && history[history.length - 1] === value) return;
   history.push(value);
-  if(history.length > HISTORY_LIMIT) history.shift();
+  if (history.length > HISTORY_LIMIT) history.shift();
   redoStack = [];
 }
 
-function undo(){
-  if(history.length <= 1) return;
-  const cur = history.pop();
-  redoStack.push(cur);
-  const prev = history[history.length-1] || '';
-  output.value = prev;
-  output.focus();
+function undo() {
+  if (history.length <= 1) return;
+  redoStack.push(history.pop());
+  els.output.value = history[history.length - 1] || '';
+  els.output.focus();
   updateStats();
   scheduleAutoSave();
-  status.textContent = 'Desfeito';
-  setTimeout(()=> status.textContent = 'Pronto', 700);
+  setStatus('Desfeito', 700);
 }
 
-function redo(){
-  if(redoStack.length === 0) return;
+function redo() {
+  if (!redoStack.length) return;
   const next = redoStack.pop();
-  output.value = next;
+  els.output.value = next;
   pushHistory(next);
-  output.focus();
+  els.output.focus();
   updateStats();
   scheduleAutoSave();
-  status.textContent = 'Refeito';
-  setTimeout(()=> status.textContent = 'Pronto', 700);
+  setStatus('Refeito', 700);
 }
 
-/* ====== Operações no Editor ====== */
-function newNote(){
+/* ====== Operações do Editor ====== */
+function newNote() {
   saveCurrentAsNote();
-  output.value = '';
+  els.output.value = '';
   history = [''];
   redoStack = [];
   currentNoteIndex = null;
   updateStats();
-  status.textContent = 'Nova nota';
-  setTimeout(()=> status.textContent = 'Pronto', 700);
+  setStatus('Nova nota', 700);
 }
 
-function clearEditor(){
-  output.value = '';
-  pushHistory(output.value);
+function clearEditor() {
+  els.output.value = '';
+  pushHistory('');
   currentNoteIndex = null;
   updateStats();
-  status.textContent = 'Limpo';
-  setTimeout(()=> status.textContent = 'Pronto', 700);
+  setStatus('Limpo', 700);
 }
 
-function loadNote(idx){
+function loadNote(idx) {
   const n = notes[idx];
-  if(!n) return;
-  output.value = n.text;
+  if (!n) return;
+  els.output.value = n.text;
   history = [n.text];
   redoStack = [];
   currentNoteIndex = idx;
   updateStats();
-  renderNotes(searchInput.value);
-  status.textContent = 'Nota carregada';
-  setTimeout(()=> status.textContent = 'Pronto', 700);
+  renderNotes(els.searchInput.value);
+  setStatus('Nota carregada', 700);
 }
 
-/* ====== Modal de Confirmação para Excluir Todas ====== */
+/* ====== Modal Excluir Tudo ====== */
 function promptDeleteAllNotes() {
-  if(!notes.length) return;
-  confirmModal.classList.add('open');
-  confirmModal.setAttribute('aria-hidden', 'false');
+  if (notes.length) toggleModal(els.confirmModal, true);
 }
 
-cancelModalBtn.addEventListener('click', () => {
-  confirmModal.classList.remove('open');
-  confirmModal.setAttribute('aria-hidden', 'true');
-});
-
-confirmModalBtn.addEventListener('click', () => {
+els.cancelModalBtn.addEventListener('click', () => toggleModal(els.confirmModal, false));
+els.confirmModalBtn.addEventListener('click', () => {
   notes = [];
   persistNotes();
   renderNotes();
   currentNoteIndex = null;
-  confirmModal.classList.remove('open');
-  confirmModal.setAttribute('aria-hidden', 'true');
-  status.textContent = 'Todas as notas excluídas';
-  setTimeout(()=> status.textContent = 'Pronto', 900);
+  toggleModal(els.confirmModal, false);
+  setStatus('Todas as notas excluídas', 900);
 });
 
-/* ====== Copiar & Toast ====== */
-let __toastTimer = null;
-function showToast(message = 'Copiado', ms = 1400){
-  if(!toastEl) return;
-  toastEl.textContent = message;
-  toastEl.classList.add('show');
-  clearTimeout(__toastTimer);
-  __toastTimer = setTimeout(() => {
-    toastEl.classList.remove('show');
-  }, ms);
-}
-
-async function copyAll(){
-  try{
-    const textToCopy = output.value || '';
-    if(!textToCopy){
-      showToast('Nada para copiar');
-      return;
-    }
-
-    if(navigator.clipboard && navigator.clipboard.writeText){
+/* ====== Copiar ====== */
+async function copyAll() {
+  try {
+    const textToCopy = els.output.value || '';
+    if (!textToCopy) return showToast('Nada para copiar');
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
       await navigator.clipboard.writeText(textToCopy);
     } else {
-      output.select();
+      els.output.select();
       document.execCommand('copy');
       try { window.getSelection().removeAllRanges(); } catch(e){}
     }
-
     showToast('Copiado para a área de transferência');
-    status.textContent = 'Copiado';
-    setTimeout(()=> status.textContent = 'Pronto', 900);
-  }catch(e){
-    console.error('Erro ao copiar:', e);
+    setStatus('Copiado', 900);
+  } catch(e) {
     showToast('Erro ao copiar');
   }
 }
 
 /* ====== Tamanho da Fonte ====== */
-function setFontSize(px){
+function setFontSize(px) {
   const fontPx = Math.max(6, Math.min(300, Number(px)));
   document.documentElement.style.setProperty('--font-size', fontPx + 'px');
-  fontRange.value = fontPx;
-  fontSizeVal.textContent = fontPx + 'px';
-  localStorage.setItem(FONT_STORAGE_KEY, fontPx);
+  els.fontRange.value = fontPx;
+  els.fontSizeVal.textContent = fontPx + 'px';
+  localStorage.setItem(STORAGE_KEYS.FONT, fontPx);
 }
 
-fontRange.addEventListener('input', ()=> setFontSize(fontRange.value));
-
-fontInc.addEventListener('click', ()=> {
-  const current = Number(fontRange.value);
-  const step = current >= 50 ? 10 : (current >= 30 ? 4 : 2);
-  setFontSize(current + step);
-});
-
-fontDec.addEventListener('click', ()=> {
-  const current = Number(fontRange.value);
-  const step = current > 50 ? 10 : (current > 30 ? 4 : 2);
-  setFontSize(current - step);
-});
+els.fontRange.addEventListener('input', () => setFontSize(els.fontRange.value));
+els.fontInc.addEventListener('click', () => setFontSize(Number(els.fontRange.value) + (els.fontRange.value >= 50 ? 10 : els.fontRange.value >= 30 ? 4 : 2)));
+els.fontDec.addEventListener('click', () => setFontSize(Number(els.fontRange.value) - (els.fontRange.value > 50 ? 10 : els.fontRange.value > 30 ? 4 : 2)));
 
 /* ====== Painel Lateral ====== */
-function openNotes(){ notesPanel.classList.add('open'); notesPanel.setAttribute('aria-hidden','false'); searchInput.focus(); }
-function closeNotes(){ notesPanel.classList.remove('open'); notesPanel.setAttribute('aria-hidden','true'); }
-function toggleNotes(){ if(notesPanel.classList.contains('open')) closeNotes(); else openNotes(); }
+const openNotes = () => { els.notesPanel.classList.add('open'); els.notesPanel.setAttribute('aria-hidden', 'false'); els.searchInput.focus(); };
+const closeNotes = () => { els.notesPanel.classList.remove('open'); els.notesPanel.setAttribute('aria-hidden', 'true'); };
+const toggleNotes = () => els.notesPanel.classList.contains('open') ? closeNotes() : openNotes();
 
-/* ====== Processamento de Texto e Ditado ====== */
-function stripPunctuation(s){ return s.replace(/[.,!?;:—–\-()\"'«»“”…]/g, '').replace(/\s+/g,' ').trim(); }
-
-/* Conversão de Pontuação Falada e Ajuste de Espaçamento */
+/* ====== Processamento e Pontuação ====== */
 const SPOKEN_PUNCT = [
-  { re: /\b(ponto e vírgula)\b/gi, out: ';' },
-  { re: /\b(ponto de interrogação)\b/gi, out: '?' },
-  { re: /\b(ponto de exclamação)\b/gi, out: '!' },
-  { re: /\b(ponto final)\b/gi, out: '.' },
-  { re: /\b(dois pontos)\b/gi, out: ':' },
-  { re: /\b(novo parágrafo|nova linha)\b/gi, out: '\n' },
-  { re: /\b(vírgula)\b/gi, out: ',' },
-  { re: /\b(interrogação)\b/gi, out: '?' },
-  { re: /\b(exclamação)\b/gi, out: '!' },
-  { re: /\b(ponto)\b/gi, out: '.' }
+  { re: /\b(ponto e vírgula)\b/gi, out: ';' }, { re: /\b(ponto de interrogação)\b/gi, out: '?' },
+  { re: /\b(ponto de exclamação)\b/gi, out: '!' }, { re: /\b(ponto final)\b/gi, out: '.' },
+  { re: /\b(dois pontos)\b/gi, out: ':' }, { re: /\b(novo parágrafo|nova linha)\b/gi, out: '\n' },
+  { re: /\b(vírgula)\b/gi, out: ',' }, { re: /\b(interrogação)\b/gi, out: '?' },
+  { re: /\b(exclamação)\b/gi, out: '!' }, { re: /\b(ponto)\b/gi, out: '.' }
 ];
 
 function formatPunctuationSpacing(text) {
-  return text
-    .replace(/\s+([.,!?;:])(?=\s|$)/g, '$1')  // Remove espaço ANTES da pontuação ("olá ," -> "olá,")
-    .replace(/([.,!?;:])([A-Za-zÀ-ÿ])/g, '$1 $2'); // Garante espaço DEPOIS da pontuação ("olá,tudo" -> "olá, tudo")
+  return text.replace(/\s+([.,!?;:])(?=\s|$)/g, '$1').replace(/([.,!?;:])([A-Za-zÀ-ÿ])/g, '$1 $2');
 }
 
-function convertSpokenPunct(text){
-  if(!text) return '';
+function convertSpokenPunct(text) {
+  if (!text) return '';
   let out = text;
-  for(const p of SPOKEN_PUNCT){
-    out = out.replace(p.re, p.out);
-  }
+  SPOKEN_PUNCT.forEach(p => out = out.replace(p.re, p.out));
   return formatPunctuationSpacing(out);
 }
 
 function analyzeInsertionContext(prefix) {
   const trimmed = prefix.trimEnd();
-  if (trimmed.length === 0) return { capitalize: true, prefixAppend: "" };
-  
+  if (!trimmed.length) return { capitalize: true, prefixAppend: "" };
   const trailingWhitespace = prefix.slice(trimmed.length);
   const hasNewline = /[\r\n]/.test(trailingWhitespace);
   const lastChar = trimmed.charAt(trimmed.length - 1);
   
   if (hasNewline) return { capitalize: true, prefixAppend: "" };
-  if (/[.!?]/.test(lastChar)) {
-    return { capitalize: true, prefixAppend: trailingWhitespace.length === 0 ? " " : "" };
-  }
+  if (/[.!?]/.test(lastChar)) return { capitalize: true, prefixAppend: trailingWhitespace.length === 0 ? " " : "" };
   return { capitalize: false, prefixAppend: trailingWhitespace.length === 0 ? " " : "" };
 }
 
-function insertAtCursor(textToInsert){
-  const start = output.selectionStart;
-  const end = output.selectionEnd;
-  const before = output.value.slice(0, start);
-  const after = output.value.slice(end);
+function insertAtCursor(textToInsert) {
+  const start = els.output.selectionStart;
+  const end = els.output.selectionEnd;
+  const before = els.output.value.slice(0, start);
+  const after = els.output.value.slice(end);
 
-  const newValue = before + textToInsert + after;
-  output.value = newValue;
+  els.output.value = before + textToInsert + after;
   const newPos = before.length + textToInsert.length;
-  output.setSelectionRange(newPos, newPos);
-  output.focus();
+  els.output.setSelectionRange(newPos, newPos);
+  els.output.focus();
   updateStats();
 }
 
@@ -1408,117 +1118,81 @@ function insertAtCursor(textToInsert){
 const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
 
-function processAndInsert(finalText, keepPunct){
-  if(!finalText || !finalText.trim()) return;
+function processAndInsert(finalText) {
+  if (!finalText || !finalText.trim()) return;
 
-  /* Converte palavras de pontuação falada (ex: "vírgula" -> ",") */
   finalText = convertSpokenPunct(finalText);
+  const insertPos = (typeof els.output.selectionStart === 'number') ? els.output.selectionStart : els.output.value.length;
+  const context = analyzeInsertionContext(els.output.value.slice(0, insertPos));
 
-  const insertPos = (typeof output.selectionStart === 'number') ? output.selectionStart : output.value.length;
-  const before = output.value.slice(0, insertPos);
-  const context = analyzeInsertionContext(before);
-
-  if(allCaps.checked){
+  if (els.allCaps.checked) {
     finalText = finalText.toUpperCase();
   } else {
-    if(context.capitalize){
-      finalText = finalText.charAt(0).toUpperCase() + finalText.slice(1);
-    } else {
-      finalText = finalText.charAt(0).toLowerCase() + finalText.slice(1);
-    }
+    finalText = context.capitalize ? finalText.charAt(0).toUpperCase() + finalText.slice(1) : finalText.charAt(0).toLowerCase() + finalText.slice(1);
   }
 
-  finalText = context.prefixAppend + finalText;
-  insertAtCursor(finalText);
+  insertAtCursor(context.prefixAppend + finalText);
 
-  if(currentNoteIndex !== null && notes[currentNoteIndex]){
-    notes[currentNoteIndex].text = output.value;
+  if (currentNoteIndex !== null && notes[currentNoteIndex]) {
+    notes[currentNoteIndex].text = els.output.value;
     notes[currentNoteIndex].t = Date.now();
     persistNotes();
-    renderNotes(searchInput.value);
+    renderNotes(els.searchInput.value);
   } else {
     saveCurrentAsNote();
   }
 
-  pushHistory(output.value);
+  pushHistory(els.output.value);
   scheduleAutoSave();
-
   lastInterim = '';
   
-  if (recognizing || userWantsRecording) {
-    overlayText.textContent = 'Ouvindo...';
-  } else {
-    hideOverlay();
-  }
+  if (recognizing || userWantsRecording) els.overlayText.textContent = 'Ouvindo...';
+  else hideOverlay();
 }
 
-function flushInterim(){
-  if(!lastInterim || !lastInterim.trim()) return;
+function flushInterim() {
+  if (!lastInterim || !lastInterim.trim()) return;
   const textToFlush = lastInterim.trim();
-
   flushedText = textToFlush.toLowerCase();
   lastInterim = '';
-
-  processAndInsert(textToFlush, true);
-
-  if (recognizing || userWantsRecording) {
-    overlayText.textContent = 'Ouvindo...';
-  } else {
-    hideOverlay();
-  }
+  processAndInsert(textToFlush);
 }
 
-/* Envio Imediato no Enter com Reinício Limpo e Zera do Buffer */
-function flushInterimKeyboard(){
-  if(!lastInterim || !lastInterim.trim()) return;
-  
+function flushInterimKeyboard() {
+  if (!lastInterim || !lastInterim.trim()) return;
   const textToFlush = lastInterim.trim();
-  flushedText = textToFlush.toLowerCase(); // Bloqueia repetições do Chrome
+  flushedText = textToFlush.toLowerCase();
   lastInterim = '';
-  
-  processAndInsert(textToFlush, true);
+  processAndInsert(textToFlush);
+  if (els.overlayText) els.overlayText.textContent = 'Ouvindo...';
 
-  if (overlayText) {
-    overlayText.textContent = 'Ouvindo...';
-  }
-
-  // Reinicia o motor de voz em segundo plano para limpar o áudio temporário do Chrome
   if (userWantsRecording && recognition) {
-    try {
-      isFlushRestarting = true;
-      recognition.abort();
-    } catch(e){}
+    try { isFlushRestarting = true; recognition.abort(); } catch(e){}
   }
 }
 
-let recognizing = false;
-let userWantsRecording = false;
-let reconnectTimer = null;
-let reconnectAttempts = 0;
-const MAX_RECONNECT = 5;
-
-function setMicState(state){
-  micBtn.disabled = false;
-  micBtn.classList.remove('recording');
+function setMicState(state) {
+  els.micBtn.disabled = false;
+  els.micBtn.classList.remove('recording');
   
-  if(state === 'recording'){
-    micBtn.classList.add('recording');
-    micBtnText.textContent = 'Parar (Esc)';
-  } else if(state === 'reconnecting'){
+  if (state === 'recording') {
+    els.micBtn.classList.add('recording');
+    els.micBtnText.textContent = 'Parar (Esc)';
+  } else if (state === 'reconnecting') {
     if (userWantsRecording) {
-      micBtn.classList.add('recording');
-      micBtnText.textContent = 'Parar (Esc)';
+      els.micBtn.classList.add('recording');
+      els.micBtnText.textContent = 'Parar (Esc)';
     } else {
-      micBtnText.textContent = 'Reconectando…';
-      micBtn.disabled = true;
+      els.micBtnText.textContent = 'Reconectando…';
+      els.micBtn.disabled = true;
     }
   } else {
-    micBtnText.textContent = 'Iniciar (Esc)';
+    els.micBtnText.textContent = 'Iniciar (Esc)';
   }
 }
 
-function buildRecognition(){
-  if(!SpeechRecognitionAPI) return null;
+function buildRecognition() {
+  if (!SpeechRecognitionAPI) return null;
   const r = new SpeechRecognitionAPI();
   r.lang = 'pt-BR';
   r.interimResults = true;
@@ -1528,406 +1202,287 @@ function buildRecognition(){
     recognizing = true;
     reconnectAttempts = 0;
     setMicState('recording');
-    status.textContent = 'Gravando...';
+    setStatus('Gravando...');
     showOverlay('Ouvindo voz...');
     lastInterim = '';
     flushedText = '';
   };
 
   r.onresult = (e) => {
-    let interim = '';
-    let final = '';
-    for(let i = e.resultIndex; i < e.results.length; i++){
+    let interim = '', final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
       const t = e.results[i][0].transcript;
-      if(e.results[i].isFinal) final += t;
+      if (e.results[i].isFinal) final += t;
       else interim += t;
     }
 
-    if(interim && interim.trim()){
+    if (interim && interim.trim()) {
       const normInterim = interim.trim().toLowerCase();
-
-      // Se o Chrome tentar repovoar o buffer com a frase exata já enviada no Enter
-      if(flushedText && normInterim === flushedText){
+      if (flushedText && normInterim === flushedText) {
         lastInterim = '';
         showOverlay('Ouvindo...');
-      }
-      // Se o usuário continuou a falar a mesma frase, aproveita apenas o trecho novo
-      else if(flushedText && normInterim.startsWith(flushedText)){
+      } else if (flushedText && normInterim.startsWith(flushedText)) {
         const newSpeech = interim.trim().slice(flushedText.length).trim();
-        if(newSpeech){
-          lastInterim = newSpeech;
-          showOverlay(convertSpokenPunct(lastInterim));
-        } else {
-          lastInterim = '';
-          showOverlay('Ouvindo...');
-        }
-      }
-      else {
-        flushedText = ''; // Nova fala iniciada, reseta a trava
+        lastInterim = newSpeech;
+        showOverlay(newSpeech ? convertSpokenPunct(newSpeech) : 'Ouvindo...');
+      } else {
+        flushedText = '';
         lastInterim = interim.trim();
         showOverlay(convertSpokenPunct(lastInterim));
       }
     } else {
       lastInterim = '';
-      if(recognizing || userWantsRecording){
-        showOverlay('Ouvindo...');
-      }
+      if (recognizing || userWantsRecording) showOverlay('Ouvindo...');
     }
 
-    if(final && final.trim()){
+    if (final && final.trim()) {
       const normFinal = final.trim().toLowerCase();
-      
-      // Se o resultado final for a frase que já inserimos no Enter
-      if(flushedText && (normFinal === flushedText || flushedText.includes(normFinal))){
-        flushedText = '';
-        lastInterim = '';
-        return;
+      if (flushedText && (normFinal === flushedText || flushedText.includes(normFinal))) {
+        flushedText = ''; lastInterim = ''; return;
       }
-      
       flushedText = '';
       processAndInsert(final.trim());
     }
   };
 
   r.onerror = (ev) => {
-    console.error('Erro de fala:', ev.error);
     recognizing = false;
-
-    if(ev.error === 'not-allowed' || ev.error === 'service-not-allowed'){
+    if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') {
       userWantsRecording = false;
       setMicState('idle');
       hideOverlay();
-      status.textContent = 'Permissão de microfone negada';
-      setTimeout(()=> status.textContent = 'Pronto', 3000);
+      setStatus('Permissão de microfone negada', 3000);
       return;
     }
-
-    if(ev.error !== 'no-speech'){
-      status.textContent = 'Erro no microfone (' + ev.error + ')';
-      setTimeout(()=> status.textContent = recognizing ? 'Gravando...' : 'Pronto', 1500);
+    if (ev.error !== 'no-speech') {
+      setStatus('Erro no microfone (' + ev.error + ')', 1500);
     }
-
-    if(userWantsRecording && !isFlushRestarting) scheduleReconnect();
+    if (userWantsRecording && !isFlushRestarting) scheduleReconnect();
   };
 
   r.onend = () => {
     recognizing = false;
-
-    if(isFlushRestarting){
+    if (isFlushRestarting) {
       isFlushRestarting = false;
-      if(userWantsRecording){
-        try {
-          recognition = buildRecognition();
-          recognition.start();
-        } catch(e) {
-          scheduleReconnect();
-        }
+      if (userWantsRecording) {
+        try { recognition = buildRecognition(); recognition.start(); } catch(e) { scheduleReconnect(); }
       }
       return;
     }
 
-    if(userWantsRecording){
-      scheduleReconnect();
-    } else {
-      lastInterim = '';
-      flushedText = '';
-      hideOverlay();
-      setMicState('idle');
-      status.textContent = 'Pronto';
+    if (userWantsRecording) scheduleReconnect();
+    else {
+      lastInterim = ''; flushedText = ''; hideOverlay();
+      setMicState('idle'); setStatus('Pronto');
     }
   };
 
   return r;
 }
 
-function scheduleReconnect(){
-  if(reconnectAttempts >= MAX_RECONNECT){
+function scheduleReconnect() {
+  if (reconnectAttempts >= MAX_RECONNECT) {
     userWantsRecording = false;
     setMicState('idle');
     hideOverlay();
-    status.textContent = 'Microfone em espera. Clique para reiniciar.';
-    setTimeout(()=> status.textContent = 'Pronto', 3000);
+    setStatus('Microfone em espera. Clique para reiniciar.', 3000);
     return;
   }
   reconnectAttempts++;
   setMicState('reconnecting');
   clearTimeout(reconnectTimer);
-  reconnectTimer = setTimeout(()=> {
-    if(!userWantsRecording) return;
+  reconnectTimer = setTimeout(() => {
+    if (!userWantsRecording) return;
     recognition = buildRecognition();
-    try{ recognition.start(); } catch(e){ scheduleReconnect(); }
+    try { recognition.start(); } catch(e) { scheduleReconnect(); }
   }, 100);
 }
 
-if(SpeechRecognitionAPI){
-  recognition = buildRecognition();
-} else {
-  micBtn.disabled = true;
-  status.textContent = 'Navegador sem suporte a fala';
-}
+if (SpeechRecognitionAPI) recognition = buildRecognition();
+else { els.micBtn.disabled = true; setStatus('Navegador sem suporte a fala'); }
 
-function toggleMic(){
-  if(!SpeechRecognitionAPI) return;
-  if(!userWantsRecording){
+function toggleMic() {
+  if (!SpeechRecognitionAPI) return;
+  if (!userWantsRecording) {
     userWantsRecording = true;
     reconnectAttempts = 0;
     clearTimeout(reconnectTimer);
     recognition = buildRecognition();
-    try{
-      recognition.start();
-    } catch(e){
-      userWantsRecording = false;
-      setMicState('idle');
-      hideOverlay();
-      status.textContent = 'Erro ao iniciar microfone';
-      setTimeout(()=> status.textContent = 'Pronto', 2000);
+    try { recognition.start(); } catch(e) {
+      userWantsRecording = false; setMicState('idle'); hideOverlay();
+      setStatus('Erro ao iniciar microfone', 2000);
     }
   } else {
     userWantsRecording = false;
     clearTimeout(reconnectTimer);
     recognizing = false;
-    setMicState('idle');
-    status.textContent = 'Pronto';
-    hideOverlay();
-    try{ recognition.stop(); } catch(e){}
+    setMicState('idle'); setStatus('Pronto'); hideOverlay();
+    try { recognition.stop(); } catch(e){}
   }
 }
 
-function showOverlay(text){
-  overlayText.textContent = text || 'Ouvindo...';
-  if(!overlay.classList.contains('open')){
-    overlay.classList.add('open');
-    overlay.setAttribute('aria-hidden','false');
-  }
-  requestAnimationFrame(() => {
-    overlayText.scrollTop = overlayText.scrollHeight;
-  });
+function showOverlay(text) {
+  els.overlayText.textContent = text || 'Ouvindo...';
+  if (!els.overlay.classList.contains('open')) toggleModal(els.overlay, true);
+  requestAnimationFrame(() => els.overlayText.scrollTop = els.overlayText.scrollHeight);
 }
 
-function hideOverlay(){ 
-  overlay.classList.remove('open'); 
-  overlay.setAttribute('aria-hidden','true'); 
-  overlayText.textContent = ''; 
+function hideOverlay() {
+  toggleModal(els.overlay, false);
+  els.overlayText.textContent = '';
 }
 
-/* ====== Lógica do Modal e Correção por IA ====== */
-aiProviderSelect.addEventListener('change', () => {
-  const p = aiProviderSelect.value;
-  aiModelInput.placeholder = `Padrão: ${DEFAULT_AI_MODELS[p] || ''}`;
+/* ====== Configuração e Execução de IA ====== */
+els.aiProviderSelect.addEventListener('change', () => {
+  els.aiModelInput.placeholder = `Padrão: ${DEFAULT_AI_MODELS[els.aiProviderSelect.value] || ''}`;
 });
 
 function openAiConfigModal() {
-  const key = localStorage.getItem(AI_KEY_STORAGE) || '';
-  const provider = localStorage.getItem(AI_PROVIDER_STORAGE) || 'gemini';
-  const model = localStorage.getItem(AI_MODEL_STORAGE) || '';
+  const key = localStorage.getItem(STORAGE_KEYS.AI_KEY) || '';
+  const provider = localStorage.getItem(STORAGE_KEYS.AI_PROVIDER) || 'gemini';
+  
+  els.aiProviderSelect.value = provider;
+  els.aiApiKeyInput.value = key;
+  els.aiModelInput.value = localStorage.getItem(STORAGE_KEYS.AI_MODEL) || '';
+  els.aiModelInput.placeholder = `Padrão: ${DEFAULT_AI_MODELS[provider] || ''}`;
+  els.clearAiKeyBtn.classList.toggle('hidden', !key);
 
-  aiProviderSelect.value = provider;
-  aiApiKeyInput.value = key;
-  aiModelInput.value = model;
-  aiModelInput.placeholder = `Padrão: ${DEFAULT_AI_MODELS[provider] || ''}`;
-
-  clearAiKeyBtn.style.display = key ? 'block' : 'none';
-
-  aiModal.classList.add('open');
-  aiModal.setAttribute('aria-hidden', 'false');
+  toggleModal(els.aiModal, true);
 }
 
-function closeAiModal() {
-  aiModal.classList.remove('open');
-  aiModal.setAttribute('aria-hidden', 'true');
-}
+els.closeAiModalBtn.addEventListener('click', () => toggleModal(els.aiModal, false));
+els.cancelAiModalBtn.addEventListener('click', () => toggleModal(els.aiModal, false));
+els.aiConfigBtn.addEventListener('click', openAiConfigModal);
 
-closeAiModalBtn.addEventListener('click', closeAiModal);
-cancelAiModalBtn.addEventListener('click', closeAiModal);
-aiConfigBtn.addEventListener('click', openAiConfigModal);
-
-clearAiKeyBtn.addEventListener('click', () => {
-  localStorage.removeItem(AI_KEY_STORAGE);
-  localStorage.removeItem(AI_PROVIDER_STORAGE);
-  localStorage.removeItem(AI_MODEL_STORAGE);
-  aiApiKeyInput.value = '';
-  aiModelInput.value = '';
-  clearAiKeyBtn.style.display = 'none';
+els.clearAiKeyBtn.addEventListener('click', () => {
+  [STORAGE_KEYS.AI_KEY, STORAGE_KEYS.AI_PROVIDER, STORAGE_KEYS.AI_MODEL].forEach(k => localStorage.removeItem(k));
+  els.aiApiKeyInput.value = '';
+  els.aiModelInput.value = '';
+  els.clearAiKeyBtn.classList.add('hidden');
   showToast('Chave de API removida');
 });
 
-saveAiModalBtn.addEventListener('click', () => {
-  const key = aiApiKeyInput.value.trim();
-  if(!key) {
-    showToast('Por favor, insira uma chave de API');
-    return;
-  }
-  localStorage.setItem(AI_KEY_STORAGE, key);
-  localStorage.setItem(AI_PROVIDER_STORAGE, aiProviderSelect.value);
-  localStorage.setItem(AI_MODEL_STORAGE, aiModelInput.value.trim());
-  closeAiModal();
-  showToast('Configurações de IA salvas');
+els.saveAiModalBtn.addEventListener('click', () => {
+  const key = els.aiApiKeyInput.value.trim();
+  if (!key) return showToast('Por favor, insira uma chave de API');
   
-  if(output.value.trim()){
-    correctWithAI();
-  }
+  localStorage.setItem(STORAGE_KEYS.AI_KEY, key);
+  localStorage.setItem(STORAGE_KEYS.AI_PROVIDER, els.aiProviderSelect.value);
+  localStorage.setItem(STORAGE_KEYS.AI_MODEL, els.aiModelInput.value.trim());
+  toggleModal(els.aiModal, false);
+  showToast('Configurações de IA salvas');
+  if (els.output.value.trim()) correctWithAI();
 });
 
 async function correctWithAI() {
-  const text = output.value.trim();
-  if (!text) {
-    showToast('Nada para corrigir');
-    return;
-  }
+  const text = els.output.value.trim();
+  if (!text) return showToast('Nada para corrigir');
 
-  const apiKey = localStorage.getItem(AI_KEY_STORAGE);
-  if (!apiKey) {
-    openAiConfigModal();
-    return;
-  }
+  const apiKey = localStorage.getItem(STORAGE_KEYS.AI_KEY);
+  if (!apiKey) return openAiConfigModal();
 
-  const provider = localStorage.getItem(AI_PROVIDER_STORAGE) || 'gemini';
-  let model = localStorage.getItem(AI_MODEL_STORAGE) || DEFAULT_AI_MODELS[provider];
-  if (!model) model = DEFAULT_AI_MODELS[provider];
+  const provider = localStorage.getItem(STORAGE_KEYS.AI_PROVIDER) || 'gemini';
+  const model = localStorage.getItem(STORAGE_KEYS.AI_MODEL) || DEFAULT_AI_MODELS[provider];
 
-  status.textContent = 'IA corrigindo texto...';
-  aiBtn.disabled = true;
+  setStatus('IA corrigindo texto...');
+  els.aiBtn.disabled = true;
 
-  /* Prompt Aprimorado com regra estrita de CAIXA ALTA */
   const systemPrompt = "Você é um assistente especialista em revisão gramatical e ortográfica em português do Brasil. Sua única função é corrigir a ortografia, pontuação, concordância e o uso de maiúsculas e minúsculas do texto a seguir. REGRA OBRIGATÓRIA: Identifique e MANTENHA RIGOROSAMENTE em CAIXA ALTA (MAIÚSCULAS) quaisquer palavras, siglas ou frases que já estejam em CAIXA ALTA no texto original. Mantenha integralmente o sentido original e a estrutura dos parágrafos. NÃO adicione saudações, explicações, nem comentários como 'Aqui está o texto corrigido'. Retorne EXCLUSIVAMENTE o texto final corrigido.";
 
   try {
     let correctedText = '';
-
     if (provider === 'gemini') {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-      const resp = await fetch(url, {
+      const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{ text: `${systemPrompt}\n\nTexto para correção:\n${text}` }]
-          }]
-        })
+        body: JSON.stringify({ contents: [{ parts: [{ text: `${systemPrompt}\n\nTexto para correção:\n${text}` }] }] })
       });
-
-      if (!resp.ok) {
-        const errData = await resp.json().catch(() => ({}));
-        throw new Error(errData.error?.message || `Erro HTTP ${resp.status}`);
-      }
-
-      const data = await resp.json();
-      correctedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
+      if (!resp.ok) throw new Error((await resp.json().catch(() => ({}))).error?.message || `Erro HTTP ${resp.status}`);
+      correctedText = (await resp.json()).candidates?.[0]?.content?.parts?.[0]?.text || '';
     } else {
-      let endpoint = 'https://api.openai.com/v1/chat/completions';
-      if (provider === 'groq') endpoint = 'https://api.groq.com/openai/v1/chat/completions';
-      if (provider === 'openrouter') endpoint = 'https://openrouter.ai/api/v1/chat/completions';
-
-      const resp = await fetch(endpoint, {
+      const endpoints = { groq: 'https://api.groq.com/openai/v1/chat/completions', openrouter: 'https://openrouter.ai/api/v1/chat/completions' };
+      const resp = await fetch(endpoints[provider] || 'https://api.openai.com/v1/chat/completions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
         body: JSON.stringify({
           model: model,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: text }
-          ],
+          messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: text }],
           temperature: 0.2
         })
       });
-
-      if (!resp.ok) {
-        const errData = await resp.json().catch(() => ({}));
-        throw new Error(errData.error?.message || `Erro HTTP ${resp.status}`);
-      }
-
-      const data = await resp.json();
-      correctedText = data.choices?.[0]?.message?.content || '';
+      if (!resp.ok) throw new Error((await resp.json().catch(() => ({}))).error?.message || `Erro HTTP ${resp.status}`);
+      correctedText = (await resp.json()).choices?.[0]?.message?.content || '';
     }
 
     correctedText = correctedText.trim();
     if (correctedText) {
-      output.value = correctedText;
-      pushHistory(output.value);
+      els.output.value = correctedText;
+      pushHistory(els.output.value);
       updateStats();
       scheduleAutoSave();
       
       if (currentNoteIndex !== null && notes[currentNoteIndex]) {
-        notes[currentNoteIndex].text = output.value;
+        notes[currentNoteIndex].text = els.output.value;
         notes[currentNoteIndex].t = Date.now();
         persistNotes();
-        renderNotes(searchInput.value);
-      } else {
-        saveCurrentAsNote();
-      }
+        renderNotes(els.searchInput.value);
+      } else saveCurrentAsNote();
+
       showToast('Texto corrigido pela IA!');
-      status.textContent = 'Texto corrigido com sucesso';
-    } else {
-      throw new Error('A resposta da IA veio vazia');
-    }
+      setStatus('Texto corrigido com sucesso', 2000);
+    } else throw new Error('A resposta da IA veio vazia');
   } catch (err) {
-    console.error('Erro ao chamar a IA:', err);
     showToast('Erro ao corrigir: ' + err.message, 2500);
-    status.textContent = 'Erro na IA';
+    setStatus('Erro na IA', 2000);
   } finally {
-    aiBtn.disabled = false;
-    setTimeout(() => { 
-      if (status.textContent === 'Texto corrigido com sucesso' || status.textContent === 'Erro na IA') {
-        status.textContent = 'Pronto';
-      }
-    }, 2000);
+    els.aiBtn.disabled = false;
   }
 }
 
-aiBtn.addEventListener('click', correctWithAI);
+/* ====== Eventos do Editor e Teclado ====== */
+els.aiBtn.addEventListener('click', correctWithAI);
+els.micBtn.addEventListener('click', toggleMic);
+els.copyBtn.addEventListener('click', copyAll);
+els.undoBtn.addEventListener('click', undo);
+els.redoBtn.addEventListener('click', redo);
+els.newBtn.addEventListener('click', newNote);
+els.clearBtn.addEventListener('click', clearEditor);
+els.notesToggle.addEventListener('click', toggleNotes);
+els.closeNotesBtn.addEventListener('click', closeNotes);
+els.deleteAllBtn.addEventListener('click', promptDeleteAllNotes);
 
-/* ====== Eventos do Usuário ====== */
-micBtn.addEventListener('click', toggleMic);
-copyBtn.addEventListener('click', copyAll);
-undoBtn.addEventListener('click', undo);
-redoBtn.addEventListener('click', redo);
-newBtn.addEventListener('click', newNote);
-clearBtn.addEventListener('click', clearEditor);
-notesToggle.addEventListener('click', toggleNotes);
-closeNotesBtn.addEventListener('click', closeNotes);
-deleteAllBtn.addEventListener('click', promptDeleteAllNotes);
+els.output.addEventListener('input', () => { updateStats(); pushHistory(els.output.value); scheduleAutoSave(); });
 
-output.addEventListener('input', () => {
-  updateStats();
-  pushHistory(output.value);
-  scheduleAutoSave();
-});
-
-/* ====== Atalhos de Teclado ====== */
-window.addEventListener('keydown', (e) => {
-  if(e.key === 'F10'){ e.preventDefault(); correctWithAI(); return; }
-  if(e.key === 'F9'){ e.preventDefault(); newNote(); return; }
-  if(e.key === 'F2'){ e.preventDefault(); toggleNotes(); return; }
-  if(e.key === 'F8'){ e.preventDefault(); clearEditor(); return; }
-  if(e.key === 'F6' || (e.ctrlKey && (e.key === 'b' || e.key === 'B'))){ e.preventDefault(); cycleBarMode(); return; }
-  if(e.key === 'Escape'){ e.preventDefault(); toggleMic(); return; }
-  if(e.key === 'F4'){ e.preventDefault(); copyAll(); return; }
-  if(e.ctrlKey && (e.key === 'u' || e.key === 'U')){ e.preventDefault(); undo(); return; }
-  if((e.ctrlKey && (e.key === 'y' || e.key === 'Y')) || (e.ctrlKey && e.shiftKey && (e.key === 'Z'))){
-    e.preventDefault();
-    redo();
+els.output.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    if (lastInterim && lastInterim.trim()) { e.preventDefault(); flushInterimKeyboard(); }
     return;
   }
-  if(e.ctrlKey && (e.key === 'n' || e.key === 'N')){ e.preventDefault(); newNote(); return; }
-  if(e.ctrlKey && e.shiftKey && e.key === 'Delete'){ e.preventDefault(); promptDeleteAllNotes(); return; }
+  if (els.quickSend.checked && recognition && lastInterim && QUICK_SEND_PUNCT.has(e.key)) {
+    e.preventDefault(); flushInterimKeyboard();
+  }
+});
+
+window.addEventListener('keydown', (e) => {
+  const actions = { F10: correctWithAI, F9: newNote, F2: toggleNotes, F8: clearEditor, F4: copyAll, Escape: toggleMic };
+  if (actions[e.key]) { e.preventDefault(); actions[e.key](); return; }
+  
+  if (e.key === 'F6' || (e.ctrlKey && e.key.toLowerCase() === 'b')) { e.preventDefault(); cycleBarMode(); return; }
+  if (e.ctrlKey && e.key.toLowerCase() === 'u') { e.preventDefault(); undo(); return; }
+  if ((e.ctrlKey && e.key.toLowerCase() === 'y') || (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === 'Z')) { e.preventDefault(); redo(); return; }
+  if (e.ctrlKey && e.key.toLowerCase() === 'n') { e.preventDefault(); newNote(); return; }
+  if (e.ctrlKey && e.shiftKey && e.key === 'Delete') { e.preventDefault(); promptDeleteAllNotes(); return; }
 });
 
 /* ====== Inicialização ====== */
 initTheme();
 initToggles();
 loadNotes();
-pushHistory(output.value || '');
-
-const initialFontSize = localStorage.getItem(FONT_STORAGE_KEY) || 18;
-setFontSize(initialFontSize);
+pushHistory(els.output.value || '');
+setFontSize(localStorage.getItem(STORAGE_KEYS.FONT) || 18);
 updateStats();
 
-/* ====== Service Worker (PWA) ====== */
-if('serviceWorker' in navigator){
+if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js').catch(err => console.warn('PWA:', err));
 }
 </script>
