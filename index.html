@@ -1387,7 +1387,7 @@ async function correctWithAI() {
   setStatus('IA corrigindo texto...');
   els.aiBtn.disabled = true;
 
-  const systemPrompt = "Você é um assistente especialista em revisão gramatical e ortográfica em português do Brasil. Sua única função é corrigir a ortografia, pontuação, concordância e o uso de maiúsculas e minúsculas do texto a seguir. REGRA OBRIGATÓRIA: Identifique e MANTENHA em CAIXA ALTA (MAIÚSCULAS) quaisquer palavras ou frases que já estejam em CAIXA ALTA (desde que a palavra ou frase INTEIRA estejam em caixa alta) no texto original. Mantenha integralmente o sentido original e a estrutura dos parágrafos. NÃO adicione saudações, explicações, nem comentários como 'Aqui está o texto corrigido'. Retorne EXCLUSIVAMENTE o texto final corrigido.";
+  const systemPrompt = "Você é um assistente especialista em revisão gramatical e ortográfica em português do Brasil. Sua única função é corrigir a ortografia, pontuação, concordância e o uso de maiúsculas e minúsculas do texto a seguir. REGRA OBRIGATÓRIA: Identifique e MANTENHA em CAIXA ALTA (MAIÚSCULAS) quaisquer palavras ou frases que já estejam em CAIXA ALTA (desde que a palavra ou frase INTEIRA estejam em caixa alta) no texto original. Se apenas a primeira letra estiver em caixa alta, manter assim. Se for nome próprio, manter apenas a primeira letra em caixa alta. Mantenha integralmente o sentido original e a estrutura dos parágrafos. NÃO adicione saudações, explicações, nem comentários como 'Aqui está o texto corrigido'. Retorne EXCLUSIVAMENTE o texto final corrigido.";
 
   try {
     let correctedText = '';
