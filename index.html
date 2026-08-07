@@ -276,7 +276,7 @@
     width: 100%;
     flex: 1 1 auto;
     font-family: var(--font-family);
-    font-size: max(16px, var(--font-size));
+    font-size: var(--font-size); /* Tamanho de fonte livre sem travamento minimo */
     line-height: 1.5;
     padding: 16px;
     border: none;
@@ -576,7 +576,8 @@
     <div class="controls-row">
       <div id="fontControls">
         <button id="fontDec" class="font-btn">A-</button>
-        <input id="fontRange" type="range" min="12" max="100" value="18" />
+        <!-- min="4" permite fontes bem pequenas -->
+        <input id="fontRange" type="range" min="4" max="120" value="18" />
         <button id="fontInc" class="font-btn">A+</button>
         <span id="fontSizeVal">18px</span>
       </div>
@@ -1006,7 +1007,8 @@ async function copyAll() {
 }
 
 function setFontSize(px) {
-  const fontPx = Math.max(12, Math.min(120, Number(px)));
+  // Limites ajustados: mínimo de 4px a máximo de 200px
+  const fontPx = Math.max(4, Math.min(200, Number(px)));
   document.documentElement.style.setProperty('--font-size', fontPx + 'px');
   els.fontRange.value = fontPx;
   els.fontSizeVal.textContent = fontPx + 'px';
@@ -1322,7 +1324,6 @@ async function correctWithAI() {
   setStatus('IA corrigindo...');
   els.aiBtn.disabled = true;
 
-  // Prompt otimizado para evitar conversão indevida para CAIXA ALTA
   const systemPrompt = "Você é um assistente especialista em revisão gramatical, ortográfica e de pontuação em português do Brasil. Sua função é APENAS corrigir erros ortográficos, gramaticais, de concordância e pontuação do texto. Siga estritamente as regras padrão da língua portuguesa para maiúsculas e minúsculas (use maiúscula apenas em início de frases, nomes próprios e siglas consagradas como IA, SUS, etc.). NÃO converta palavras comuns, termos técnicos, nomes de medicamentos ou expressões como 'inteligência artificial' para CAIXA ALTA (MAIÚSCULAS). Mantenha o sentido original, o tom e a estrutura de parágrafos. NÃO adicione saudações, explicações ou comentários. Retorne EXCLUSIVAMENTE o texto final corrigido.";
 
   try {
