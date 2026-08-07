@@ -599,7 +599,7 @@
       <div class="editor-wrapper">
         <textarea id="output" placeholder="Pressione 'Esc' ou toque em 'Falar' para ditar..." aria-label="Área de texto ditado"></textarea>
         
-        <!-- Nova Barra de Buffer Integrada no Rodapé (Sem sobrepor texto) -->
+        <!-- Barra de Buffer Integrada no Rodapé (Zero Sobreposição) -->
         <div id="liveBufferBar" class="hidden">
           <div class="live-badge"><div class="live-dot"></div>Ouvindo</div>
           <div id="bufferText">Aguardando fala...</div>
@@ -1035,6 +1035,28 @@ function hideOverlay() {
   els.bufferText.textContent = '';
 }
 
+/* ====== Helper de Maiúscula Automática no Ditado ====== */
+function shouldCapitalizeFirst(beforeText) {
+  const trimmed = beforeText.trimEnd();
+  if (trimmed.length === 0) return true; // Início do documento
+  const lastChar = trimmed.slice(-1);
+  if (['.', '!', '?', '\n'].includes(lastChar)) return true; // Após pontuação final
+  if (beforeText.endsWith('\n')) return true; // Após Enter / nova linha
+  return false;
+}
+
+function formatDictatedText(text, beforeText) {
+  if (!text) return '';
+  let out = convertSpokenPunct(text.trim());
+  if (els.allCaps.checked) {
+    return out.toUpperCase();
+  }
+  if (shouldCapitalizeFirst(beforeText)) {
+    out = out.charAt(0).toUpperCase() + out.slice(1);
+  }
+  return out;
+}
+
 /* ====== DITADO - MOTOR 1: WEBSPEECH API ====== */
 const SPOKEN_PUNCT = [
   { re: /\b(ponto e vírgula)\b/gi, out: ';' }, { re: /\b(ponto de interrogação)\b/gi, out: '?' },
@@ -1053,10 +1075,12 @@ function convertSpokenPunct(text) {
 
 function processAndInsertWebSpeech(finalText) {
   if (!finalText || !finalText.trim()) return;
-  finalText = convertSpokenPunct(finalText.trim());
-
-  if (els.allCaps.checked) finalText = finalText.toUpperCase();
-  insertAtCursor(finalText);
+  
+  const start = els.output.selectionStart;
+  const before = els.output.value.slice(0, start);
+  
+  const formatted = formatDictatedText(finalText, before);
+  insertAtCursor(formatted);
 
   lastInterim = '';
   if (recognizing || userWantsWebSpeech) showOverlay('Ouvindo...');
@@ -1235,8 +1259,11 @@ async function transcribeWithGroq(audioBlob) {
     let text = data.text ? data.text.trim() : '';
 
     if (text) {
-      if (els.allCaps.checked) text = text.toUpperCase();
-      insertAtCursor(text);
+      const start = els.output.selectionStart;
+      const before = els.output.value.slice(0, start);
+      const formatted = formatDictatedText(text, before);
+      
+      insertAtCursor(formatted);
       setStatus('Transcrito!', 1500);
     } else {
       setStatus('Nenhum texto identificado', 1500);
@@ -1323,7 +1350,16 @@ async function correctWithAI() {
   setStatus('IA corrigindo...');
   els.aiBtn.disabled = true;
 
-  const systemPrompt = "Você é um assistente especialista em revisão gramatical, ortográfica e de pontuação em português do Brasil. Sua função é APENAS corrigir erros ortográficos, gramaticais, de concordância e pontuação do texto. Siga estritamente as regras padrão da língua portuguesa para maiúsculas e minúsculas (use maiúscula apenas em início de frases, nomes próprios e siglas consagradas como IA, SUS, etc.). NÃO converta palavras comuns, termos técnicos, nomes de medicamentos ou expressões como 'inteligência artificial' para CAIXA ALTA (MAIÚSCULAS). Mantenha o sentido original, o tom e a estrutura de parágrafos. NÃO adicione saudações, explicações ou comentários. Retorne EXCLUSIVAMENTE o texto final corrigido.";
+  // Prompt estruturado em tópicos diretos para garantir maiúsculas em início de frase
+  const systemPrompt = `Você é um especialista em revisão ortográfica, gramatical e de pontuação em português do Brasil.
+
+Instruções obrigatórias de revisão:
+1. OBRIGATÓRIO: Garanta que TODAS as frases e parágrafos comecem com a PRIMEIRA LETRA MAIÚSCULA.
+2. Mantenha em maiúsculas os nomes próprios, nomes de pessoas, locais, instituições e siglas consagradas (como IA, SUS, etc.).
+3. NÃO altere o texto todo para CAIXA ALTA (MAIÚSCULAS). Use apenas a primeira letra maiúscula em inícios de frase e nomes próprios/siglas.
+4. Mantenha nomes de medicamentos, termos comuns e palavras gerais em minúsculas (a menos que estejam no início da frase).
+5. Corrija a pontuação, acentuação, ortografia e concordância, mantendo fielmente o sentido original.
+6. Retorne EXCLUSIVAMENTE o texto final corrigido, sem explicações, saudações ou comentários.`;
 
   try {
     const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -1335,7 +1371,7 @@ async function correctWithAI() {
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
         messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: text }],
-        temperature: 0.2
+        temperature: 0.1
       })
     });
 
@@ -1380,8 +1416,10 @@ els.output.addEventListener('keydown', (e) => {
     e.preventDefault();
     
     if (lastInterim && lastInterim.trim()) {
-      let formatted = convertSpokenPunct(lastInterim.trim());
-      if (els.allCaps.checked) formatted = formatted.toUpperCase();
+      const start = els.output.selectionStart;
+      const before = els.output.value.slice(0, start);
+      
+      const formatted = formatDictatedText(lastInterim, before);
       
       insertAtCursor(formatted);
       flushAndRestartRecognition();
