@@ -289,6 +289,55 @@
     word-break: break-word;
   }
 
+  /* Barra de Buffer Integrada no Rodapé */
+  #liveBufferBar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-color);
+    font-size: 13px;
+    color: var(--text-primary);
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+  }
+
+  #liveBufferBar.hidden { display: none !important; }
+
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--recording-color);
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--recording-color);
+    animation: blinkDot 1s infinite alternate;
+  }
+
+  @keyframes blinkDot { from { opacity: 0.3; } to { opacity: 1; } }
+
+  #bufferText {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary-color);
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 55px;
+    overflow-y: auto;
+  }
+
   #editorFooter {
     display: flex;
     align-items: center;
@@ -393,70 +442,6 @@
 
   .note-card .actions { display: flex; gap: 6px; }
   .note-btn { padding: 4px 8px; font-size: 12px; min-height: unset; }
-
-  #dictateOverlay {
-    position: fixed;
-    left: 50%;
-    bottom: calc(24px + env(safe-area-inset-bottom));
-    transform: translateX(-50%) translateY(100px);
-    width: fit-content;
-    min-width: 280px;
-    max-width: min(840px, 92vw);
-    max-height: 50vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 14px;
-    padding: 14px 18px;
-    background: var(--bg-surface);
-    color: var(--text-primary);
-    border: 1px solid var(--primary-color);
-    border-radius: 18px;
-    box-shadow: var(--shadow-md), 0 0 24px var(--primary-glow);
-    z-index: 100;
-    opacity: 0;
-    pointer-events: none;
-    transition: transform 0.22s ease, opacity 0.22s ease;
-  }
-
-  #dictateOverlay.open {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .live-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--recording-color);
-    text-transform: uppercase;
-    white-space: nowrap;
-    padding-top: 2px;
-  }
-
-  .live-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--recording-color);
-    animation: blinkDot 1s infinite alternate;
-  }
-
-  @keyframes blinkDot { from { opacity: 0.3; } to { opacity: 1; } }
-
-  #overlayText {
-    font-size: 15px;
-    font-weight: 500;
-    line-height: 1.5;
-    color: var(--text-primary);
-    white-space: pre-wrap;
-    word-break: break-word;
-    overflow-y: auto;
-    max-height: 40vh;
-  }
 
   #toast {
     position: fixed;
@@ -614,6 +599,12 @@
       <div class="editor-wrapper">
         <textarea id="output" placeholder="Pressione 'Esc' ou toque em 'Falar' para ditar..." aria-label="Área de texto ditado"></textarea>
         
+        <!-- Nova Barra de Buffer Integrada no Rodapé (Sem sobrepor texto) -->
+        <div id="liveBufferBar" class="hidden">
+          <div class="live-badge"><div class="live-dot"></div>Ouvindo</div>
+          <div id="bufferText">Aguardando fala...</div>
+        </div>
+
         <div id="editorFooter">
           <div class="stats-group">
             <span id="wordCount">0 palavras</span>
@@ -640,11 +631,6 @@
       <div id="notesList" role="list"></div>
     </aside>
   </main>
-</div>
-
-<div id="dictateOverlay" aria-hidden="true">
-  <div class="live-badge"><div class="live-dot"></div>Ouvindo</div>
-  <div id="overlayText">Aguardando fala...</div>
 </div>
 
 <div id="toast" role="status">Copiado</div>
@@ -698,10 +684,9 @@ const els = {
   aiModal: $('aiModal'), closeAiModalBtn: $('closeAiModalBtn'), cancelAiModalBtn: $('cancelAiModalBtn'), 
   saveAiModalBtn: $('saveAiModalBtn'), clearAiKeyBtn: $('clearAiKeyBtn'), aiApiKeyInput: $('aiApiKeyInput'), 
   themeToggleBtn: $('themeToggleBtn'), themeIconSun: $('themeIconSun'), themeIconMoon: $('themeIconMoon'), 
-  wordCountEl: $('wordCount'), charCountEl: $('charCount'), overlay: $('dictateOverlay'), 
-  overlayText: $('overlayText'), toastEl: $('toast'), confirmModal: $('confirmModal'), 
+  wordCountEl: $('wordCount'), charCountEl: $('charCount'), toastEl: $('toast'), confirmModal: $('confirmModal'), 
   cancelModalBtn: $('cancelModalBtn'), confirmModalBtn: $('confirmModalBtn'), barModeBtn: $('barModeBtn'), 
-  unhideBarBtn: $('unhideBarBtn')
+  unhideBarBtn: $('unhideBarBtn'), liveBufferBar: $('liveBufferBar'), bufferText: $('bufferText')
 };
 
 const STORAGE_KEYS = {
@@ -1039,6 +1024,17 @@ function insertAtCursor(textToInsert) {
   scheduleAutoSave();
 }
 
+/* ====== Controle do Buffer Visual ====== */
+function showOverlay(text) {
+  els.bufferText.textContent = text || 'Ouvindo...';
+  els.liveBufferBar.classList.remove('hidden');
+}
+
+function hideOverlay() {
+  els.liveBufferBar.classList.add('hidden');
+  els.bufferText.textContent = '';
+}
+
 /* ====== DITADO - MOTOR 1: WEBSPEECH API ====== */
 const SPOKEN_PUNCT = [
   { re: /\b(ponto e vírgula)\b/gi, out: ';' }, { re: /\b(ponto de interrogação)\b/gi, out: '?' },
@@ -1288,16 +1284,6 @@ function setMicUI(active, waiting = false) {
   }
 }
 
-function showOverlay(text) {
-  els.overlayText.textContent = text || 'Ouvindo...';
-  toggleModal(els.overlay, true);
-}
-
-function hideOverlay() {
-  toggleModal(els.overlay, false);
-  els.overlayText.textContent = '';
-}
-
 /* ====== CORREÇÃO POR IA (GROQ LLAMA 3.3) ====== */
 function openAiConfigModal() {
   const key = localStorage.getItem(STORAGE_KEYS.AI_KEY) || '';
@@ -1394,17 +1380,13 @@ els.output.addEventListener('keydown', (e) => {
     e.preventDefault();
     
     if (lastInterim && lastInterim.trim()) {
-      // 1. Tem texto no buffer: insere na MESMA LINHA (sem \n)
       let formatted = convertSpokenPunct(lastInterim.trim());
       if (els.allCaps.checked) formatted = formatted.toUpperCase();
       
       insertAtCursor(formatted);
-      
-      // Reinicia o motor para limpar o buffer e evitar duplicação do texto
       flushAndRestartRecognition();
       showOverlay('Ouvindo...');
     } else {
-      // 2. Buffer vazio (2º Enter): pula para a linha de baixo
       insertAtCursor('\n');
     }
   }
