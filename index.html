@@ -276,7 +276,7 @@
     width: 100%;
     flex: 1 1 auto;
     font-family: var(--font-family);
-    font-size: var(--font-size); /* Tamanho de fonte livre sem travamento minimo */
+    font-size: var(--font-size);
     line-height: 1.5;
     padding: 16px;
     border: none;
@@ -576,7 +576,6 @@
     <div class="controls-row">
       <div id="fontControls">
         <button id="fontDec" class="font-btn">A-</button>
-        <!-- min="4" permite fontes bem pequenas -->
         <input id="fontRange" type="range" min="4" max="120" value="18" />
         <button id="fontInc" class="font-btn">A+</button>
         <span id="fontSizeVal">18px</span>
@@ -741,7 +740,6 @@ function checkUrlApiKey() {
   if (keyFromUrl) {
     localStorage.setItem(STORAGE_KEYS.AI_KEY, keyFromUrl.trim());
     showToast('Chave API configurada via URL!', 2500);
-    // Limpa a URL sem recarregar a página
     const cleanUrl = window.location.pathname + window.location.hash;
     window.history.replaceState({}, document.title, cleanUrl);
   }
@@ -1007,7 +1005,6 @@ async function copyAll() {
 }
 
 function setFontSize(px) {
-  // Limites ajustados: mínimo de 4px a máximo de 200px
   const fontPx = Math.max(4, Math.min(200, Number(px)));
   document.documentElement.style.setProperty('--font-size', fontPx + 'px');
   els.fontRange.value = fontPx;
@@ -1030,7 +1027,7 @@ function insertAtCursor(textToInsert) {
   const before = els.output.value.slice(0, start);
   const after = els.output.value.slice(end);
 
-  const needsSpace = before.length > 0 && !before.endsWith(' ') && !before.endsWith('\n');
+  const needsSpace = before.length > 0 && !before.endsWith(' ') && !before.endsWith('\n') && !textToInsert.startsWith('\n');
   const formattedText = (needsSpace ? ' ' : '') + textToInsert;
 
   els.output.value = before + formattedText + after;
@@ -1068,6 +1065,21 @@ function processAndInsertWebSpeech(finalText) {
   lastInterim = '';
   if (recognizing || userWantsWebSpeech) showOverlay('Ouvindo...');
   else hideOverlay();
+}
+
+function flushAndRestartRecognition() {
+  isFlushRestarting = true;
+  lastInterim = '';
+  if (recognition) {
+    try { recognition.abort(); } catch(e){}
+  }
+  setTimeout(() => {
+    if (userWantsWebSpeech) {
+      recognition = buildRecognition();
+      try { recognition.start(); } catch(e){}
+    }
+    isFlushRestarting = false;
+  }, 80);
 }
 
 function buildRecognition() {
@@ -1118,6 +1130,7 @@ function buildRecognition() {
 
   r.onend = () => {
     recognizing = false;
+    if (isFlushRestarting) return;
     if (userWantsWebSpeech) scheduleReconnect();
     else {
       hideOverlay();
@@ -1379,7 +1392,21 @@ els.output.addEventListener('input', () => { updateStats(); pushHistory(els.outp
 els.output.addEventListener('keydown', (e) => {
   if (els.quickSend.checked && e.key === 'Enter' && userWantsWebSpeech) {
     e.preventDefault();
-    if (lastInterim) processAndInsertWebSpeech(lastInterim);
+    
+    if (lastInterim && lastInterim.trim()) {
+      // 1. Tem texto no buffer: insere na MESMA LINHA (sem \n)
+      let formatted = convertSpokenPunct(lastInterim.trim());
+      if (els.allCaps.checked) formatted = formatted.toUpperCase();
+      
+      insertAtCursor(formatted);
+      
+      // Reinicia o motor para limpar o buffer e evitar duplicação do texto
+      flushAndRestartRecognition();
+      showOverlay('Ouvindo...');
+    } else {
+      // 2. Buffer vazio (2º Enter): pula para a linha de baixo
+      insertAtCursor('\n');
+    }
   }
 });
 
