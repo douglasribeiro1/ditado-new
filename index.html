@@ -571,6 +571,11 @@
         <span class="btn-text">CAIXA ALTA</span>
       </label>
 
+      <label class="toggle" title="Pontuação automática no ditado">
+        <input type="checkbox" id="autoPunct" />
+        <span class="btn-text">Pontuação Automática</span>
+      </label>
+
       <label class="toggle" title="Envia texto ao pressionar Enter durante ditado">
         <input type="checkbox" id="quickSend" />
         <span class="btn-text">Envio Rápido</span>
@@ -679,7 +684,7 @@ const els = {
   notesToggle: $('notesToggle'), notesPanel: $('notesPanel'), notesList: $('notesList'),
   searchInput: $('searchInput'), closeNotesBtn: $('closeNotesBtn'), deleteAllBtn: $('deleteAllBtn'),
   status: $('status'), fontRange: $('fontRange'), fontSizeVal: $('fontSizeVal'),
-  fontInc: $('fontInc'), fontDec: $('fontDec'), allCaps: $('allCaps'), quickSend: $('quickSend'),
+  fontInc: $('fontInc'), fontDec: $('fontDec'), allCaps: $('allCaps'), autoPunct: $('autoPunct'), quickSend: $('quickSend'),
   engineSelect: $('engineSelect'), aiBtn: $('aiBtn'), aiConfigBtn: $('aiConfigBtn'), 
   aiModal: $('aiModal'), closeAiModalBtn: $('closeAiModalBtn'), cancelAiModalBtn: $('cancelAiModalBtn'), 
   saveAiModalBtn: $('saveAiModalBtn'), clearAiKeyBtn: $('clearAiKeyBtn'), aiApiKeyInput: $('aiApiKeyInput'), 
@@ -691,7 +696,7 @@ const els = {
 
 const STORAGE_KEYS = {
   NOTES: 'ditado_unified_notes', FONT: 'ditado_unified_fontsize', THEME: 'ditado_unified_theme',
-  ALL_CAPS: 'ditado_unified_allcaps', QUICK_SEND: 'ditado_unified_quicksend',
+  ALL_CAPS: 'ditado_unified_allcaps', AUTO_PUNCT: 'ditado_unified_autopunct', QUICK_SEND: 'ditado_unified_quicksend',
   ENGINE: 'ditado_unified_engine', AI_KEY: 'ditado_ai_key', BAR_MODE: 'ditado_unified_barmode'
 };
 
@@ -777,11 +782,18 @@ function initToggles() {
     return v !== null ? v === 'true' : defaultVal;
   };
   els.allCaps.checked = getBool(STORAGE_KEYS.ALL_CAPS, false);
+  els.autoPunct.checked = getBool(STORAGE_KEYS.AUTO_PUNCT, true);
   els.quickSend.checked = getBool(STORAGE_KEYS.QUICK_SEND, false);
   els.engineSelect.value = localStorage.getItem(STORAGE_KEYS.ENGINE) || 'webspeech';
 }
 
 els.allCaps.addEventListener('change', () => localStorage.setItem(STORAGE_KEYS.ALL_CAPS, els.allCaps.checked));
+els.autoPunct.addEventListener('change', () => {
+  localStorage.setItem(STORAGE_KEYS.AUTO_PUNCT, els.autoPunct.checked);
+  if (userWantsWebSpeech) {
+    flushAndRestartRecognition();
+  }
+});
 els.quickSend.addEventListener('change', () => localStorage.setItem(STORAGE_KEYS.QUICK_SEND, els.quickSend.checked));
 els.engineSelect.addEventListener('change', () => {
   localStorage.setItem(STORAGE_KEYS.ENGINE, els.engineSelect.value);
@@ -1068,6 +1080,7 @@ const SPOKEN_PUNCT = [
 
 function convertSpokenPunct(text) {
   if (!text) return '';
+  if (els.autoPunct && !els.autoPunct.checked) return text;
   let out = text;
   SPOKEN_PUNCT.forEach(p => out = out.replace(p.re, p.out));
   return out.replace(/\s+([.,!?;:])(?=\s|$)/g, '$1');
@@ -1108,6 +1121,10 @@ function buildRecognition() {
   r.lang = 'pt-BR';
   r.interimResults = true;
   r.continuous = true;
+
+  const isPunctEnabled = els.autoPunct ? els.autoPunct.checked : true;
+  try { r.punctuation = isPunctEnabled; } catch(e){}
+  try { r.autoPunctuation = isPunctEnabled; } catch(e){}
 
   r.onstart = () => {
     recognizing = true;
