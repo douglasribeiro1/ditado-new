@@ -1357,9 +1357,10 @@ Instruções obrigatórias de revisão:
 1. OBRIGATÓRIO: Garanta que TODAS as frases e parágrafos comecem com a PRIMEIRA LETRA MAIÚSCULA.
 2. Mantenha em maiúsculas os nomes próprios, nomes de pessoas, locais, instituições e siglas consagradas (como IA, SUS, etc.).
 3. NÃO altere o texto todo para CAIXA ALTA (MAIÚSCULAS). Use apenas a primeira letra maiúscula em inícios de frase e nomes próprios/siglas.
-4. Mantenha nomes de medicamentos, termos comuns e palavras gerais em minúsculas (a menos que estejam no início da frase).
-5. Corrija a pontuação, acentuação, ortografia e concordância, mantendo fielmente o sentido original.
-6. Retorne EXCLUSIVAMENTE o texto final corrigido, sem explicações, saudações ou comentários.`;
+4. Não coloque todas as palavras de uma frase começando com a letra maiúscula.
+5. Mantenha nomes de medicamentos, termos comuns e palavras gerais em minúsculas (a menos que estejam no início da frase).
+6. Corrija a pontuação, acentuação, ortografia e concordância, mantendo fielmente o sentido original.
+7. Retorne EXCLUSIVAMENTE o texto final corrigido, sem explicações, saudações ou comentários.`;
 
   try {
     const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
