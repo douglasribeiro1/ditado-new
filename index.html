@@ -1351,16 +1351,7 @@ async function correctWithAI() {
   els.aiBtn.disabled = true;
 
   // Prompt estruturado em tópicos diretos para garantir maiúsculas em início de frase
-  const systemPrompt = `Você é um especialista em revisão ortográfica, gramatical e de pontuação em português do Brasil.
-
-Instruções obrigatórias de revisão:
-1. OBRIGATÓRIO: Garanta que TODAS as frases e parágrafos comecem com a PRIMEIRA LETRA MAIÚSCULA.
-2. Mantenha em maiúsculas os nomes próprios, nomes de pessoas, locais, instituições e siglas consagradas (como IA, SUS, etc.).
-3. NÃO altere o texto todo para CAIXA ALTA (MAIÚSCULAS). Use apenas a primeira letra maiúscula em inícios de frase e nomes próprios/siglas.
-4. Não coloque todas as palavras de uma frase começando com a letra maiúscula.
-5. Mantenha nomes de medicamentos, termos comuns e palavras gerais em minúsculas (a menos que estejam no início da frase).
-6. Corrija a pontuação, acentuação, ortografia e concordância, mantendo fielmente o sentido original.
-7. Retorne EXCLUSIVAMENTE o texto final corrigido, sem explicações, saudações ou comentários.`;
+  const systemPrompt = 'Faça a correção ortográfica e de pontuação conforme regras gramaticais da língua portuguesa no Brasil. Não altere palavras, não crie palavras, não exclua palavras e nunca responda o que está escrito. Apenas me entregue o texto com correções e nada mais.'
 
   try {
     const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
