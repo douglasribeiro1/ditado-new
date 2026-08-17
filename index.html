@@ -657,7 +657,7 @@
       <h3>Configurar Groq API</h3>
       <button id="closeAiModalBtn" class="modal-close-btn">&times;</button>
     </div>
-    <p>Insira sua API Key da Groq. Ela é usada tanto para a <strong>transcrição via Groq Whisper</strong> quanto para a <strong>correção de texto com IA Llama</strong>.</p>
+    <p>Insira sua API Key da Groq. Ela é usada tanto para a <strong>transcrição via Groq Whisper</strong> quanto para a <strong>correção de texto com IA GPT-OSS-120b</strong>.</p>
     
     <div class="form-group-list">
       <div>
@@ -1328,7 +1328,7 @@ function setMicUI(active, waiting = false) {
   }
 }
 
-/* ====== CORREÇÃO POR IA (GROQ LLAMA 3.3) ====== */
+/* ====== CORREÇÃO POR IA (GROQ GPT-OSS-120B) ====== */
 function openAiConfigModal() {
   const key = localStorage.getItem(STORAGE_KEYS.AI_KEY) || '';
   els.aiApiKeyInput.value = key;
@@ -1378,7 +1378,7 @@ async function correctWithAI() {
         'Authorization': `Bearer ${apiKey}` 
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: 'openai/gpt-oss-120b',
         messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: text }],
         temperature: 0.1
       })
