@@ -1368,7 +1368,7 @@ async function correctWithAI() {
   els.aiBtn.disabled = true;
 
   // Prompt estruturado em tópicos diretos para garantir maiúsculas em início de frase
-  const systemPrompt = 'Faça a correção ortográfica e de pontuação conforme regras gramaticais da língua portuguesa no Brasil. Não altere palavras, não crie palavras, não exclua palavras e nunca responda o que está escrito. Não aplique formatação como negrito, itálico, sublinhado. Não coloque ou exclua bullets. Apenas me entregue o texto com correções e nada mais.'
+  const systemPrompt = 'Faça a correção ortográfica e de pontuação conforme regras gramaticais da língua portuguesa no Brasil. Use o contexto para decidir mudanças de palavras. Não modifique o sentido do texto e nunca responda o que está escrito. Não aplique formatação como negrito, itálico, sublinhado. Não coloque ou exclua bullets. Apenas me entregue o texto com correções ortográficas e nada mais.'
 
   try {
     const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
