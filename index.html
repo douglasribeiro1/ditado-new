@@ -1447,6 +1447,7 @@ window.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key.toLowerCase() === 'u') { e.preventDefault(); undo(); return; }
   if ((e.ctrlKey && e.key.toLowerCase() === 'y') || (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === 'Z')) { e.preventDefault(); redo(); return; }
   if (e.ctrlKey && e.key.toLowerCase() === 'n') { e.preventDefault(); newNote(); return; }
+  if (e.ctrlKey && e.key.toLowerCase() === 'l') { e.preventDefault(); clearEditor(); return; }
 });
 
 /* ====== Inicialização ====== */
