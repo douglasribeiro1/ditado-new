@@ -213,16 +213,38 @@
   }
 
   #status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-sizing: border-box;
+    width: 200px;
+    height: 40px;
+    padding: 0 14px;
+    margin-left: auto;
+    flex-shrink: 0;
     font-size: 12px;
     font-weight: 600;
     color: var(--text-secondary);
-    padding: 6px 12px;
     border-radius: 20px;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    margin-left: auto;
-    flex-shrink: 0;
+    transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
   }
+  #status .status-dot {
+    width: 8px; height: 8px; flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--text-muted);
+    transition: background-color 0.2s ease;
+  }
+  #status .status-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  #status[data-state="rec"]  { color: var(--recording-color); border-color: var(--recording-color); }
+  #status[data-state="rec"] .status-dot  { background: var(--recording-color); animation: blinkDot 1s infinite alternate; }
+  #status[data-state="busy"] { color: var(--primary-color); border-color: var(--primary-color); }
+  #status[data-state="busy"] .status-dot { background: var(--primary-color); animation: blinkDot 0.7s infinite alternate; }
+  #status[data-state="ok"] .status-dot   { background: #22c55e; }
+  #status[data-state="err"]  { color: var(--warn-color); border-color: var(--warn-color); }
+  #status[data-state="err"] .status-dot  { background: var(--warn-color); }
+  @media (max-width: 480px) { #status { width: 150px; padding: 0 10px; } }
 
   /* Modos da Barra */
   body.bar-compact #controls .btn-text { display: none !important; }
@@ -502,6 +524,12 @@
   .form-group-list { display: flex; flex-direction: column; gap: 10px; }
   .form-label { font-size: 11px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 2px; }
   .btn-auto-left { margin-right: auto; }
+
+  .panel-tabs { display: flex; gap: 6px; }
+  .panel-tab { flex: 1; min-height: 34px; padding: 6px 10px; }
+  .panel-tab.active { background: var(--primary-color); border-color: var(--primary-color); color: #fff; }
+  .tpl-name { font-weight: 700; font-size: 14px; color: var(--primary-color); word-break: break-word; }
+  .note-card.is-template { border-color: var(--primary-color); }
   .hidden { display: none !important; }
 </style>
 </head>
@@ -595,7 +623,7 @@
         <span class="btn-text">Notas (F2)</span>
       </button>
 
-      <div id="status" aria-live="polite">Pronto</div>
+      <div id="status" aria-live="polite" data-state="idle"><span class="status-dot"></span><span class="status-text" id="statusText">Pronto</span></div>
     </div>
   </header>
 
@@ -631,7 +659,11 @@
             <button id="closeNotesBtn">Fechar</button>
           </div>
         </div>
-        <input type="text" id="searchInput" placeholder="Filtrar notas..." aria-label="Filtrar notas" />
+        <div class="panel-tabs" role="tablist">
+          <button id="tabNotes" class="panel-tab active" role="tab">Notas</button>
+          <button id="tabTemplates" class="panel-tab" role="tab">Modelos</button>
+        </div>
+        <input type="text" id="searchInput" placeholder="Filtrar notas..." aria-label="Filtrar" />
       </div>
       <div id="notesList" role="list"></div>
     </aside>
@@ -674,6 +706,24 @@
   </div>
 </div>
 
+<div id="tplModal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal-card">
+    <div class="modal-header-row">
+      <h3 id="tplModalTitle">Salvar como modelo</h3>
+      <button id="closeTplModalBtn" class="modal-close-btn">&times;</button>
+    </div>
+    <p>Dê um nome ao modelo (ex.: Evolução padrão, Alta, Retorno).</p>
+    <div class="form-group-list">
+      <label class="form-label">NOME DO MODELO:</label>
+      <input type="text" id="tplNameInput" class="form-input" maxlength="60" placeholder="Nome do modelo" />
+    </div>
+    <div class="modal-actions">
+      <button id="cancelTplModalBtn">Cancelar</button>
+      <button id="saveTplModalBtn" class="primary">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ====== Helper DOM ====== */
 const $ = id => document.getElementById(id);
@@ -683,7 +733,7 @@ const els = {
   undoBtn: $('undoBtn'), redoBtn: $('redoBtn'), newBtn: $('newBtn'), clearBtn: $('clearBtn'),
   notesToggle: $('notesToggle'), notesPanel: $('notesPanel'), notesList: $('notesList'),
   searchInput: $('searchInput'), closeNotesBtn: $('closeNotesBtn'), deleteAllBtn: $('deleteAllBtn'),
-  status: $('status'), fontRange: $('fontRange'), fontSizeVal: $('fontSizeVal'),
+  status: $('status'), statusText: $('statusText'), fontRange: $('fontRange'), fontSizeVal: $('fontSizeVal'),
   fontInc: $('fontInc'), fontDec: $('fontDec'), allCaps: $('allCaps'), autoPunct: $('autoPunct'), quickSend: $('quickSend'),
   engineSelect: $('engineSelect'), aiBtn: $('aiBtn'), aiConfigBtn: $('aiConfigBtn'), 
   aiModal: $('aiModal'), closeAiModalBtn: $('closeAiModalBtn'), cancelAiModalBtn: $('cancelAiModalBtn'), 
@@ -691,13 +741,15 @@ const els = {
   themeToggleBtn: $('themeToggleBtn'), themeIconSun: $('themeIconSun'), themeIconMoon: $('themeIconMoon'), 
   wordCountEl: $('wordCount'), charCountEl: $('charCount'), toastEl: $('toast'), confirmModal: $('confirmModal'), 
   cancelModalBtn: $('cancelModalBtn'), confirmModalBtn: $('confirmModalBtn'), barModeBtn: $('barModeBtn'), 
-  unhideBarBtn: $('unhideBarBtn'), liveBufferBar: $('liveBufferBar'), bufferText: $('bufferText')
+  unhideBarBtn: $('unhideBarBtn'), tabNotes: $('tabNotes'), tabTemplates: $('tabTemplates'),
+  tplModal: $('tplModal'), tplNameInput: $('tplNameInput'), tplModalTitle: $('tplModalTitle'),
+  saveTplModalBtn: $('saveTplModalBtn'), cancelTplModalBtn: $('cancelTplModalBtn'), closeTplModalBtn: $('closeTplModalBtn'), liveBufferBar: $('liveBufferBar'), bufferText: $('bufferText')
 };
 
 const STORAGE_KEYS = {
   NOTES: 'ditado_unified_notes', FONT: 'ditado_unified_fontsize', THEME: 'ditado_unified_theme',
   ALL_CAPS: 'ditado_unified_allcaps', AUTO_PUNCT: 'ditado_unified_autopunct', QUICK_SEND: 'ditado_unified_quicksend',
-  ENGINE: 'ditado_unified_engine', AI_KEY: 'ditado_ai_key', BAR_MODE: 'ditado_unified_barmode'
+  ENGINE: 'ditado_unified_engine', AI_KEY: 'ditado_ai_key', BAR_MODE: 'ditado_unified_barmode', TEMPLATES: 'ditado_unified_templates'
 };
 
 const QUICK_SEND_PUNCT = new Set(['.', ',', ';', '/', '-', '!', '?', ':']);
@@ -727,18 +779,34 @@ const autosaveDelay = 1500, HISTORY_LIMIT = 200, MAX_NOTES = 300;
 function checkUrlApiKey() {
   const params = new URLSearchParams(window.location.search);
   const keyFromUrl = params.get('key') || params.get('groq_key');
+  const engineFromUrl = params.get('engine');
+  if (!keyFromUrl && !engineFromUrl) return;
   if (keyFromUrl) {
     localStorage.setItem(STORAGE_KEYS.AI_KEY, keyFromUrl.trim());
     showToast('Chave API configurada via URL!', 2500);
-    const cleanUrl = window.location.pathname + window.location.hash;
-    window.history.replaceState({}, document.title, cleanUrl);
   }
+  if (engineFromUrl === 'whisper' || engineFromUrl === 'webspeech') {
+    localStorage.setItem(STORAGE_KEYS.ENGINE, engineFromUrl);
+  }
+  const cleanUrl = window.location.pathname + window.location.hash;
+  window.history.replaceState({}, document.title, cleanUrl);
 }
 
 /* ====== Feedback de Interface ====== */
+let __statusTimer = null;
+function statusState(msg) {
+  if (/^(Gravando|Ouvindo)/.test(msg)) return 'rec';
+  if (/^(Transcrevendo|IA corrigindo)/.test(msg)) return 'busy';
+  if (/^(Erro|Permiss|Reinicie)/.test(msg)) return 'err';
+  if (/^(Salvo|Transcrito|Texto corrigido|Copiado)/.test(msg)) return 'ok';
+  return 'idle';
+}
 function setStatus(msg, timeout = 0) {
-  els.status.textContent = msg;
-  if (timeout) setTimeout(() => els.status.textContent = 'Pronto', timeout);
+  clearTimeout(__statusTimer);
+  els.status.dataset.state = statusState(msg);
+  els.statusText.textContent = msg;
+  els.status.title = msg;
+  if (timeout) __statusTimer = setTimeout(() => setStatus('Pronto'), timeout);
 }
 
 function toggleModal(modal, open) {
@@ -834,7 +902,53 @@ function updateStats() {
   els.charCountEl.textContent = `${chars} car.`;
 }
 
+let templates = [];
+let panelTab = 'notes';
+let tplEditing = null; /* { mode: 'new', text } | { mode: 'rename', id } */
+
+function loadTemplates() {
+  try { templates = JSON.parse(localStorage.getItem(STORAGE_KEYS.TEMPLATES) || '[]'); } catch(e) { templates = []; }
+}
+const persistTemplates = () => localStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(templates));
+
+function renderPanel() {
+  if (panelTab === 'templates') renderTemplates(els.searchInput.value);
+  else renderNotes(els.searchInput.value);
+}
+
+function setPanelTab(tab) {
+  panelTab = tab;
+  els.tabNotes.classList.toggle('active', tab === 'notes');
+  els.tabTemplates.classList.toggle('active', tab === 'templates');
+  els.searchInput.placeholder = tab === 'notes' ? 'Filtrar notas...' : 'Filtrar modelos...';
+  els.searchInput.value = '';
+  renderPanel();
+}
+
+function renderTemplates(filter = '') {
+  const query = filter.toLowerCase().trim();
+  const filtered = templates.filter(t => !query || t.name.toLowerCase().includes(query) || t.text.toLowerCase().includes(query));
+  if (!filtered.length) {
+    els.notesList.innerHTML = `<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center;">${templates.length === 0 ? 'Nenhum modelo. Na aba Notas, use "Salvar modelo" em uma nota.' : 'Nada encontrado'}</div>`;
+    return;
+  }
+  els.notesList.innerHTML = filtered.map(t => `
+    <div class="note-card is-template" data-tid="${t.id}">
+      <div class="tpl-name">${escapeHtml(t.name)}</div>
+      <div class="text-preview">${escapeHtml(t.text)}</div>
+      <div class="meta">
+        <div class="actions">
+          <button class="note-btn primary use-tpl-btn">Usar</button>
+          <button class="note-btn rename-tpl-btn">Renomear</button>
+        </div>
+        <button class="note-btn warn del-tpl-btn">Excluir</button>
+      </div>
+    </div>
+  `).join('');
+}
+
 function renderNotes(filter = '') {
+  if (panelTab === 'templates') return renderTemplates(els.searchInput.value);
   const query = filter.toLowerCase().trim();
   const filtered = notes.map((n, i) => ({ ...n, realIdx: i })).filter(n => !query || n.text.toLowerCase().includes(query));
 
@@ -849,6 +963,7 @@ function renderNotes(filter = '') {
       <div class="meta">
         <span>${new Date(n.t).toLocaleDateString()} ${new Date(n.t).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
         <div class="actions">
+          <button class="note-btn tpl-btn" title="Salvar esta nota como modelo">Salvar modelo</button>
           <button class="note-btn load-btn">Carregar</button>
           <button class="note-btn warn del-btn">Excluir</button>
         </div>
@@ -862,16 +977,82 @@ function escapeHtml(str) {
 }
 
 els.notesList.addEventListener('click', (e) => {
+  const tplCard = e.target.closest('[data-tid]');
+  if (tplCard) return handleTemplateClick(e, tplCard.dataset.tid);
   const card = e.target.closest('.note-card');
   if (!card) return;
   const idx = parseInt(card.dataset.idx, 10);
   if (e.target.classList.contains('del-btn')) {
     deleteSingleNote(idx);
+  } else if (e.target.classList.contains('tpl-btn')) {
+    openTemplateModal({ mode: 'new', text: notes[idx].text }, '');
   } else {
     loadNote(idx);
     closeNotes();
   }
 });
+
+function handleTemplateClick(e, id) {
+  const tpl = templates.find(t => t.id === id);
+  if (!tpl) return;
+  if (e.target.classList.contains('del-tpl-btn')) {
+    templates = templates.filter(t => t.id !== id);
+    persistTemplates();
+    renderTemplates(els.searchInput.value);
+    setStatus('Modelo excluído', 900);
+  } else if (e.target.classList.contains('rename-tpl-btn')) {
+    openTemplateModal({ mode: 'rename', id }, tpl.name);
+  } else {
+    useTemplate(tpl);
+  }
+}
+
+function useTemplate(tpl) {
+  saveCurrentAsNote();
+  els.output.value = tpl.text;
+  history = [tpl.text];
+  redoStack = [];
+  currentNoteIndex = null;
+  updateStats();
+  closeNotes();
+  els.output.focus();
+  setStatus('Modelo: ' + tpl.name, 1500);
+}
+
+function openTemplateModal(state, name) {
+  tplEditing = state;
+  els.tplModalTitle.textContent = state.mode === 'new' ? 'Salvar como modelo' : 'Renomear modelo';
+  els.tplNameInput.value = name;
+  toggleModal(els.tplModal, true);
+  setTimeout(() => { els.tplNameInput.focus(); els.tplNameInput.select(); }, 50);
+}
+
+function closeTemplateModal() { toggleModal(els.tplModal, false); tplEditing = null; }
+
+function saveTemplateModal() {
+  const name = els.tplNameInput.value.trim();
+  if (!name) { showToast('Digite um nome'); return; }
+  if (tplEditing.mode === 'new') {
+    templates.unshift({ id: 't' + Date.now().toString(36), name, text: tplEditing.text, t: Date.now() });
+    showToast('Modelo salvo: ' + name);
+  } else {
+    const tpl = templates.find(t => t.id === tplEditing.id);
+    if (tpl) tpl.name = name;
+  }
+  persistTemplates();
+  closeTemplateModal();
+  renderPanel();
+}
+
+els.saveTplModalBtn.addEventListener('click', saveTemplateModal);
+els.cancelTplModalBtn.addEventListener('click', closeTemplateModal);
+els.closeTplModalBtn.addEventListener('click', closeTemplateModal);
+els.tplNameInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); saveTemplateModal(); }
+  else if (e.key === 'Escape') { e.stopPropagation(); closeTemplateModal(); }
+});
+els.tabNotes.addEventListener('click', () => setPanelTab('notes'));
+els.tabTemplates.addEventListener('click', () => setPanelTab('templates'));
 
 function deleteSingleNote(idx) {
   if (currentNoteIndex !== null) {
@@ -884,7 +1065,7 @@ function deleteSingleNote(idx) {
   setStatus('Excluída', 900);
 }
 
-els.searchInput.addEventListener('input', () => renderNotes(els.searchInput.value));
+els.searchInput.addEventListener('input', renderPanel);
 
 /* ====== Histórico & Edição ====== */
 function scheduleAutoSave() {
@@ -1454,6 +1635,7 @@ window.addEventListener('keydown', (e) => {
 checkUrlApiKey();
 initTheme();
 initToggles();
+loadTemplates();
 loadNotes();
 pushHistory(els.output.value || '');
 setFontSize(localStorage.getItem(STORAGE_KEYS.FONT) || 18);
