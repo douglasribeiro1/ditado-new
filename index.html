@@ -244,7 +244,18 @@
   #status[data-state="ok"] .status-dot   { background: #22c55e; }
   #status[data-state="err"]  { color: var(--warn-color); border-color: var(--warn-color); }
   #status[data-state="err"] .status-dot  { background: var(--warn-color); }
-  @media (max-width: 480px) { #status { width: 150px; padding: 0 10px; } }
+  #status { width: 150px; }
+  @media (max-width: 480px) { #status { padding: 0 10px; } }
+
+  /* Desktop: barra sempre em UMA linha; ajusta o nível de compactação ao espaço disponível */
+  @media (min-width: 768px) {
+    #controls { flex-wrap: nowrap; }
+    .controls-row { display: contents; }
+    body.fit-1 #controls button .btn-text { display: none; }
+    body.fit-2 #controls .btn-text { display: none; }
+    body.fit-3 #fontControls input[type="range"] { display: none; }
+    body.fit-wrap #controls { flex-wrap: wrap; }
+  }
 
   /* Modos da Barra */
   body.bar-compact #controls .btn-text { display: none !important; }
@@ -829,7 +840,22 @@ function setBarMode(mode, save = true) {
   if (mode === 'compact') document.body.classList.add('bar-compact');
   else if (mode === 'hidden') document.body.classList.add('bar-hidden');
   if (save) localStorage.setItem(STORAGE_KEYS.BAR_MODE, mode);
+  fitBar();
 }
+
+function fitBar() {
+  const bar = $('controls');
+  document.body.classList.remove('fit-1', 'fit-2', 'fit-3', 'fit-wrap');
+  if (window.innerWidth < 768 || currentBarMode !== 'full') return;
+  for (let lvl = 1; lvl <= 3 && bar.scrollWidth > bar.clientWidth + 1; lvl++) {
+    document.body.classList.add('fit-' + lvl);
+  }
+  if (bar.scrollWidth > bar.clientWidth + 1) {
+    document.body.classList.remove('fit-1', 'fit-2', 'fit-3');
+    document.body.classList.add('fit-wrap');
+  }
+}
+window.addEventListener('resize', fitBar);
 
 function cycleBarMode() {
   const modes = { full: 'compact', compact: 'hidden', hidden: 'full' };
@@ -1311,7 +1337,7 @@ function buildRecognition() {
     recognizing = true;
     reconnectAttempts = 0;
     setMicUI(true);
-    setStatus('Ouvindo (Navegador)...');
+    setStatus('Ouvindo...');
     showOverlay('Ouvindo voz...');
     lastInterim = ''; flushedText = '';
   };
@@ -1421,7 +1447,7 @@ async function toggleWhisperRecording() {
       mediaRecorder.start();
       isWhisperRecording = true;
       setMicUI(true);
-      setStatus('Gravando áudio (Groq)...');
+      setStatus('Gravando...');
     } catch (err) {
       showToast('Erro no microfone: ' + err.message);
       setStatus('Erro no microfone');
@@ -1429,7 +1455,7 @@ async function toggleWhisperRecording() {
   } else {
     isWhisperRecording = false;
     setMicUI(false, true);
-    setStatus('Transcrevendo via Groq Whisper...');
+    setStatus('Transcrevendo...');
     mediaRecorder.stop();
   }
 }
@@ -1640,6 +1666,8 @@ loadNotes();
 pushHistory(els.output.value || '');
 setFontSize(localStorage.getItem(STORAGE_KEYS.FONT) || 18);
 updateStats();
+fitBar();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitBar);
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js').catch(err => console.warn('PWA:', err));
