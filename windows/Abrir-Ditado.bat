@@ -4,7 +4,7 @@ chcp 65001 >nul
 cd /d "%~dp0"
 
 rem ---- Configuracao (edite em config.txt / groq-key.txt) ----
-set "SITE_URL=https://douglasribeiro1.github.io/ditado-new/"
+set "SITE_URL=https://ditado-new.vercel.app/"
 set "BROWSER_PREF=chrome"
 set "GROQ_KEY="
 if exist "config.txt" for /f "usebackq tokens=1,* delims==" %%A in ("config.txt") do (
