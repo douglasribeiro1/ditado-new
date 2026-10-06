@@ -1,2 +1,4 @@
 node_modules/
 .env
+windows/groq-key.txt
+windows/config.txt

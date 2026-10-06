@@ -1,0 +1,2 @@
+SITE_URL=https://douglasribeiro1.github.io/ditado-new/
+BROWSER=chrome
