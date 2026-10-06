@@ -1,2 +1,2 @@
-SITE_URL=https://douglasribeiro1.github.io/ditado-new/
+SITE_URL=https://ditado-new.vercel.app/
 BROWSER=chrome
