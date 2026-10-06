@@ -3,18 +3,17 @@ setlocal EnableExtensions
 chcp 65001 >nul
 cd /d "%~dp0"
 
-rem ---- Configuracao (edite em config.txt / groq-key.txt) ----
+rem ---- Configuracao: cole sua chave Groq entre as aspas abaixo ----
+set "GROQ_KEY="
 set "SITE_URL=https://ditado-new.vercel.app/"
 set "BROWSER_PREF=chrome"
-set "GROQ_KEY="
 if exist "config.txt" for /f "usebackq tokens=1,* delims==" %%A in ("config.txt") do (
   if /i "%%A"=="SITE_URL" set "SITE_URL=%%B"
   if /i "%%A"=="BROWSER" set "BROWSER_PREF=%%B"
 )
-if exist "groq-key.txt" set /p GROQ_KEY=<"groq-key.txt"
 
 if "%GROQ_KEY%"=="" (
-  echo Cole sua chave Groq em groq-key.txt ^(veja groq-key.exemplo.txt^) e abra de novo.
+  echo Edite Abrir-Ditado.bat e cole sua chave Groq em set "GROQ_KEY=" ^(linha 7^).
   pause
   exit /b 1
 )
