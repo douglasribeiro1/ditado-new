@@ -603,6 +603,43 @@
     #notesPanel { position: relative; height: auto; flex-shrink: 0; }
     #notesPanel.open { width: var(--notes-panel-width); }
   }
+
+  /* ====== Barra superior (novo visual) ====== */
+  :root { --ok-bg: rgba(34, 197, 94, 0.14); --ok-fg: #4ade80; --ok-dot: #22c55e; }
+  [data-theme="light"] { --ok-bg: #e6f6ec; --ok-fg: #15803d; --ok-dot: #16a34a; }
+  #controls { min-height: 64px; padding: 0 20px; gap: 14px; box-shadow: none; }
+  .brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .brand-icon { color: var(--primary-color); }
+  .brand-name { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+  .brand-sep { width: 1px; height: 22px; background: var(--border-color); margin: 0 4px; }
+  .brand-sub { font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
+  @media (max-width: 1599px) { .brand-sub, .brand-sep { display: none; } }
+  .bar-center { margin: 0 auto; }
+  .bar-right { margin-left: 0; }
+  .bar-edit { gap: 2px; }
+  .bar-ai { gap: 0; align-items: center; }
+  #aiBtn { padding: 8px 6px 8px 10px; }
+  #aiBtn svg { color: var(--primary-color); }
+  #aiConfigBtn { width: 28px; padding: 0; }
+  #controls button:not(.primary):not(.recording):not(:disabled):hover { background: var(--bg-card); }
+  #controls button:not(.primary):not(.recording), #controls .btn-group button {
+    background: transparent; border-color: transparent; box-shadow: none;
+  }
+  #controls button:not(.primary):not(.recording):hover { background: var(--bg-card); }
+  #controls button.warn { color: var(--warn-color); }
+  #micBtn { border-radius: 999px; padding: 8px 18px; }
+  #engineSelect { background: transparent; border-color: transparent; }
+  #engineSelect:hover { background: var(--bg-card); }
+  #status[data-state="idle"] { background: var(--ok-bg); color: var(--ok-fg); border-color: transparent; }
+  #status[data-state="idle"] .status-dot { background: var(--ok-dot); }
+  #status { border-radius: 999px; }
+  @media (min-width: 768px) {
+    .bar-center { flex-shrink: 0; }
+  }
+  @media (max-width: 767px) {
+    .bar-center { margin: 0; }
+    #controls { padding: 8px 12px; }
+  }
   .hidden { display: none !important; }
 </style>
 </head>
@@ -615,7 +652,13 @@
   </button>
 
   <header id="controls" role="toolbar">
-    <div class="bar-group">
+    <div class="brand">
+      <svg class="brand-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+      <span class="brand-name">Ditado</span>
+      <span class="brand-sep"></span>
+      <span class="brand-sub">Bloco de notas por voz</span>
+    </div>
+    <div class="bar-group bar-voice">
       <button id="micBtn" class="primary" title="Iniciar/Parar Ditado (Atalho: Esc)">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
         <span id="micBtnText" class="btn-text">Falar (Esc)</span>
@@ -625,37 +668,39 @@
         <option value="webspeech">Navegador (Tempo Real)</option>
         <option value="whisper">Groq Whisper (Áudio)</option>
       </select>
-      <div class="btn-group">
-        <button id="aiBtn" title="Corrigir ortografia e gramática com IA Groq (Atalho: F10)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2z"/></svg>
-          <span class="btn-text">IA (F10)</span>
-        </button>
-        <button id="aiConfigBtn" class="icon-only" title="Configurar Chave API Groq">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        </button>
-      </div>
     </div>
-    <div class="bar-sep"></div>
-    <div class="bar-group">
-      <button id="copyBtn" title="Copiar texto (F4)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        <span class="btn-text">Copiar (F4)</span>
-      </button>
-      <button id="undoBtn" class="icon-only" title="Desfazer (Ctrl+U)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
-      </button>
-      <button id="redoBtn" class="icon-only" title="Refazer (Ctrl+Y)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
-      </button>
-      <button id="newBtn" title="Nova Nota (F9)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-        <span class="btn-text">Novo (F9)</span>
-      </button>
-      <button id="clearBtn" class="warn icon-only" title="Limpar tudo (F8)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-      </button>
+    <div class="bar-group bar-center">
+      <div id="status" aria-live="polite" data-state="idle"><span class="status-dot"></span><span class="status-text" id="statusText">Pronto</span></div>
     </div>
     <div class="bar-group bar-right">
+      <div class="bar-group bar-edit">
+        <button id="copyBtn" title="Copiar texto (F4)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
+        <button id="undoBtn" class="icon-only" title="Desfazer (Ctrl+U)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+      </button>
+        <button id="redoBtn" class="icon-only" title="Refazer (Ctrl+Y)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+      </button>
+        <button id="newBtn" title="Nova Nota (F9)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+        <button id="clearBtn" class="warn icon-only" title="Limpar tudo (F8)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      </button>
+      </div>
+      <div class="bar-sep"></div>
+      <div class="btn-group bar-ai">
+        <button id="aiBtn" title="Corrigir ortografia e gramática com IA Groq (Atalho: F10)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2z"/></svg>
+          <span class="btn-text">Corrigir com IA</span>
+        </button>
+        <button id="aiConfigBtn" class="icon-only" title="Configurar chave Groq">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+      </div>
+      <div class="bar-sep"></div>
       <button id="notesToggle" title="Ver Notas Salvas (F2)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         <span class="btn-text">Notas (F2)</span>
@@ -667,7 +712,6 @@
         <svg id="themeIconSun" class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
-      <div id="status" aria-live="polite" data-state="idle"><span class="status-dot"></span><span class="status-text" id="statusText">Pronto</span></div>
     </div>
   </header>
 
