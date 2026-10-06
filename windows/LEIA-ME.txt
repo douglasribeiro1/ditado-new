@@ -9,6 +9,15 @@ ATALHO DO DITADO (Windows)
 4. Clique com o botao direito em Abrir-Ditado.vbs > Enviar para > Area de trabalho (criar atalho).
    Dica: no atalho, Propriedades > Alterar icone para escolher um icone.
 
+BACKUP AUTOMATICO
+Se houver um arquivo ditado-backup*.json nesta pasta (o mais recente e usado), o atalho
+o importa sozinho ao abrir: notas e modelos sao mesclados com os que ja existem
+(sem duplicar). Gere o arquivo no site em Ajustes > Dados > Exportar backup e
+guarde-o aqui. Na primeira vez o Chrome/Edge pode perguntar se o site pode acessar
+"dispositivos na rede local": clique em Permitir. Se nao funcionar, use
+Ajustes > Dados > Importar backup. Mantenha arquivos de backup fora do GitHub
+(contem suas notas).
+
 O site abre em janela propria (sem barra de enderecos), com a chave ja
 configurada e o motor "Groq Whisper" como padrao.
 A chave fica apenas no seu PC. Nao envie o Abrir-Ditado.bat preenchido para o GitHub.
