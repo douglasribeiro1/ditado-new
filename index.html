@@ -249,7 +249,7 @@
   /* Grupos da barra */
   .bar-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .bar-sep { display: none; width: 1px; height: 26px; background: var(--border-color); margin: 0 4px; }
-  @media (min-width: 768px) {
+  @media (min-width: 560px) {
     #controls { flex-wrap: nowrap; gap: 10px; }
     .bar-group { flex-wrap: nowrap; }
     .bar-sep { display: block; }
@@ -633,13 +633,30 @@
   #status[data-state="idle"] { background: var(--ok-bg); color: var(--ok-fg); border-color: transparent; }
   #status[data-state="idle"] .status-dot { background: var(--ok-dot); }
   #status { border-radius: 999px; }
-  @media (min-width: 768px) {
+  @media (min-width: 560px) {
     .bar-center { flex-shrink: 0; }
   }
-  @media (max-width: 767px) {
+  @media (max-width: 559px) {
     .bar-center { margin: 0; }
     #controls { padding: 8px 12px; }
   }
+
+  /* ====== Meia tela: níveis de compactação (sempre uma linha) ====== */
+  #moreBtn { display: none; }
+  body.fit-3 #moreBtn { display: inline-flex; }
+  body.fit-2 #controls { gap: 8px; padding: 0 12px; }
+  body.fit-2 .brand-name { display: none; }
+  body.fit-2 #engineSelect { max-width: 130px; }
+  body.fit-2 #status { width: 120px; padding: 0 12px; }
+  body.fit-3 .sep-edit { display: none; }
+  body.fit-4 .brand { display: none; }
+  body.fit-4 #engineSelect { max-width: 112px; }
+  body.fit-4 #status { width: 104px; }
+  body.fit-5 #status { width: 40px; padding: 0; justify-content: center; }
+  body.fit-5 #status .status-text { display: none; }
+  body.fit-5 #engineSelect { max-width: 104px; }
+  #moreMenu { width: auto; padding: 10px; flex-direction: row; flex-wrap: wrap; gap: 6px; max-width: 260px; }
+  #moreMenu button { border: 1px solid var(--border-color); }
   .hidden { display: none !important; }
 </style>
 </head>
@@ -665,8 +682,8 @@
         <span class="mic-level"></span>
       </button>
       <select id="engineSelect" title="Alternar mecanismo de voz">
-        <option value="webspeech">Navegador (Tempo Real)</option>
-        <option value="whisper">Groq Whisper (Áudio)</option>
+        <option value="webspeech">Navegador</option>
+        <option value="whisper">Groq Whisper</option>
       </select>
     </div>
     <div class="bar-group bar-center">
@@ -690,7 +707,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
       </button>
       </div>
-      <div class="bar-sep"></div>
+      <div class="bar-sep sep-edit"></div>
       <div class="btn-group bar-ai">
         <button id="aiBtn" title="Corrigir ortografia e gramática com IA Groq (Atalho: F10)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2z"/></svg>
@@ -712,8 +729,13 @@
         <svg id="themeIconSun" class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
+      <button id="moreBtn" class="icon-only" title="Mais ações" aria-haspopup="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+      </button>
     </div>
   </header>
+
+  <div id="moreMenu" class="popover hidden" role="menu" aria-label="Mais ações"></div>
 
   <div id="settingsMenu" class="popover hidden" role="dialog" aria-label="Ajustes">
     <div class="pop-section">
@@ -1001,14 +1023,36 @@ function setBarMode(mode, save = true) {
   fitBar();
 }
 
+let overflowOn = false;
+function placeOverflow(on) {
+  if (on === overflowOn) return;
+  overflowOn = on;
+  const menu = $('moreMenu'), edit = document.querySelector('.bar-edit'), theme = $('themeToggleBtn');
+  if (on) {
+    menu.appendChild(edit); menu.appendChild(theme);
+  } else {
+    const right = document.querySelector('.bar-right');
+    right.insertBefore(edit, right.firstChild);
+    right.insertBefore(theme, els.settingsBtn.nextSibling);
+    menu.classList.add('hidden');
+  }
+}
+
 function fitBar() {
   const bar = $('controls');
-  document.body.classList.remove('fit-1', 'fit-wrap');
-  if (window.innerWidth < 768 || currentBarMode !== 'full') return;
-  if (bar.scrollWidth > bar.clientWidth + 1) document.body.classList.add('fit-1');
-  if (bar.scrollWidth > bar.clientWidth + 1) {
-    document.body.classList.remove('fit-1');
-    document.body.classList.add('fit-wrap');
+  const cl = document.body.classList;
+  cl.remove('fit-1', 'fit-2', 'fit-3', 'fit-4', 'fit-5', 'fit-wrap');
+  placeOverflow(false);
+  if (window.innerWidth < 560 || currentBarMode !== 'full') return;
+  const over = () => bar.scrollWidth > bar.clientWidth + 1;
+  for (let lvl = 1; lvl <= 5 && over(); lvl++) {
+    cl.add('fit-' + lvl);
+    if (lvl === 3) placeOverflow(true);
+  }
+  if (over()) {
+    cl.remove('fit-1', 'fit-2', 'fit-3', 'fit-4', 'fit-5');
+    placeOverflow(false);
+    cl.add('fit-wrap');
   }
 }
 window.addEventListener('resize', fitBar);
@@ -1921,17 +1965,28 @@ async function correctWithAI() {
 
 /* ====== Menu de Ajustes ====== */
 function openSettings() {
+  moreMenu.classList.add('hidden');
   const r = els.settingsBtn.getBoundingClientRect();
   els.settingsMenu.classList.remove('hidden');
   els.settingsMenu.style.top = (r.bottom + 8) + 'px';
   els.settingsMenu.style.right = Math.max(12, window.innerWidth - r.right) + 'px';
   updateBackupInfo();
 }
-const closeSettings = () => els.settingsMenu.classList.add('hidden');
-const settingsOpen = () => !els.settingsMenu.classList.contains('hidden');
+const moreMenu = $('moreMenu'), moreBtn = $('moreBtn');
+const closeSettings = () => { els.settingsMenu.classList.add('hidden'); moreMenu.classList.add('hidden'); };
+const settingsOpen = () => !els.settingsMenu.classList.contains('hidden') || !moreMenu.classList.contains('hidden');
+function openMore() {
+  closeSettings();
+  const r = moreBtn.getBoundingClientRect();
+  moreMenu.classList.remove('hidden');
+  moreMenu.style.top = (r.bottom + 8) + 'px';
+  moreMenu.style.right = Math.max(12, window.innerWidth - r.right) + 'px';
+}
+moreBtn.addEventListener('click', (e) => { e.stopPropagation(); moreMenu.classList.contains('hidden') ? openMore() : closeSettings(); });
+moreMenu.addEventListener('click', (e) => { if (e.target.closest('button')) setTimeout(closeSettings, 0); });
 els.settingsBtn.addEventListener('click', (e) => { e.stopPropagation(); settingsOpen() ? closeSettings() : openSettings(); });
 document.addEventListener('click', (e) => {
-  if (settingsOpen() && !els.settingsMenu.contains(e.target) && !els.settingsBtn.contains(e.target)) closeSettings();
+  if (settingsOpen() && !els.settingsMenu.contains(e.target) && !els.settingsBtn.contains(e.target) && !moreMenu.contains(e.target) && !moreBtn.contains(e.target)) closeSettings();
 });
 
 /* ====== Backup (exportar / importar) ====== */
