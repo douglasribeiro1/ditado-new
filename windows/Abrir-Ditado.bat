@@ -18,7 +18,16 @@ if "%GROQ_KEY%"=="" (
   exit /b 1
 )
 
-set "URL=%SITE_URL%?key=%GROQ_KEY%&engine=whisper"
+rem ---- Backup: usa o ditado-backup*.json mais recente desta pasta (se existir) ----
+set "BACKUP_FILE="
+for /f "delims=" %%F in ('dir /b /a-d /o-d "ditado-backup*.json" 2^>nul') do if not defined BACKUP_FILE set "BACKUP_FILE=%%F"
+set "BK_PARAM="
+if defined BACKUP_FILE (
+  start "" /b powershell -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "%~dp0Servir-Backup.ps1" -Path "%~dp0%BACKUP_FILE%" -Port 47831
+  set "BK_PARAM=&backup=http%%3A%%2F%%2F127.0.0.1%%3A47831%%2Fbackup.json"
+)
+
+set "URL=%SITE_URL%?key=%GROQ_KEY%&engine=whisper%BK_PARAM%"
 
 rem ---- Localiza Chrome e Edge ----
 set "CHROME="

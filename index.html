@@ -220,7 +220,6 @@
     width: 200px;
     height: 40px;
     padding: 0 14px;
-    margin-left: auto;
     flex-shrink: 0;
     font-size: 12px;
     font-weight: 600;
@@ -247,18 +246,22 @@
   #status { width: 150px; }
   @media (max-width: 480px) { #status { padding: 0 10px; } }
 
-  /* Desktop: barra sempre em UMA linha; ajusta o nível de compactação ao espaço disponível */
+  /* Grupos da barra */
+  .bar-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .bar-sep { display: none; width: 1px; height: 26px; background: var(--border-color); margin: 0 4px; }
   @media (min-width: 768px) {
-    #controls { flex-wrap: nowrap; }
-    .controls-row { display: contents; }
+    #controls { flex-wrap: nowrap; gap: 10px; }
+    .bar-group { flex-wrap: nowrap; }
+    .bar-sep { display: block; }
+    .bar-right { margin-left: auto; }
+    #status { margin-left: 0; }
     body.fit-1 #controls button .btn-text { display: none; }
-    body.fit-2 #controls .btn-text { display: none; }
-    body.fit-3 #fontControls input[type="range"] { display: none; }
     body.fit-wrap #controls { flex-wrap: wrap; }
+    body.fit-wrap .bar-group { flex-wrap: wrap; }
   }
 
   /* Modos da Barra */
-  body.bar-compact #controls .btn-text { display: none !important; }
+  body.bar-compact #controls button .btn-text { display: none !important; }
   body.bar-compact button, body.bar-compact .toggle { padding: 6px 10px; }
   body.bar-hidden #controls { display: none !important; }
 
@@ -541,6 +544,65 @@
   .panel-tab.active { background: var(--primary-color); border-color: var(--primary-color); color: #fff; }
   .tpl-name { font-weight: 700; font-size: 14px; color: var(--primary-color); word-break: break-word; }
   .note-card.is-template { border-color: var(--primary-color); }
+
+  /* ====== Polimento ====== */
+  :root { --bg-app: #0b1020; --bg-surface: #111a2e; --bg-card: #18233a; --border-color: #26344d; }
+  [data-theme="light"] { --bg-app: #f4f6fa; --bg-surface: #ffffff; --bg-card: #f1f4f9; --border-color: #dde3ec; }
+  button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, .toggle:focus-within {
+    outline: 2px solid var(--primary-color); outline-offset: 2px;
+  }
+  #controls { padding: 10px 16px; }
+  #micBtn { position: relative; overflow: hidden; min-width: 128px; }
+  .mic-level { position: absolute; left: 0; bottom: 0; height: 3px; width: calc(var(--level, 0) * 100%);
+    background: rgba(255,255,255,0.9); transition: width 0.08s linear; pointer-events: none; }
+  #editor { padding: 16px 20px; }
+  .editor-wrapper { width: 100%; max-width: 980px; margin: 0 auto; }
+  #output { padding: 24px 28px; line-height: 1.6; }
+  #editorFooter { gap: 12px; }
+  #saveState { margin-right: auto; margin-left: 12px; color: var(--text-muted); }
+  .footer-right { display: flex; align-items: center; gap: 12px; }
+  .footer-keys { white-space: nowrap; }
+  @media (max-width: 600px) { .footer-keys { display: none; } }
+
+  /* Ajustes */
+  .popover {
+    position: fixed; z-index: 1500; width: 320px; max-width: calc(100vw - 24px);
+    background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 14px;
+    box-shadow: var(--shadow-md); padding: 6px 14px 14px; display: flex; flex-direction: column; gap: 4px;
+  }
+  .pop-section { display: flex; flex-direction: column; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+  .pop-section:last-child { border-bottom: none; padding-bottom: 0; }
+  .pop-title { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); }
+  .pop-row { display: flex; gap: 8px; }
+  .pop-row button { flex: 1; }
+  .pop-note { font-size: 11px; color: var(--text-secondary); line-height: 1.4; }
+  .popover .toggle, .popover #fontControls { width: 100%; }
+  .popover #fontControls { justify-content: space-between; }
+  .popover input[type="range"] { flex: 1; }
+
+  /* Biblioteca */
+  #libFilters { display: flex; gap: 8px; }
+  #libFilters select { flex: 1; min-width: 0; height: 36px; border-radius: 8px; border: 1px solid var(--border-color);
+    background: var(--input-bg); color: var(--text-primary); font-size: 12px; padding: 0 8px; }
+  #tagBar { display: flex; flex-wrap: wrap; gap: 6px; }
+  #tagBar:empty { display: none; }
+  .chip { min-height: unset; padding: 3px 9px; font-size: 11px; border-radius: 20px; background: var(--bg-card); }
+  .chip.active { background: var(--primary-color); border-color: var(--primary-color); color: #fff; }
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .note-title { font-weight: 700; font-size: 14px; word-break: break-word; }
+  .pin-btn { border: none; background: transparent; padding: 0 4px; min-height: unset; font-size: 16px; color: var(--text-muted); }
+  .pin-btn.on { color: #f59e0b; }
+  .note-card.pinned { border-color: rgba(245, 158, 11, 0.5); }
+  .note-card.active { border-color: var(--primary-color); box-shadow: 0 0 0 1px var(--primary-color); }
+  .badges { display: flex; flex-wrap: wrap; gap: 6px; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: var(--primary-glow); color: var(--primary-color); font-weight: 600; }
+  .badge.tag { background: var(--bg-surface); color: var(--text-secondary); border: 1px solid var(--border-color); font-weight: 500; }
+
+  /* Painel lateral fixo no desktop */
+  @media (min-width: 1100px) {
+    #notesPanel { position: relative; height: auto; flex-shrink: 0; }
+    #notesPanel.open { width: var(--notes-panel-width); }
+  }
   .hidden { display: none !important; }
 </style>
 </head>
@@ -553,17 +615,16 @@
   </button>
 
   <header id="controls" role="toolbar">
-    <div class="controls-row">
+    <div class="bar-group">
       <button id="micBtn" class="primary" title="Iniciar/Parar Ditado (Atalho: Esc)">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
         <span id="micBtnText" class="btn-text">Falar (Esc)</span>
+        <span class="mic-level"></span>
       </button>
-
       <select id="engineSelect" title="Alternar mecanismo de voz">
         <option value="webspeech">Navegador (Tempo Real)</option>
         <option value="whisper">Groq Whisper (Áudio)</option>
       </select>
-
       <div class="btn-group">
         <button id="aiBtn" title="Corrigir ortografia e gramática com IA Groq (Atalho: F10)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2z"/></svg>
@@ -573,70 +634,80 @@
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
       </div>
-
+    </div>
+    <div class="bar-sep"></div>
+    <div class="bar-group">
       <button id="copyBtn" title="Copiar texto (F4)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         <span class="btn-text">Copiar (F4)</span>
       </button>
-
       <button id="undoBtn" class="icon-only" title="Desfazer (Ctrl+U)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
       </button>
-
       <button id="redoBtn" class="icon-only" title="Refazer (Ctrl+Y)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
       </button>
-
       <button id="newBtn" title="Nova Nota (F9)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
         <span class="btn-text">Novo (F9)</span>
       </button>
-
       <button id="clearBtn" class="warn icon-only" title="Limpar tudo (F8)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
       </button>
     </div>
+    <div class="bar-group bar-right">
+      <button id="notesToggle" title="Ver Notas Salvas (F2)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span class="btn-text">Notas (F2)</span>
+      </button>
+      <button id="settingsBtn" class="icon-only" title="Ajustes (texto, barra, backup)" aria-haspopup="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+      </button>
+      <button id="themeToggleBtn" class="icon-only" title="Alternar Tema">
+        <svg id="themeIconSun" class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <div id="status" aria-live="polite" data-state="idle"><span class="status-dot"></span><span class="status-text" id="statusText">Pronto</span></div>
+    </div>
+  </header>
 
-    <div class="controls-row">
+  <div id="settingsMenu" class="popover hidden" role="dialog" aria-label="Ajustes">
+    <div class="pop-section">
+      <div class="pop-title">Texto</div>
       <div id="fontControls">
         <button id="fontDec" class="font-btn">A-</button>
         <input id="fontRange" type="range" min="4" max="120" value="18" />
         <button id="fontInc" class="font-btn">A+</button>
         <span id="fontSizeVal">18px</span>
       </div>
-
       <label class="toggle" title="Caixa alta em todo o texto ditado">
         <input type="checkbox" id="allCaps" />
         <span class="btn-text">CAIXA ALTA</span>
       </label>
-
       <label class="toggle" title="Pontuação automática no ditado">
         <input type="checkbox" id="autoPunct" />
         <span class="btn-text">Pontuação Automática</span>
       </label>
-
       <label class="toggle" title="Envia texto ao pressionar Enter durante ditado">
         <input type="checkbox" id="quickSend" />
         <span class="btn-text">Envio Rápido</span>
       </label>
-
-      <button id="barModeBtn" class="icon-only" title="Alternar Barra (Ctrl+B ou F6)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-      </button>
-
-      <button id="themeToggleBtn" class="icon-only" title="Alternar Tema">
-        <svg id="themeIconSun" class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      </button>
-
-      <button id="notesToggle" title="Ver Notas Salvas (F2)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        <span class="btn-text">Notas (F2)</span>
-      </button>
-
-      <div id="status" aria-live="polite" data-state="idle"><span class="status-dot"></span><span class="status-text" id="statusText">Pronto</span></div>
     </div>
-  </header>
+    <div class="pop-section">
+      <div class="pop-title">Barra</div>
+      <button id="barModeBtn" title="Alternar Barra (Ctrl+B ou F6)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Alternar barra (F6)</span></button>
+    </div>
+    <div class="pop-section">
+      <div class="pop-title">Dados</div>
+      <div class="pop-row">
+        <button id="exportBtn" title="Baixar backup das notas e modelos (.json)">Exportar backup</button>
+        <button id="importBtn" title="Restaurar ou mesclar um backup (.json)">Importar backup</button>
+      </div>
+      <input type="file" id="importFile" accept=".json,application/json" class="hidden" />
+      <small id="backupInfo" class="pop-note"></small>
+      <small class="pop-note">Notas e modelos ficam só neste navegador. Exporte backups com frequência. A chave Groq não entra no backup.</small>
+    </div>
+  </div>
 
   <main id="main">
     <div id="editor">
@@ -654,7 +725,11 @@
             <span id="wordCount">0 palavras</span>
             <span id="charCount">0 caracteres</span>
           </div>
-          <span>Esc = Gravar | F10 = Corrigir IA</span>
+          <span id="saveState"></span>
+          <div class="footer-right">
+            <button id="organizeCurrentBtn" class="note-btn" title="Definir pasta e tags desta nota">Organizar</button>
+            <span class="footer-keys">Esc = Gravar | F10 = Corrigir IA</span>
+          </div>
         </div>
       </div>
     </div>
@@ -662,7 +737,7 @@
     <aside id="notesPanel" aria-hidden="true">
       <div id="notesHeader">
         <div class="notes-header-top">
-          <strong style="font-size:16px;">Notas Salvas</strong>
+          <strong style="font-size:16px;">Biblioteca</strong>
           <div class="notes-actions">
             <button id="deleteAllBtn" class="warn icon-only" title="Excluir todas">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -675,6 +750,14 @@
           <button id="tabTemplates" class="panel-tab" role="tab">Modelos</button>
         </div>
         <input type="text" id="searchInput" placeholder="Filtrar notas..." aria-label="Filtrar" />
+        <div id="libFilters">
+          <select id="folderFilter" aria-label="Filtrar por pasta"></select>
+          <select id="sortSelect" aria-label="Ordenar">
+            <option value="recent">Mais recentes</option>
+            <option value="title">Título (A–Z)</option>
+          </select>
+        </div>
+        <div id="tagBar"></div>
       </div>
       <div id="notesList" role="list"></div>
     </aside>
@@ -717,6 +800,30 @@
   </div>
 </div>
 
+<div id="orgModal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal-card">
+    <div class="modal-header-row">
+      <h3>Organizar nota</h3>
+      <button id="closeOrgModalBtn" class="modal-close-btn">&times;</button>
+    </div>
+    <div class="form-group-list">
+      <div>
+        <label class="form-label">PASTA:</label>
+        <input type="text" id="orgFolderInput" class="form-input" list="folderList" maxlength="40" placeholder="Ex.: Evoluções (vazio = sem pasta)" />
+        <datalist id="folderList"></datalist>
+      </div>
+      <div>
+        <label class="form-label">TAGS (separadas por vírgula):</label>
+        <input type="text" id="orgTagsInput" class="form-input" maxlength="120" placeholder="Ex.: uti, alta, retorno" />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button id="cancelOrgModalBtn">Cancelar</button>
+      <button id="saveOrgModalBtn" class="primary">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <div id="tplModal" class="modal-backdrop" aria-hidden="true">
   <div class="modal-card">
     <div class="modal-header-row">
@@ -753,6 +860,11 @@ const els = {
   wordCountEl: $('wordCount'), charCountEl: $('charCount'), toastEl: $('toast'), confirmModal: $('confirmModal'), 
   cancelModalBtn: $('cancelModalBtn'), confirmModalBtn: $('confirmModalBtn'), barModeBtn: $('barModeBtn'), 
   unhideBarBtn: $('unhideBarBtn'), tabNotes: $('tabNotes'), tabTemplates: $('tabTemplates'),
+  settingsBtn: $('settingsBtn'), settingsMenu: $('settingsMenu'), exportBtn: $('exportBtn'), importBtn: $('importBtn'),
+  importFile: $('importFile'), backupInfo: $('backupInfo'), saveState: $('saveState'), organizeCurrentBtn: $('organizeCurrentBtn'),
+  folderFilter: $('folderFilter'), sortSelect: $('sortSelect'), tagBar: $('tagBar'),
+  orgModal: $('orgModal'), orgFolderInput: $('orgFolderInput'), orgTagsInput: $('orgTagsInput'), folderList: $('folderList'),
+  saveOrgModalBtn: $('saveOrgModalBtn'), cancelOrgModalBtn: $('cancelOrgModalBtn'), closeOrgModalBtn: $('closeOrgModalBtn'),
   tplModal: $('tplModal'), tplNameInput: $('tplNameInput'), tplModalTitle: $('tplModalTitle'),
   saveTplModalBtn: $('saveTplModalBtn'), cancelTplModalBtn: $('cancelTplModalBtn'), closeTplModalBtn: $('closeTplModalBtn'), liveBufferBar: $('liveBufferBar'), bufferText: $('bufferText')
 };
@@ -760,7 +872,7 @@ const els = {
 const STORAGE_KEYS = {
   NOTES: 'ditado_unified_notes', FONT: 'ditado_unified_fontsize', THEME: 'ditado_unified_theme',
   ALL_CAPS: 'ditado_unified_allcaps', AUTO_PUNCT: 'ditado_unified_autopunct', QUICK_SEND: 'ditado_unified_quicksend',
-  ENGINE: 'ditado_unified_engine', AI_KEY: 'ditado_ai_key', BAR_MODE: 'ditado_unified_barmode', TEMPLATES: 'ditado_unified_templates'
+  ENGINE: 'ditado_unified_engine', AI_KEY: 'ditado_ai_key', BAR_MODE: 'ditado_unified_barmode', TEMPLATES: 'ditado_unified_templates', LAST_BACKUP: 'ditado_last_backup', PANEL: 'ditado_unified_panel'
 };
 
 const QUICK_SEND_PUNCT = new Set(['.', ',', ';', '/', '-', '!', '?', ':']);
@@ -787,11 +899,13 @@ let isWhisperRecording = false;
 const autosaveDelay = 1500, HISTORY_LIMIT = 200, MAX_NOTES = 300;
 
 /* ====== Auto-importação de API Key via URL ====== */
+let pendingBackupUrl = null;
 function checkUrlApiKey() {
   const params = new URLSearchParams(window.location.search);
   const keyFromUrl = params.get('key') || params.get('groq_key');
   const engineFromUrl = params.get('engine');
-  if (!keyFromUrl && !engineFromUrl) return;
+  pendingBackupUrl = params.get('backup');
+  if (!keyFromUrl && !engineFromUrl && !pendingBackupUrl) return;
   if (keyFromUrl) {
     localStorage.setItem(STORAGE_KEYS.AI_KEY, keyFromUrl.trim());
     showToast('Chave API configurada via URL!', 2500);
@@ -845,13 +959,11 @@ function setBarMode(mode, save = true) {
 
 function fitBar() {
   const bar = $('controls');
-  document.body.classList.remove('fit-1', 'fit-2', 'fit-3', 'fit-wrap');
+  document.body.classList.remove('fit-1', 'fit-wrap');
   if (window.innerWidth < 768 || currentBarMode !== 'full') return;
-  for (let lvl = 1; lvl <= 3 && bar.scrollWidth > bar.clientWidth + 1; lvl++) {
-    document.body.classList.add('fit-' + lvl);
-  }
+  if (bar.scrollWidth > bar.clientWidth + 1) document.body.classList.add('fit-1');
   if (bar.scrollWidth > bar.clientWidth + 1) {
-    document.body.classList.remove('fit-1', 'fit-2', 'fit-3');
+    document.body.classList.remove('fit-1');
     document.body.classList.add('fit-wrap');
   }
 }
@@ -916,8 +1028,9 @@ els.themeToggleBtn.addEventListener('click', () => {
 const persistNotes = () => localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(notes));
 
 function loadNotes() {
-  try { notes = JSON.parse(localStorage.getItem(STORAGE_KEYS.NOTES) || '[]'); } catch(e) { notes = []; }
-  renderNotes();
+  try { notes = toArr(JSON.parse(localStorage.getItem(STORAGE_KEYS.NOTES) || '[]')).map(normalizeNote); } catch(e) { notes = []; }
+  persistNotes();
+  renderPanel();
 }
 
 function updateStats() {
@@ -931,16 +1044,70 @@ function updateStats() {
 let templates = [];
 let panelTab = 'notes';
 let tplEditing = null; /* { mode: 'new', text } | { mode: 'rename', id } */
+let orgTarget = null;  /* índice da nota sendo organizada */
+const libFilter = { folder: '__all', tag: null, sort: 'recent' };
+
+const newId = () => 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const toArr = v => Array.isArray(v) ? v : [];
+
+function normalizeNote(n) {
+  return {
+    id: n.id || newId(),
+    text: String(n.text || ''),
+    t: Number(n.t) || Date.now(),
+    folder: String(n.folder || '').trim(),
+    tags: toArr(n.tags).map(x => String(x).trim()).filter(Boolean),
+    pinned: !!n.pinned
+  };
+}
+
+function normalizeTemplate(t) {
+  return { id: t.id || newId(), name: String(t.name || 'Modelo').trim() || 'Modelo', text: String(t.text || ''), t: Number(t.t) || Date.now(), pinned: !!t.pinned };
+}
 
 function loadTemplates() {
-  try { templates = JSON.parse(localStorage.getItem(STORAGE_KEYS.TEMPLATES) || '[]'); } catch(e) { templates = []; }
+  try { templates = toArr(JSON.parse(localStorage.getItem(STORAGE_KEYS.TEMPLATES) || '[]')).map(normalizeTemplate); } catch(e) { templates = []; }
 }
 const persistTemplates = () => localStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(templates));
 
-function renderPanel() {
-  if (panelTab === 'templates') renderTemplates(els.searchInput.value);
-  else renderNotes(els.searchInput.value);
+function noteTitle(text) {
+  const line = (text.split('\n').find(l => l.trim()) || '').trim();
+  return line.length > 70 ? line.slice(0, 70) + '…' : (line || '(vazia)');
 }
+function noteBody(text) {
+  const lines = text.split('\n');
+  const i = lines.findIndex(l => l.trim());
+  return lines.slice(i + 1).join('\n').trim();
+}
+
+function uniqueFolders() {
+  return [...new Set(notes.map(n => n.folder).filter(Boolean))].sort((x, y) => x.localeCompare(y, 'pt'));
+}
+
+function updateLibControls() {
+  const isNotes = panelTab === 'notes';
+  els.folderFilter.parentElement.classList.toggle('hidden', !isNotes);
+  els.tagBar.classList.toggle('hidden', !isNotes);
+  if (!isNotes) return;
+  const folders = uniqueFolders();
+  if (libFilter.folder !== '__all' && libFilter.folder !== '__none' && !folders.includes(libFilter.folder)) libFilter.folder = '__all';
+  els.folderFilter.innerHTML = `<option value="__all">Todas as pastas</option><option value="__none">Sem pasta</option>` +
+    folders.map(f => `<option value="${escapeHtml(f)}">📁 ${escapeHtml(f)}</option>`).join('');
+  els.folderFilter.value = libFilter.folder;
+  els.sortSelect.value = libFilter.sort;
+  els.folderList.innerHTML = folders.map(f => `<option value="${escapeHtml(f)}">`).join('');
+  const tagCount = {};
+  notes.forEach(n => n.tags.forEach(t => tagCount[t] = (tagCount[t] || 0) + 1));
+  const tags = Object.keys(tagCount).sort((x, y) => x.localeCompare(y, 'pt'));
+  if (libFilter.tag && !tags.includes(libFilter.tag)) libFilter.tag = null;
+  els.tagBar.innerHTML = tags.map(t => `<button class="chip ${libFilter.tag === t ? 'active' : ''}" data-tag="${escapeHtml(t)}">#${escapeHtml(t)} ${tagCount[t]}</button>`).join('');
+}
+
+function renderPanel() {
+  updateLibControls();
+  if (panelTab === 'templates') renderTemplates(); else renderNotesList();
+}
+function renderNotes() { renderPanel(); }
 
 function setPanelTab(tab) {
   panelTab = tab;
@@ -951,16 +1118,20 @@ function setPanelTab(tab) {
   renderPanel();
 }
 
-function renderTemplates(filter = '') {
-  const query = filter.toLowerCase().trim();
-  const filtered = templates.filter(t => !query || t.name.toLowerCase().includes(query) || t.text.toLowerCase().includes(query));
-  if (!filtered.length) {
-    els.notesList.innerHTML = `<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center;">${templates.length === 0 ? 'Nenhum modelo. Na aba Notas, use "Salvar modelo" em uma nota.' : 'Nada encontrado'}</div>`;
+const pinBtn = on => `<button class="pin-btn ${on ? 'on' : ''}" title="${on ? 'Desafixar' : 'Fixar no topo'}">${on ? '★' : '☆'}</button>`;
+const emptyMsg = txt => `<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center;">${txt}</div>`;
+
+function renderTemplates() {
+  const q = els.searchInput.value.toLowerCase().trim();
+  const list = templates.filter(t => !q || t.name.toLowerCase().includes(q) || t.text.toLowerCase().includes(q))
+    .sort((x, y) => (y.pinned - x.pinned) || (y.t - x.t));
+  if (!list.length) {
+    els.notesList.innerHTML = emptyMsg(templates.length === 0 ? 'Nenhum modelo. Na aba Notas, use "Modelo" em uma nota.' : 'Nada encontrado');
     return;
   }
-  els.notesList.innerHTML = filtered.map(t => `
-    <div class="note-card is-template" data-tid="${t.id}">
-      <div class="tpl-name">${escapeHtml(t.name)}</div>
+  els.notesList.innerHTML = list.map(t => `
+    <div class="note-card is-template ${t.pinned ? 'pinned' : ''}" data-tid="${t.id}">
+      <div class="card-top"><div class="tpl-name">${escapeHtml(t.name)}</div>${pinBtn(t.pinned)}</div>
       <div class="text-preview">${escapeHtml(t.text)}</div>
       <div class="meta">
         <div class="actions">
@@ -969,38 +1140,48 @@ function renderTemplates(filter = '') {
         </div>
         <button class="note-btn warn del-tpl-btn">Excluir</button>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-function renderNotes(filter = '') {
-  if (panelTab === 'templates') return renderTemplates(els.searchInput.value);
-  const query = filter.toLowerCase().trim();
-  const filtered = notes.map((n, i) => ({ ...n, realIdx: i })).filter(n => !query || n.text.toLowerCase().includes(query));
+function renderNotesList() {
+  const q = els.searchInput.value.toLowerCase().trim();
+  const list = notes.map((n, i) => ({ ...n, realIdx: i })).filter(n => {
+    if (libFilter.folder === '__none' && n.folder) return false;
+    if (libFilter.folder !== '__all' && libFilter.folder !== '__none' && n.folder !== libFilter.folder) return false;
+    if (libFilter.tag && !n.tags.includes(libFilter.tag)) return false;
+    return !q || n.text.toLowerCase().includes(q) || n.folder.toLowerCase().includes(q) || n.tags.some(t => t.toLowerCase().includes(q));
+  }).sort((x, y) => (y.pinned - x.pinned) ||
+    (libFilter.sort === 'title' ? noteTitle(x.text).localeCompare(noteTitle(y.text), 'pt') : y.t - x.t));
 
-  if (!filtered.length) {
-    els.notesList.innerHTML = `<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center;">${notes.length === 0 ? 'Nenhuma nota' : 'Nada encontrado'}</div>`;
+  if (!list.length) {
+    els.notesList.innerHTML = emptyMsg(notes.length === 0 ? 'Nenhuma nota' : 'Nada encontrado');
     return;
   }
-
-  els.notesList.innerHTML = filtered.map(n => `
-    <div class="note-card ${n.realIdx === currentNoteIndex ? 'active' : ''}" data-idx="${n.realIdx}">
-      <div class="text-preview">${escapeHtml(n.text)}</div>
+  els.notesList.innerHTML = list.map(n => {
+    const body = noteBody(n.text);
+    const badges = (n.folder ? `<span class="badge">📁 ${escapeHtml(n.folder)}</span>` : '') + n.tags.map(t => `<span class="badge tag">#${escapeHtml(t)}</span>`).join('');
+    return `
+    <div class="note-card ${n.realIdx === currentNoteIndex ? 'active' : ''} ${n.pinned ? 'pinned' : ''}" data-idx="${n.realIdx}">
+      <div class="card-top"><div class="note-title">${escapeHtml(noteTitle(n.text))}</div>${pinBtn(n.pinned)}</div>
+      ${body ? `<div class="text-preview">${escapeHtml(body)}</div>` : ''}
+      ${badges ? `<div class="badges">${badges}</div>` : ''}
       <div class="meta">
         <span>${new Date(n.t).toLocaleDateString()} ${new Date(n.t).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
         <div class="actions">
-          <button class="note-btn tpl-btn" title="Salvar esta nota como modelo">Salvar modelo</button>
-          <button class="note-btn load-btn">Carregar</button>
+          <button class="note-btn org-btn" title="Pasta e tags">Organizar</button>
+          <button class="note-btn tpl-btn" title="Salvar esta nota como modelo">Modelo</button>
           <button class="note-btn warn del-btn">Excluir</button>
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 function escapeHtml(str) {
   return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
 }
+
+const isDesktopPanel = () => window.innerWidth >= 1100;
 
 els.notesList.addEventListener('click', (e) => {
   const tplCard = e.target.closest('[data-tid]');
@@ -1008,25 +1189,44 @@ els.notesList.addEventListener('click', (e) => {
   const card = e.target.closest('.note-card');
   if (!card) return;
   const idx = parseInt(card.dataset.idx, 10);
-  if (e.target.classList.contains('del-btn')) {
+  const note = notes[idx];
+  if (!note) return;
+  if (e.target.closest('.pin-btn')) {
+    note.pinned = !note.pinned;
+    persistNotes(); renderPanel();
+  } else if (e.target.closest('.del-btn')) {
     deleteSingleNote(idx);
-  } else if (e.target.classList.contains('tpl-btn')) {
-    openTemplateModal({ mode: 'new', text: notes[idx].text }, '');
+  } else if (e.target.closest('.tpl-btn')) {
+    openTemplateModal({ mode: 'new', text: note.text }, noteTitle(note.text).slice(0, 40));
+  } else if (e.target.closest('.org-btn')) {
+    openOrgModal(idx);
   } else {
     loadNote(idx);
-    closeNotes();
+    if (!isDesktopPanel()) closeNotes();
   }
 });
+
+els.tagBar.addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  libFilter.tag = libFilter.tag === chip.dataset.tag ? null : chip.dataset.tag;
+  renderPanel();
+});
+els.folderFilter.addEventListener('change', () => { libFilter.folder = els.folderFilter.value; renderPanel(); });
+els.sortSelect.addEventListener('change', () => { libFilter.sort = els.sortSelect.value; renderPanel(); });
 
 function handleTemplateClick(e, id) {
   const tpl = templates.find(t => t.id === id);
   if (!tpl) return;
-  if (e.target.classList.contains('del-tpl-btn')) {
+  if (e.target.closest('.pin-btn')) {
+    tpl.pinned = !tpl.pinned;
+    persistTemplates(); renderPanel();
+  } else if (e.target.closest('.del-tpl-btn')) {
     templates = templates.filter(t => t.id !== id);
     persistTemplates();
-    renderTemplates(els.searchInput.value);
+    renderPanel();
     setStatus('Modelo excluído', 900);
-  } else if (e.target.classList.contains('rename-tpl-btn')) {
+  } else if (e.target.closest('.rename-tpl-btn')) {
     openTemplateModal({ mode: 'rename', id }, tpl.name);
   } else {
     useTemplate(tpl);
@@ -1040,7 +1240,8 @@ function useTemplate(tpl) {
   redoStack = [];
   currentNoteIndex = null;
   updateStats();
-  closeNotes();
+  updateOrgInfo();
+  if (!isDesktopPanel()) closeNotes();
   els.output.focus();
   setStatus('Modelo: ' + tpl.name, 1500);
 }
@@ -1059,7 +1260,7 @@ function saveTemplateModal() {
   const name = els.tplNameInput.value.trim();
   if (!name) { showToast('Digite um nome'); return; }
   if (tplEditing.mode === 'new') {
-    templates.unshift({ id: 't' + Date.now().toString(36), name, text: tplEditing.text, t: Date.now() });
+    templates.unshift({ id: newId(), name, text: tplEditing.text, t: Date.now(), pinned: false });
     showToast('Modelo salvo: ' + name);
   } else {
     const tpl = templates.find(t => t.id === tplEditing.id);
@@ -1079,6 +1280,54 @@ els.tplNameInput.addEventListener('keydown', e => {
 });
 els.tabNotes.addEventListener('click', () => setPanelTab('notes'));
 els.tabTemplates.addEventListener('click', () => setPanelTab('templates'));
+
+/* ====== Pastas e tags ====== */
+function parseTags(str) {
+  const seen = new Set();
+  return str.split(/[,;]+/).map(t => t.trim().replace(/^#+/, '')).filter(t => t && !seen.has(t.toLowerCase()) && seen.add(t.toLowerCase()));
+}
+
+function openOrgModal(idx) {
+  const n = notes[idx];
+  if (!n) return;
+  orgTarget = idx;
+  els.orgFolderInput.value = n.folder;
+  els.orgTagsInput.value = n.tags.join(', ');
+  toggleModal(els.orgModal, true);
+  setTimeout(() => els.orgFolderInput.focus(), 50);
+}
+function closeOrgModal() { toggleModal(els.orgModal, false); orgTarget = null; }
+function saveOrgModal() {
+  const n = notes[orgTarget];
+  if (n) {
+    n.folder = els.orgFolderInput.value.trim();
+    n.tags = parseTags(els.orgTagsInput.value);
+    persistNotes();
+    renderPanel();
+    updateOrgInfo();
+    showToast('Nota organizada');
+  }
+  closeOrgModal();
+}
+els.saveOrgModalBtn.addEventListener('click', saveOrgModal);
+els.cancelOrgModalBtn.addEventListener('click', closeOrgModal);
+els.closeOrgModalBtn.addEventListener('click', closeOrgModal);
+[els.orgFolderInput, els.orgTagsInput].forEach(inp => inp.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); saveOrgModal(); }
+  else if (e.key === 'Escape') { e.stopPropagation(); closeOrgModal(); }
+}));
+els.organizeCurrentBtn.addEventListener('click', () => {
+  saveCurrentAsNote();
+  if (currentNoteIndex === null) return showToast('Escreva algo antes de organizar');
+  openOrgModal(currentNoteIndex);
+});
+
+function updateOrgInfo() {
+  const n = currentNoteIndex !== null ? notes[currentNoteIndex] : null;
+  els.organizeCurrentBtn.textContent = n && n.folder ? '📁 ' + n.folder : 'Organizar';
+}
+
+function setSaveState(txt) { els.saveState.textContent = txt; }
 
 function deleteSingleNote(idx) {
   if (currentNoteIndex !== null) {
@@ -1111,12 +1360,15 @@ function saveCurrentAsNote() {
     notes[0].t = Date.now();
     currentNoteIndex = 0;
   } else {
-    notes.unshift({ text, t: Date.now() });
+    const folder = libFilter.folder !== '__all' && libFilter.folder !== '__none' ? libFilter.folder : '';
+    notes.unshift({ id: newId(), text, t: Date.now(), folder, tags: [], pinned: false });
     if (notes.length > MAX_NOTES) notes.length = MAX_NOTES;
     currentNoteIndex = 0;
   }
   persistNotes();
-  renderNotes(els.searchInput.value);
+  renderPanel();
+  updateOrgInfo();
+  setSaveState('Salvo às ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
   setStatus('Salvo', 900);
 }
 
@@ -1153,6 +1405,8 @@ function newNote() {
   redoStack = [];
   currentNoteIndex = null;
   updateStats();
+  updateOrgInfo();
+  setSaveState('');
   setStatus('Nova nota', 700);
 }
 
@@ -1172,7 +1426,8 @@ function loadNote(idx) {
   redoStack = [];
   currentNoteIndex = idx;
   updateStats();
-  renderNotes(els.searchInput.value);
+  updateOrgInfo();
+  renderPanel();
   setStatus('Carregada', 700);
 }
 
@@ -1220,8 +1475,14 @@ els.fontRange.addEventListener('input', () => setFontSize(els.fontRange.value));
 els.fontInc.addEventListener('click', () => setFontSize(Number(els.fontRange.value) + 2));
 els.fontDec.addEventListener('click', () => setFontSize(Number(els.fontRange.value) - 2));
 
-const openNotes = () => { els.notesPanel.classList.add('open'); els.notesPanel.setAttribute('aria-hidden', 'false'); };
-const closeNotes = () => { els.notesPanel.classList.remove('open'); els.notesPanel.setAttribute('aria-hidden', 'true'); };
+const openNotes = () => {
+  els.notesPanel.classList.add('open'); els.notesPanel.setAttribute('aria-hidden', 'false');
+  if (isDesktopPanel()) localStorage.setItem(STORAGE_KEYS.PANEL, 'open');
+};
+const closeNotes = () => {
+  els.notesPanel.classList.remove('open'); els.notesPanel.setAttribute('aria-hidden', 'true');
+  if (isDesktopPanel()) localStorage.setItem(STORAGE_KEYS.PANEL, 'closed');
+};
 const toggleNotes = () => els.notesPanel.classList.contains('open') ? closeNotes() : openNotes();
 
 /* ====== Inserção de Texto ====== */
@@ -1523,6 +1784,7 @@ function stopAllRecording() {
 }
 
 function setMicUI(active, waiting = false) {
+  if (active) startMeter(); else stopMeter();
   if (active) {
     els.micBtn.classList.add('recording');
     els.micBtnText.textContent = 'Parar (Esc)';
@@ -1613,6 +1875,132 @@ async function correctWithAI() {
   }
 }
 
+/* ====== Menu de Ajustes ====== */
+function openSettings() {
+  const r = els.settingsBtn.getBoundingClientRect();
+  els.settingsMenu.classList.remove('hidden');
+  els.settingsMenu.style.top = (r.bottom + 8) + 'px';
+  els.settingsMenu.style.right = Math.max(12, window.innerWidth - r.right) + 'px';
+  updateBackupInfo();
+}
+const closeSettings = () => els.settingsMenu.classList.add('hidden');
+const settingsOpen = () => !els.settingsMenu.classList.contains('hidden');
+els.settingsBtn.addEventListener('click', (e) => { e.stopPropagation(); settingsOpen() ? closeSettings() : openSettings(); });
+document.addEventListener('click', (e) => {
+  if (settingsOpen() && !els.settingsMenu.contains(e.target) && !els.settingsBtn.contains(e.target)) closeSettings();
+});
+
+/* ====== Backup (exportar / importar) ====== */
+function updateBackupInfo() {
+  const t = Number(localStorage.getItem(STORAGE_KEYS.LAST_BACKUP));
+  els.backupInfo.textContent = t ? 'Último backup: ' + new Date(t).toLocaleString() : 'Nenhum backup exportado ainda.';
+}
+
+function exportBackup() {
+  saveCurrentAsNote();
+  if (!notes.length && !templates.length) return showToast('Nada para exportar');
+  const data = { app: 'ditado-new', version: 2, exportedAt: new Date().toISOString(), notes, templates };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ditado-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  localStorage.setItem(STORAGE_KEYS.LAST_BACKUP, Date.now());
+  updateBackupInfo();
+  showToast('Backup exportado (' + notes.length + ' notas, ' + templates.length + ' modelos)', 2500);
+}
+
+/* Mescla um backup: mesma nota (id ou texto idêntico) fica com a versão mais recente; o resto é adicionado. */
+function mergeBackup(data) {
+  const inNotes = Array.isArray(data) ? data : toArr(data && data.notes);
+  const inTpls = Array.isArray(data) ? [] : toArr(data && data.templates);
+  if (!inNotes.length && !inTpls.length) throw new Error('Arquivo sem notas ou modelos');
+  const currentId = currentNoteIndex !== null && notes[currentNoteIndex] ? notes[currentNoteIndex].id : null;
+  let added = 0, updated = 0, addedTpl = 0;
+  inNotes.filter(n => n && typeof n.text === 'string' && n.text.trim()).map(normalizeNote).forEach(n => {
+    const ex = notes.find(e => e.id === n.id) || notes.find(e => e.text === n.text);
+    if (!ex) { notes.push(n); added++; }
+    else if (n.t > ex.t) { Object.assign(ex, n, { id: ex.id }); updated++; }
+  });
+  inTpls.filter(t => t && typeof t.text === 'string').map(normalizeTemplate).forEach(t => {
+    if (!templates.some(e => e.id === t.id || (e.name === t.name && e.text === t.text))) { templates.push(t); addedTpl++; }
+  });
+  notes.sort((x, y) => y.t - x.t);
+  if (notes.length > MAX_NOTES) notes.length = MAX_NOTES;
+  currentNoteIndex = currentId ? notes.findIndex(n => n.id === currentId) : null;
+  if (currentNoteIndex === -1) currentNoteIndex = null;
+  persistNotes(); persistTemplates();
+  localStorage.setItem(STORAGE_KEYS.LAST_BACKUP, Date.now());
+  renderPanel(); updateOrgInfo();
+  return { added, updated, addedTpl };
+}
+
+const backupMsg = r => `Backup importado: ${r.added} novas, ${r.updated} atualizadas, ${r.addedTpl} modelos`;
+
+els.exportBtn.addEventListener('click', exportBackup);
+els.importBtn.addEventListener('click', () => els.importFile.click());
+els.importFile.addEventListener('change', async () => {
+  const file = els.importFile.files[0];
+  els.importFile.value = '';
+  if (!file) return;
+  try {
+    showToast(backupMsg(mergeBackup(JSON.parse(await file.text()))), 3500);
+    updateBackupInfo();
+  } catch (err) { showToast('Backup inválido: ' + err.message, 3500); }
+});
+
+/* Importação automática via ?backup=http://127.0.0.1:PORT/... (usada pelo atalho do Windows) */
+async function importBackupFromUrl(url) {
+  try {
+    const u = new URL(url);
+    if (!['127.0.0.1', 'localhost'].includes(u.hostname)) return;
+    const resp = await fetch(u.href);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    showToast(backupMsg(mergeBackup(await resp.json())), 3500);
+  } catch (err) { showToast('Backup local não carregado: ' + err.message, 3500); }
+}
+
+function backupReminder() {
+  const last = Number(localStorage.getItem(STORAGE_KEYS.LAST_BACKUP)) || 0;
+  if (notes.length && Date.now() - last > 7 * 86400000) {
+    setTimeout(() => showToast('Dica: exporte um backup em Ajustes › Dados', 4500), 2500);
+  }
+}
+
+/* ====== Medidor de volume do microfone ====== */
+let meter = null;
+async function startMeter() {
+  if (meter) return;
+  meter = { starting: true };
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    if (!meter) { stream.getTracks().forEach(t => t.stop()); return; }
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 512;
+    ctx.createMediaStreamSource(stream).connect(analyser);
+    const buf = new Uint8Array(analyser.fftSize);
+    meter = { stream, ctx, raf: 0 };
+    const m = meter;
+    const tick = () => {
+      analyser.getByteTimeDomainData(buf);
+      let sum = 0;
+      for (let i = 0; i < buf.length; i++) { const v = (buf[i] - 128) / 128; sum += v * v; }
+      els.micBtn.style.setProperty('--level', Math.min(1, Math.sqrt(sum / buf.length) * 4).toFixed(2));
+      m.raf = requestAnimationFrame(tick);
+    };
+    tick();
+  } catch (e) { meter = null; }
+}
+function stopMeter() {
+  const m = meter; meter = null;
+  if (m && m.raf) cancelAnimationFrame(m.raf);
+  if (m && m.stream) m.stream.getTracks().forEach(t => t.stop());
+  if (m && m.ctx) m.ctx.close().catch(() => {});
+  els.micBtn.style.setProperty('--level', 0);
+}
+
 /* ====== Eventos do Editor e Atalhos Globais ====== */
 els.aiBtn.addEventListener('click', correctWithAI);
 els.micBtn.addEventListener('click', toggleMic);
@@ -1647,6 +2035,15 @@ els.output.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const open = [...document.querySelectorAll('.modal-backdrop.open')];
+    if (open.length || settingsOpen()) {
+      e.preventDefault();
+      open.forEach(m => toggleModal(m, false));
+      closeSettings();
+      return;
+    }
+  }
   const actions = { F10: correctWithAI, F9: newNote, F2: toggleNotes, F8: clearEditor, F4: copyAll, Escape: toggleMic };
   if (actions[e.key]) { e.preventDefault(); actions[e.key](); return; }
   
@@ -1663,6 +2060,8 @@ initTheme();
 initToggles();
 loadTemplates();
 loadNotes();
+if (isDesktopPanel() && localStorage.getItem(STORAGE_KEYS.PANEL) !== 'closed') openNotes();
+if (pendingBackupUrl) importBackupFromUrl(pendingBackupUrl); else backupReminder();
 pushHistory(els.output.value || '');
 setFontSize(localStorage.getItem(STORAGE_KEYS.FONT) || 18);
 updateStats();

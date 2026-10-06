@@ -1,3 +1,4 @@
 node_modules/
 .env
 windows/config.txt
+windows/ditado-backup*.json
