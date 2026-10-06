@@ -1,7 +1,8 @@
 ATALHO DO DITADO (Windows)
 
 1. Copie esta pasta "windows" para o seu PC (ex.: C:\Ditado).
-2. Copie groq-key.exemplo.txt para groq-key.txt e cole sua chave Groq (uma linha).
+2. Abra Abrir-Ditado.bat no Bloco de Notas e cole sua chave Groq entre as aspas
+   da linha:  set "GROQ_KEY="   (ex.: set "GROQ_KEY=gsk_abc123")
 3. (Opcional) Copie config.exemplo.txt para config.txt e ajuste:
      SITE_URL = endereco do seu site publicado
      BROWSER  = chrome ou edge
@@ -10,4 +11,4 @@ ATALHO DO DITADO (Windows)
 
 O site abre em janela propria (sem barra de enderecos), com a chave ja
 configurada e o motor "Groq Whisper" como padrao.
-A chave fica apenas neste arquivo local; nao envie groq-key.txt para o GitHub.
+A chave fica apenas no seu PC. Nao envie o Abrir-Ditado.bat preenchido para o GitHub.
