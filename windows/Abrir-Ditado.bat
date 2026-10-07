@@ -7,9 +7,15 @@ rem ---- Configuracao: cole sua chave Groq entre as aspas abaixo ----
 set "GROQ_KEY="
 set "SITE_URL=https://ditado-new.vercel.app/"
 set "BROWSER_PREF=chrome"
+set "MODE=tab"
+set "PWA_ID="
+set "PROFILE=Default"
 if exist "config.txt" for /f "usebackq tokens=1,* delims==" %%A in ("config.txt") do (
   if /i "%%A"=="SITE_URL" set "SITE_URL=%%B"
   if /i "%%A"=="BROWSER" set "BROWSER_PREF=%%B"
+  if /i "%%A"=="MODE" set "MODE=%%B"
+  if /i "%%A"=="PWA_ID" set "PWA_ID=%%B"
+  if /i "%%A"=="PROFILE" set "PROFILE=%%B"
 )
 
 if "%GROQ_KEY%"=="" (
@@ -27,7 +33,7 @@ if defined BACKUP_FILE (
   set "BK_PARAM=&backup=http%%3A%%2F%%2F127.0.0.1%%3A47831%%2Fbackup.json"
 )
 
-set "URL=%SITE_URL%?key=%GROQ_KEY%&engine=whisper%BK_PARAM%"
+set "URL=%SITE_URL%?key=%GROQ_KEY%&engine=whisper&install=1%BK_PARAM%"
 
 rem ---- Localiza Chrome e Edge ----
 set "CHROME="
@@ -35,13 +41,28 @@ for %%P in ("%ProgramFiles%\Google\Chrome\Application\chrome.exe" "%ProgramFiles
 set "EDGE="
 for %%P in ("%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe" "%ProgramFiles%\Microsoft\Edge\Application\msedge.exe") do if exist %%P if not defined EDGE set "EDGE=%%~P"
 
-if /i "%BROWSER_PREF%"=="edge" (
-  if defined EDGE ( start "" "%EDGE%" --app="%URL%" & exit /b 0 )
-  if defined CHROME ( start "" "%CHROME%" --app="%URL%" & exit /b 0 )
-) else (
-  if defined CHROME ( start "" "%CHROME%" --app="%URL%" & exit /b 0 )
-  if defined EDGE ( start "" "%EDGE%" --app="%URL%" & exit /b 0 )
+set "BROWSER_EXE="
+if /i "%BROWSER_PREF%"=="edge" if defined EDGE set "BROWSER_EXE=%EDGE%"
+if /i not "%BROWSER_PREF%"=="edge" if defined CHROME set "BROWSER_EXE=%CHROME%"
+if not defined BROWSER_EXE if defined CHROME set "BROWSER_EXE=%CHROME%"
+if not defined BROWSER_EXE if defined EDGE set "BROWSER_EXE=%EDGE%"
+if not defined BROWSER_EXE goto :nobrowser
+
+rem ---- MODE=pwa: abre o app ja instalado (precisa de PWA_ID no config.txt) ----
+if /i "%MODE%"=="pwa" if defined PWA_ID (
+  start "" "%BROWSER_EXE%" --profile-directory="%PROFILE%" --app-id=%PWA_ID%
+  exit /b 0
 )
+rem ---- MODE=app: janela propria, sem barra de enderecos (nao permite instalar o PWA) ----
+if /i "%MODE%"=="app" (
+  start "" "%BROWSER_EXE%" --app="%URL%"
+  exit /b 0
+)
+rem ---- MODE=tab (padrao): navegador comum; o site oferece "Instalar app" ----
+start "" "%BROWSER_EXE%" "%URL%"
+exit /b 0
+
+:nobrowser
 echo Nao encontrei Chrome nem Edge instalados.
 pause
 exit /b 1
