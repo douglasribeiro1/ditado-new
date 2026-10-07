@@ -557,6 +557,8 @@
     background: rgba(255,255,255,0.9); transition: width 0.08s linear; pointer-events: none; }
   #editor { padding: 16px 20px; }
   .editor-wrapper { width: 100%; max-width: 980px; margin: 0 auto; }
+  body.view-wide .editor-wrapper { max-width: none; }
+  .pop-select { width: 100%; height: 36px; padding: 0 10px; border-radius: 8px; background: var(--bg-card); color: var(--text-main, inherit); border: 1px solid var(--border-color); font: inherit; }
   #output { padding: 24px 28px; line-height: 1.6; }
   #editorFooter { gap: 12px; }
   #saveState { margin-right: auto; margin-left: 12px; color: var(--text-muted); }
@@ -809,6 +811,20 @@
       </label>
     </div>
     <div class="pop-section">
+      <div class="pop-title">Visualização</div>
+      <select id="viewModeSelect" class="pop-select" aria-label="Visualização">
+        <option value="normal">Atual (texto centralizado)</option>
+        <option value="wide">Tela inteira (ponta a ponta)</option>
+      </select>
+    </div>
+    <div class="pop-section">
+      <div class="pop-title">Modelo Whisper (Groq)</div>
+      <select id="whisperModelSelect" class="pop-select" aria-label="Modelo Whisper">
+        <option value="whisper-large-v3">Whisper Large V3 (recomendado)</option>
+        <option value="whisper-large-v3-turbo">Whisper Large V3 Turbo (mais rápido)</option>
+      </select>
+    </div>
+    <div class="pop-section">
       <div class="pop-title">Barra</div>
       <button id="barModeBtn" title="Alternar Barra (Ctrl+B ou F6)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Alternar barra (F6)</span></button>
     </div>
@@ -1000,7 +1016,7 @@ const els = {
 const STORAGE_KEYS = {
   NOTES: 'ditado_unified_notes', FONT: 'ditado_unified_fontsize', THEME: 'ditado_unified_theme',
   ALL_CAPS: 'ditado_unified_allcaps', AUTO_PUNCT: 'ditado_unified_autopunct', QUICK_SEND: 'ditado_unified_quicksend',
-  ENGINE: 'ditado_unified_engine', AI_KEY: 'ditado_ai_key', BAR_MODE: 'ditado_unified_barmode', TEMPLATES: 'ditado_unified_templates', LAST_BACKUP: 'ditado_last_backup', PANEL: 'ditado_unified_panel'
+  ENGINE: 'ditado_unified_engine', AI_KEY: 'ditado_ai_key', BAR_MODE: 'ditado_unified_barmode', TEMPLATES: 'ditado_unified_templates', LAST_BACKUP: 'ditado_last_backup', PANEL: 'ditado_unified_panel', VIEW: 'ditado_view', WHISPER: 'ditado_whisper_model'
 };
 
 const QUICK_SEND_PUNCT = new Set(['.', ',', ';', '/', '-', '!', '?', ':']);
@@ -1152,6 +1168,22 @@ function cycleBarMode() {
 }
 
 els.barModeBtn.addEventListener('click', cycleBarMode);
+
+const WHISPER_MODELS = ['whisper-large-v3', 'whisper-large-v3-turbo'];
+function getWhisperModel() {
+  const m = localStorage.getItem(STORAGE_KEYS.WHISPER);
+  return WHISPER_MODELS.includes(m) ? m : WHISPER_MODELS[0];
+}
+const viewModeSelect = $('viewModeSelect'), whisperModelSelect = $('whisperModelSelect');
+function setViewMode(mode, save = true) {
+  document.body.classList.toggle('view-wide', mode === 'wide');
+  viewModeSelect.value = mode === 'wide' ? 'wide' : 'normal';
+  if (save) localStorage.setItem(STORAGE_KEYS.VIEW, viewModeSelect.value);
+}
+viewModeSelect.addEventListener('change', () => setViewMode(viewModeSelect.value));
+whisperModelSelect.value = getWhisperModel();
+whisperModelSelect.addEventListener('change', () => localStorage.setItem(STORAGE_KEYS.WHISPER, whisperModelSelect.value));
+setViewMode(localStorage.getItem(STORAGE_KEYS.VIEW) || 'normal', false);
 els.unhideBarBtn.addEventListener('click', () => { setBarMode('full'); showToast('Barra Expandida'); });
 setBarMode(localStorage.getItem(STORAGE_KEYS.BAR_MODE) || 'full', false);
 
@@ -1899,7 +1931,7 @@ async function transcribeWithGroq(audioBlob) {
   const apiKey = localStorage.getItem(STORAGE_KEYS.AI_KEY);
   const formData = new FormData();
   formData.append('file', audioBlob, 'speech.webm');
-  formData.append('model', 'whisper-large-v3');
+  formData.append('model', getWhisperModel());
   formData.append('language', 'pt');
 
   try {
