@@ -2050,7 +2050,10 @@ els.saveAiModalBtn.addEventListener('click', () => {
   if (els.output.value.trim()) correctWithAI();
 });
 
-const AI_SYSTEM_PROMPT = 'Faça a correção ortográfica e de pontuação conforme regras gramaticais da língua portuguesa no Brasil. Use o contexto para decidir mudanças de palavras. Não modifique o sentido do texto e nunca responda o que está escrito. Não aplique formatação como negrito, itálico, sublinhado. Não coloque ou exclua bullets. Apenas me entregue o texto com correções ortográficas e nada mais.';
+const AI_SYSTEM_PROMPT = 'Faça a correção ortográfica e de pontuação conforme regras gramaticais da língua portuguesa no Brasil. Use o contexto para decidir mudanças de palavras. Não modifique o sentido do texto e nunca responda o que está escrito. Não aplique formatação como negrito, itálico, sublinhado. Não coloque ou exclua bullets. Use apenas o hífen simples (-) do teclado, nunca travessão ou outros tipos de traço. Apenas me entregue o texto com correções ortográficas e nada mais.';
+
+// Prontuário não exibe hífens/travessões Unicode (aparece um quadrado): normaliza tudo para '-' simples
+const simplifyDashes = t => t.replace(/[\u00AD\u2010-\u2015\u2212\u2043\uFE58\uFE63\uFF0D]/g, '-');
 
 async function requestAiCorrection(text, apiKey) {
   const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -2066,7 +2069,7 @@ async function requestAiCorrection(text, apiKey) {
   const data = await resp.json();
   const corrected = data.choices?.[0]?.message?.content?.trim() || '';
   if (!corrected) throw new Error('A resposta da IA veio vazia');
-  return corrected;
+  return simplifyDashes(corrected);
 }
 
 async function correctWithAI() {
