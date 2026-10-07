@@ -1,2 +1,5 @@
 SITE_URL=https://ditado-new.vercel.app/
 BROWSER=chrome
+MODE=tab
+PWA_ID=
+PROFILE=Default

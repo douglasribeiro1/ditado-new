@@ -18,6 +18,24 @@ guarde-o aqui. Na primeira vez o Chrome/Edge pode perguntar se o site pode acess
 Ajustes > Dados > Importar backup. Mantenha arquivos de backup fora do GitHub
 (contem suas notas).
 
-O site abre em janela propria (sem barra de enderecos), com a chave ja
-configurada e o motor "Groq Whisper" como padrao.
+COMO ABRE (MODE no config.txt)
+  tab (padrao)  Abre numa aba normal do Chrome/Edge, ja com a chave e o Whisper.
+                Nesse modo o site mostra a faixa "Instalar o Ditado como app" (ou use
+                Ajustes > App > Instalar). Clique em Instalar: o navegador cria o app
+                e ja o abre em janela propria; depois pode fechar a aba.
+  pwa           Abre direto o app JA INSTALADO (sem aba). Precisa de PWA_ID (abaixo).
+  app           Janela propria sem instalar (nao permite instalar o PWA).
+
+COMO USAR O MODO pwa
+1. Instale o app uma vez pelo modo tab (acima).
+2. No atalho do app criado (Area de Trabalho ou Menu Iniciar) > Propriedades >
+   campo "Destino": copie o valor depois de --app-id= (ex.: abcdefghijklmnopabcdefghijklmnop).
+   Se o Chrome usar outro perfil, copie tambem o --profile-directory= (ex.: Profile 1).
+3. Crie config.txt (copie config.exemplo.txt) e preencha:
+     MODE=pwa
+     PWA_ID=o-id-copiado
+     PROFILE=Default
+   A chave Groq e o motor ja ficam guardados no navegador pela primeira abertura.
+   Para importar um backup, volte temporariamente a MODE=tab.
+
 A chave fica apenas no seu PC. Nao envie o Abrir-Ditado.bat preenchido para o GitHub.

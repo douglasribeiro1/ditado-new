@@ -700,6 +700,12 @@
   body.m-mobile #moreMenu button { min-height: 44px; min-width: 44px; }
   body.m-mobile #moreMenu #aiConfigBtn { width: auto; padding: 0 14px; }
   body.m-mobile #moreMenu #aiConfigBtn::after { content: "Chave Groq"; margin-left: 8px; font-size: 13px; font-weight: 500; }
+
+  #installBanner { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    padding: 10px 20px; background: var(--primary-glow); border-bottom: 1px solid var(--border-color); font-size: 13px; }
+  #installBanner.hidden { display: none; }
+  .install-actions { display: flex; gap: 8px; }
+  #installBtn.hidden { display: none; }
   .hidden { display: none !important; }
 </style>
 </head>
@@ -806,6 +812,11 @@
       <div class="pop-title">Barra</div>
       <button id="barModeBtn" title="Alternar Barra (Ctrl+B ou F6)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Alternar barra (F6)</span></button>
     </div>
+    <div class="pop-section" id="installSection">
+      <div class="pop-title">App</div>
+      <button id="installBtn" class="hidden" title="Instalar o Ditado como app (PWA)">Instalar como app</button>
+      <small class="pop-note" id="installNote">A opção aparece quando o navegador permite a instalação. Se já instalou, abra pelo atalho do app.</small>
+    </div>
     <div class="pop-section">
       <div class="pop-title">Dados</div>
       <div class="pop-row">
@@ -815,6 +826,14 @@
       <input type="file" id="importFile" accept=".json,application/json" class="hidden" />
       <small id="backupInfo" class="pop-note"></small>
       <small class="pop-note">Notas e modelos ficam só neste navegador. Exporte backups com frequência. A chave Groq não entra no backup.</small>
+    </div>
+  </div>
+
+  <div id="installBanner" class="hidden" role="region" aria-label="Instalar app">
+    <span>Instale o <strong>Ditado</strong> como app: abre em janela própria e fica no menu Iniciar.</span>
+    <div class="install-actions">
+      <button id="installBannerBtn" class="primary">Instalar</button>
+      <button id="installDismissBtn">Agora não</button>
     </div>
   </div>
 
@@ -1009,12 +1028,14 @@ const autosaveDelay = 1500, HISTORY_LIMIT = 200, MAX_NOTES = 300;
 
 /* ====== Auto-importação de API Key via URL ====== */
 let pendingBackupUrl = null;
+let forceInstallBanner = false;
 function checkUrlApiKey() {
   const params = new URLSearchParams(window.location.search);
   const keyFromUrl = params.get('key') || params.get('groq_key');
   const engineFromUrl = params.get('engine');
   pendingBackupUrl = params.get('backup');
-  if (!keyFromUrl && !engineFromUrl && !pendingBackupUrl) return;
+  forceInstallBanner = params.get('install') === '1';
+  if (!keyFromUrl && !engineFromUrl && !pendingBackupUrl && !forceInstallBanner) return;
   if (keyFromUrl) {
     localStorage.setItem(STORAGE_KEYS.AI_KEY, keyFromUrl.trim());
     showToast('Chave API configurada via URL!', 2500);
@@ -2027,6 +2048,40 @@ async function correctWithAI() {
     els.aiBtn.disabled = false;
   }
 }
+
+/* ====== Instalação do PWA ====== */
+let deferredInstall = null;
+const installBanner = $('installBanner'), installBtn = $('installBtn');
+const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+const INSTALL_DISMISS_KEY = 'ditado_install_dismissed';
+
+function updateInstallUI() {
+  const can = !!deferredInstall && !isStandalone();
+  installBtn.classList.toggle('hidden', !can);
+  let dismissed = false;
+  try { dismissed = Date.now() - Number(localStorage.getItem(INSTALL_DISMISS_KEY) || 0) < 30 * 86400000; } catch (e) {}
+  installBanner.classList.toggle('hidden', !(can && (forceInstallBanner || !dismissed)));
+  fitBar();
+}
+
+async function promptInstall() {
+  if (!deferredInstall) return showToast('Instalação indisponível neste navegador/janela');
+  deferredInstall.prompt();
+  const choice = await deferredInstall.userChoice.catch(() => null);
+  if (choice && choice.outcome === 'accepted') showToast('Instalando o app...', 2500);
+  deferredInstall = null;
+  updateInstallUI();
+}
+
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredInstall = e; updateInstallUI(); });
+window.addEventListener('appinstalled', () => { deferredInstall = null; updateInstallUI(); showToast('App instalado!', 2500); });
+installBtn.addEventListener('click', () => { closeSettings(); promptInstall(); });
+$('installBannerBtn').addEventListener('click', promptInstall);
+$('installDismissBtn').addEventListener('click', () => {
+  try { localStorage.setItem(INSTALL_DISMISS_KEY, Date.now()); } catch (e) {}
+  forceInstallBanner = false;
+  updateInstallUI();
+});
 
 /* ====== Menu de Ajustes ====== */
 function openSettings() {
