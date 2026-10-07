@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="dark">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>Bloco de Notas com Ditado & Groq AI (PWA)</title>
@@ -657,6 +657,49 @@
   body.fit-5 #engineSelect { max-width: 104px; }
   #moreMenu { width: auto; padding: 10px; flex-direction: row; flex-wrap: wrap; gap: 6px; max-width: 260px; }
   #moreMenu button { border: 1px solid var(--border-color); }
+
+  /* ====== Layout de celular (< 560px): topo fino + microfone grande embaixo ====== */
+  body.m-mobile #controls { flex-wrap: nowrap; min-height: 52px; padding: 0 10px; gap: 6px; }
+  body.m-mobile .bar-group { flex-wrap: nowrap; gap: 4px; }
+  body.m-mobile .bar-voice, body.m-mobile .bar-edit, body.m-mobile .bar-ai { display: contents; }
+  body.m-mobile .bar-sep, body.m-mobile .brand-sub, body.m-mobile .brand-sep { display: none; }
+  body.m-mobile .bar-center { margin: 0 auto; }
+  body.m-mobile .bar-right { margin-left: 0; }
+  body.m-mobile #status { width: 112px; height: 36px; padding: 0 10px; }
+  body.m-mobile #moreBtn { display: inline-flex; }
+  body.m-mobile #controls button.icon-only { width: 42px; height: 42px; }
+  body.m-mobile #unhideBarBtn { display: none !important; }
+  body.m-mobile.bar-hidden #controls { display: flex !important; }
+  @media (max-width: 420px) { body.m-mobile .brand-name { display: none; } }
+
+  body.m-mobile #micBtn {
+    position: fixed; z-index: 5;
+    left: calc(50% - 36px); bottom: calc(18px + env(safe-area-inset-bottom));
+    width: 72px; height: 72px; min-width: 0; padding: 0; border-radius: 50%;
+    box-shadow: 0 8px 22px var(--primary-glow), var(--shadow-md);
+  }
+  body.m-mobile #micBtn .btn-text { display: none; }
+  body.m-mobile #micBtn svg { width: 30px; height: 30px; }
+  body.m-mobile #aiBtn, body.m-mobile #copyBtn {
+    position: fixed; z-index: 5; width: 48px; height: 48px; min-height: 0; padding: 0;
+    bottom: calc(30px + env(safe-area-inset-bottom)); border-radius: 50%;
+    background: var(--bg-surface) !important; border: 1px solid var(--border-color) !important; box-shadow: var(--shadow-sm) !important;
+  }
+  body.m-mobile #aiBtn { left: calc(50% - 100px); }
+  body.m-mobile #copyBtn { left: calc(50% + 52px); }
+  body.m-mobile #aiBtn .btn-text { display: none; }
+  body.m-mobile #main { padding-bottom: calc(104px + env(safe-area-inset-bottom)); }
+  body.m-mobile #editor { padding: 8px; }
+  body.m-mobile #output { padding: 14px; }
+  body.m-mobile #saveState { display: none; }
+  body.m-mobile #moreMenu { max-width: calc(100vw - 24px); }
+  body.m-mobile #moreMenu #engineSelect {
+    flex: 1 1 100%; max-width: none; height: 44px; padding: 0 12px; font-size: 13px;
+    border: 1px solid var(--border-color); background: var(--bg-card);
+  }
+  body.m-mobile #moreMenu button { min-height: 44px; min-width: 44px; }
+  body.m-mobile #moreMenu #aiConfigBtn { width: auto; padding: 0 14px; }
+  body.m-mobile #moreMenu #aiConfigBtn::after { content: "Chave Groq"; margin-left: 8px; font-size: 13px; font-weight: 500; }
   .hidden { display: none !important; }
 </style>
 </head>
@@ -1038,12 +1081,34 @@ function placeOverflow(on) {
   }
 }
 
+const MOBILE_MENU_IDS = ['engineSelect', 'aiConfigBtn', 'undoBtn', 'redoBtn', 'newBtn', 'clearBtn', 'themeToggleBtn'];
+const mobileMarks = [];
+function placeMobile(on) {
+  if (on === (mobileMarks.length > 0)) return;
+  const menu = $('moreMenu');
+  if (on) {
+    MOBILE_MENU_IDS.forEach(id => {
+      const el = $(id), mark = document.createComment(id);
+      el.parentNode.insertBefore(mark, el);
+      menu.appendChild(el);
+      mobileMarks.push({ el, mark });
+    });
+  } else {
+    mobileMarks.splice(0).forEach(({ el, mark }) => mark.parentNode.replaceChild(el, mark));
+    menu.classList.add('hidden');
+  }
+}
+
 function fitBar() {
   const bar = $('controls');
   const cl = document.body.classList;
   cl.remove('fit-1', 'fit-2', 'fit-3', 'fit-4', 'fit-5', 'fit-wrap');
+  const mobile = window.innerWidth < 560;
+  cl.toggle('m-mobile', mobile);
+  if (mobile) { placeOverflow(false); placeMobile(true); return; }
+  placeMobile(false);
   placeOverflow(false);
-  if (window.innerWidth < 560 || currentBarMode !== 'full') return;
+  if (currentBarMode !== 'full') return;
   const over = () => bar.scrollWidth > bar.clientWidth + 1;
   for (let lvl = 1; lvl <= 5 && over(); lvl++) {
     cl.add('fit-' + lvl);
