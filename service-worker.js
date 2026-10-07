@@ -1,5 +1,5 @@
 // service-worker.js
-const CACHE_NAME = 'ditado-cache-v10';
+const CACHE_NAME = 'ditado-cache-v11';
 const ASSETS = [
   '.',
   './index.html',
