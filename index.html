@@ -1899,7 +1899,7 @@ async function transcribeWithGroq(audioBlob) {
   const apiKey = localStorage.getItem(STORAGE_KEYS.AI_KEY);
   const formData = new FormData();
   formData.append('file', audioBlob, 'speech.webm');
-  formData.append('model', 'whisper-large-v3-turbo');
+  formData.append('model', 'whisper-large-v3');
   formData.append('language', 'pt');
 
   try {
