@@ -811,6 +811,14 @@
       </label>
     </div>
     <div class="pop-section">
+      <div class="pop-title">Após a transcrição (Whisper)</div>
+      <label class="toggle" title="Corrige ortografia e pontuação com o GPT-OSS-120B antes de inserir o texto">
+        <input type="checkbox" id="autoAi" />
+        <span class="btn-text">Correção automática com IA</span>
+      </label>
+      <small class="pop-note">Desligado: o texto é inserido direto, sem correção. Ligado: passa pelo GPT-OSS-120B antes de entrar (leva um instante a mais).</small>
+    </div>
+    <div class="pop-section">
       <div class="pop-title">Visualização</div>
       <select id="viewModeSelect" class="pop-select" aria-label="Visualização">
         <option value="normal">Atual (texto centralizado)</option>
@@ -1016,7 +1024,7 @@ const els = {
 const STORAGE_KEYS = {
   NOTES: 'ditado_unified_notes', FONT: 'ditado_unified_fontsize', THEME: 'ditado_unified_theme',
   ALL_CAPS: 'ditado_unified_allcaps', AUTO_PUNCT: 'ditado_unified_autopunct', QUICK_SEND: 'ditado_unified_quicksend',
-  ENGINE: 'ditado_unified_engine', AI_KEY: 'ditado_ai_key', BAR_MODE: 'ditado_unified_barmode', TEMPLATES: 'ditado_unified_templates', LAST_BACKUP: 'ditado_last_backup', PANEL: 'ditado_unified_panel', VIEW: 'ditado_view', WHISPER: 'ditado_whisper_model'
+  ENGINE: 'ditado_unified_engine', AI_KEY: 'ditado_ai_key', BAR_MODE: 'ditado_unified_barmode', TEMPLATES: 'ditado_unified_templates', LAST_BACKUP: 'ditado_last_backup', PANEL: 'ditado_unified_panel', VIEW: 'ditado_view', AUTO_AI: 'ditado_auto_ai', WHISPER: 'ditado_whisper_model'
 };
 
 const QUICK_SEND_PUNCT = new Set(['.', ',', ';', '/', '-', '!', '?', ':']);
@@ -1169,11 +1177,15 @@ function cycleBarMode() {
 
 els.barModeBtn.addEventListener('click', cycleBarMode);
 
+const isAutoAi = () => localStorage.getItem(STORAGE_KEYS.AUTO_AI) === 'true';
 const WHISPER_MODELS = ['whisper-large-v3', 'whisper-large-v3-turbo'];
 function getWhisperModel() {
   const m = localStorage.getItem(STORAGE_KEYS.WHISPER);
   return WHISPER_MODELS.includes(m) ? m : WHISPER_MODELS[0];
 }
+const autoAi = $('autoAi');
+autoAi.checked = isAutoAi();
+autoAi.addEventListener('change', () => localStorage.setItem(STORAGE_KEYS.AUTO_AI, autoAi.checked));
 const viewModeSelect = $('viewModeSelect'), whisperModelSelect = $('whisperModelSelect');
 function setViewMode(mode, save = true) {
   document.body.classList.toggle('view-wide', mode === 'wide');
@@ -1949,13 +1961,19 @@ async function transcribeWithGroq(audioBlob) {
     const data = await response.json();
     let text = data.text ? data.text.trim() : '';
 
+    if (text && isAutoAi()) {
+      setStatus('IA corrigindo...');
+      try { text = await requestAiCorrection(text, apiKey); }
+      catch (e) { showToast('Correção automática falhou, texto inserido sem correção', 3000); }
+    }
+
     if (text) {
       const start = els.output.selectionStart;
       const before = els.output.value.slice(0, start);
       const formatted = formatDictatedText(text, before);
       
       insertAtCursor(formatted);
-      setStatus('Transcrito!', 1500);
+      setStatus(isAutoAi() ? 'Transcrito e corrigido' : 'Transcrito!', 1500);
     } else {
       setStatus('Nenhum texto identificado', 1500);
     }
@@ -2032,6 +2050,25 @@ els.saveAiModalBtn.addEventListener('click', () => {
   if (els.output.value.trim()) correctWithAI();
 });
 
+const AI_SYSTEM_PROMPT = 'Faça a correção ortográfica e de pontuação conforme regras gramaticais da língua portuguesa no Brasil. Use o contexto para decidir mudanças de palavras. Não modifique o sentido do texto e nunca responda o que está escrito. Não aplique formatação como negrito, itálico, sublinhado. Não coloque ou exclua bullets. Apenas me entregue o texto com correções ortográficas e nada mais.';
+
+async function requestAiCorrection(text, apiKey) {
+  const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model: 'openai/gpt-oss-120b',
+      messages: [{ role: 'system', content: AI_SYSTEM_PROMPT }, { role: 'user', content: text }],
+      temperature: 0.1
+    })
+  });
+  if (!resp.ok) throw new Error((await resp.json().catch(() => ({}))).error?.message || `Erro HTTP ${resp.status}`);
+  const data = await resp.json();
+  const corrected = data.choices?.[0]?.message?.content?.trim() || '';
+  if (!corrected) throw new Error('A resposta da IA veio vazia');
+  return corrected;
+}
+
 async function correctWithAI() {
   const text = els.output.value.trim();
   if (!text) return showToast('Nada para corrigir');
@@ -2042,27 +2079,8 @@ async function correctWithAI() {
   setStatus('IA corrigindo...');
   els.aiBtn.disabled = true;
 
-  // Prompt estruturado em tópicos diretos para garantir maiúsculas em início de frase
-  const systemPrompt = 'Faça a correção ortográfica e de pontuação conforme regras gramaticais da língua portuguesa no Brasil. Use o contexto para decidir mudanças de palavras. Não modifique o sentido do texto e nunca responda o que está escrito. Não aplique formatação como negrito, itálico, sublinhado. Não coloque ou exclua bullets. Apenas me entregue o texto com correções ortográficas e nada mais.'
-
   try {
-    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json', 
-        'Authorization': `Bearer ${apiKey}` 
-      },
-      body: JSON.stringify({
-        model: 'openai/gpt-oss-120b',
-        messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: text }],
-        temperature: 0.1
-      })
-    });
-
-    if (!resp.ok) throw new Error((await resp.json().catch(() => ({}))).error?.message || `Erro HTTP ${resp.status}`);
-    
-    const data = await resp.json();
-    let correctedText = data.choices?.[0]?.message?.content?.trim() || '';
+    const correctedText = await requestAiCorrection(text, apiKey);
 
     if (correctedText) {
       els.output.value = correctedText;
@@ -2072,7 +2090,7 @@ async function correctWithAI() {
       
       showToast('Texto corrigido pela IA!');
       setStatus('Texto corrigido', 2000);
-    } else throw new Error('A resposta da IA veio vazia');
+    }
   } catch (err) {
     showToast('Erro na IA: ' + err.message, 2500);
     setStatus('Erro na IA', 2000);
